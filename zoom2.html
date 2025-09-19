@@ -44,14 +44,14 @@ const img = document.getElementById('zoomImage');
 
 let scale = 1;
 const zoomStep = 0.1;
-const padding = 200;
+const padding = 200; // extra scrollable space around edges
 
 function updateBounds() {
   const imgWidth = img.naturalWidth * scale;
   const imgHeight = img.naturalHeight * scale;
 
-  img.style.width = imgWidth + 'px';
-  img.style.height = imgHeight + 'px';
+  img.style.width = img.naturalWidth * scale + 'px';
+  img.style.height = img.naturalHeight * scale + 'px';
 
   const maxScrollX = imgWidth + padding - container.clientWidth;
   const maxScrollY = imgHeight + padding - container.clientHeight;
@@ -60,6 +60,7 @@ function updateBounds() {
   container.scrollTop = Math.min(Math.max(container.scrollTop, -padding), maxScrollY);
 }
 
+// Center image on load
 function centerImage() {
   const viewportWidth = container.clientWidth;
   const viewportHeight = container.clientHeight;
@@ -67,19 +68,21 @@ function centerImage() {
   const imgWidth = img.naturalWidth * scale;
   const imgHeight = img.naturalHeight * scale;
 
-  const startX = Math.max((imgWidth - viewportWidth)/2, 0);
-  const startY = Math.max((imgHeight - viewportHeight)/2, 0);
+  const startX = Math.max((imgWidth - viewportWidth) / 2, 0);
+  const startY = Math.max((imgHeight - viewportHeight) / 2, 0);
 
   container.scrollLeft = startX;
   container.scrollTop = startY;
 }
 
+// Initialize
 window.addEventListener('load', () => {
   img.style.left = padding + 'px';
   img.style.top = padding + 'px';
   centerImage();
 });
 
+// Zoom with Ctrl/Cmd + scroll
 window.addEventListener('wheel', e => {
   if (e.ctrlKey || e.metaKey) {
     e.preventDefault();

@@ -3,118 +3,77 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kiss The Ring 2025 - Zoom</title>
+<title>Kiss The Ring 2025</title>
 <style>
-  html, body {
+  body {
+    display: flex;
     margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
+    font-family: Helvetica, Arial, sans-serif;
+    height: 100vh;
     overflow: hidden;
-    background: #000; /* black background */
+    background: #fff;
   }
 
-  #container {
+  .info-container {
+    width: 30%;
+    padding: 40px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: #f5f5f5;
+  }
+
+  .info-container h1 {
+    margin: 0 0 10px 0;
+    font-size: 2em;
+  }
+
+  .info-container p {
+    margin: 5px 0;
+    color: #333;
+  }
+
+  .image-area {
+    width: 70%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    overflow: hidden;
+    background: #000; /* makes image pop */
+  }
+
+  .image-area img {
     width: 100%;
     height: 100%;
-    overflow: auto;
-    position: relative;
-    background: #000;
+    object-fit: contain;
+    transition: transform 0.3s ease;
   }
 
-  #zoomImage {
-    display: block;
-    transform-origin: top left;
-    transition: transform 0.3s ease;
-    position: absolute;
-    user-select: none;
-    -webkit-user-drag: none;
+  .image-area img:hover {
+    transform: scale(1.05);
   }
 </style>
 </head>
 <body>
 
-<div id="container">
-  <img src="hhttps://i.imgur.com/5jTEm6F.jpeg" id="zoomImage" alt="NO SMOKING 2025">
-</div>
+  <div class="info-container">
+    <h1>Kiss The Ring 2025</h1>
+    <p><strong>Digital Painting</strong></p>
+    <p>The hand of harsh reality.</p>
+  </div>
+
+  <div class="image-area">
+    <img src="https://i.imgur.com/RaeVRby.jpeg" alt="Kiss The Ring 2025" id="mainImage">
+  </div>
 
 <script>
-const container = document.getElementById('container');
-const img = document.getElementById('zoomImage');
-
-let scale = 1;
-const zoomStep = 0.1;
-const padding = 200; // extra scrollable space around edges
-
-function updateBounds() {
-  const imgWidth = img.naturalWidth * scale;
-  const imgHeight = img.naturalHeight * scale;
-
-  img.style.width = img.naturalWidth * scale + 'px';
-  img.style.height = img.naturalHeight * scale + 'px';
-
-  // Clamp scroll
-  const maxScrollX = imgWidth + padding - container.clientWidth;
-  const maxScrollY = imgHeight + padding - container.clientHeight;
-
-  container.scrollLeft = Math.min(Math.max(container.scrollLeft, -padding), maxScrollX);
-  container.scrollTop = Math.min(Math.max(container.scrollTop, -padding), maxScrollY);
-}
-
-// Center image on load
-function centerImage() {
-  const viewportWidth = container.clientWidth;
-  const viewportHeight = container.clientHeight;
-
-  const imgWidth = img.naturalWidth * scale;
-  const imgHeight = img.naturalHeight * scale;
-
-  const startX = Math.max((imgWidth - viewportWidth)/2, 0);
-  const startY = Math.max((imgHeight - viewportHeight)/2, 0);
-
-  container.scrollLeft = startX;
-  container.scrollTop = startY;
-}
-
-// Initialize
-window.addEventListener('load', () => {
-  img.style.left = padding + 'px';
-  img.style.top = padding + 'px';
-  centerImage();
-});
-
-// Zoom with Ctrl/Cmd + scroll
-window.addEventListener('wheel', e => {
-  if (e.ctrlKey || e.metaKey) {
-    e.preventDefault();
-
-    const oldWidth = img.offsetWidth;
-    const oldHeight = img.offsetHeight;
-
-    // Adjust scale
-    const newScale = scale + (e.deltaY < 0 ? zoomStep : -zoomStep);
-    const minScale = container.clientHeight / img.naturalHeight; // prevent zooming out too much
-    scale = Math.max(newScale, minScale);
-
-    // Apply new width and height
-    img.style.width = img.naturalWidth * scale + 'px';
-    img.style.height = img.naturalHeight * scale + 'px';
-
-    // Maintain cursor position relative to image
-    const rect = img.getBoundingClientRect();
-    const offsetX = e.clientX - rect.left;
-    const offsetY = e.clientY - rect.top;
-
-    container.scrollLeft += offsetX * (scale - (oldWidth / img.naturalWidth));
-    container.scrollTop += offsetY * (scale - (oldHeight / img.naturalHeight));
-
-    // Update bounds
-    updateBounds();
-  }
-}, { passive: false });
-
-// Optional: re-center on window resize
-window.addEventListener('resize', centerImage);
+  // Clicking the image redirects to zoom page
+  const img = document.getElementById('mainImage');
+  img.addEventListener('click', () => {
+    window.location.href = 'zoom2.html';
+  });
 </script>
 
 </body>
