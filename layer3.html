@@ -1,138 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>No Smoking 2025 - Jacob Samuel Kelly</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      font-family: Helvetica, Arial, sans-serif;
-      height: 100%;
-      width: 100%;
-      background: #fff;
-      color: #111;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kiss The Ring 2025</title>
+<style>
+  body {
+    display: flex;
+    margin: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #000; /* entire background black */
+    color: #fff;            /* default text color white */
+  }
 
+  /* LEFT PANEL */
+  .info-container {
+    width: 30%;
+    padding: 40px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #000; /* black panel */
+    color: #fff;            /* white text */
+  }
+
+  .info-container h1 {
+    margin: 0 0 10px 0;
+    font-size: clamp(1.5rem, 5vw, 2em); /* scales for responsiveness */
+    color: #fff;
+  }
+
+  .info-container p {
+    margin: 5px 0;
+    color: #fff;
+    font-size: clamp(0.9rem, 2.5vw, 1.2em);
+    line-height: 1.4;
+  }
+
+  /* RIGHT IMAGE AREA */
+  .image-area {
+    width: 70%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    overflow: hidden;
+    background-color: #000; /* make it black too */
+  }
+
+  .image-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+  }
+
+  .image-area img:hover {
+    transform: scale(1.05);
+  }
+
+  /* RESPONSIVE LAYOUT */
+  @media (max-width: 768px) {
     body {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
+      flex-direction: column;
+      height: auto;
     }
-
-    .text-area {
-      width: 30%;
-      padding: 40px;
-      box-sizing: border-box;
-      font-size: 1em;
-      line-height: 1.6;
-      color: #555;
-      overflow-y: auto;
-      height: 100vh;
+    .info-container, .image-area {
+      width: 100%;
+      padding: 20px;
     }
-
     .image-area {
-      width: 70%;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
+      height: 50vh;
     }
-
-    .image-area img {
-      display: block;
-      max-width: 100%;
-      max-height: 100%;
-      cursor: zoom-in;
-      transition: transform 0.5s ease;
-      transform-origin: top left;
-    }
-
-    a.back {
-      display: inline-block;
-      margin-top: 20px;
-      text-decoration: none;
-      color: #111;
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
-
-    @media(max-width:900px){
-      body { flex-direction: column; }
-      .text-area { width: 90%; height: auto; }
-      .image-area { width: 90%; margin-top: 20px; height: auto; }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <div class="text-area">
-    <h1>No Smoking 2025</h1>
+
+  <div class="info-container">
+    <h1>Kiss The Ring 2025</h1>
     <p><strong>Digital Painting</strong></p>
-    <p>Praying Mantis, Graffiti, waiting room.</p>
-    <a href="index.html" class="back">← Back to Portfolio</a>
+    <p>The hand of harsh reality.</p>
   </div>
 
   <div class="image-area">
-    <img src="images/layer1.png" alt="No Smoking 2025">
+    <img src="https://i.imgur.com/RaeVRby.jpeg" alt="Kiss The Ring 2025" id="mainImage">
   </div>
 
-  <script>
-    const img = document.querySelector('.image-area img');
-    const container = img.parentElement;
-    let zoomed = false;
-    const scale = 4;
+<script>
+  // Clicking the image goes to zoom page
+  const img = document.getElementById('mainImage');
+  img.addEventListener('click', () => {
+    window.location.href = 'zoom2.html';
+  });
+</script>
 
-img.addEventListener('click', (e) => {
-  if (!zoomed) {
-    // Zoom in at cursor
-    const rect = img.getBoundingClientRect();
-    const offsetX = (e.clientX - rect.left) / rect.width;
-    const offsetY = (e.clientY - rect.top) / rect.height;
-
-    container.style.overflow = 'auto';
-    img.style.transformOrigin = `${offsetX * 100}% ${offsetY * 100}%`;
-    img.style.transform = `scale(${scale})`;
-    container.scrollLeft = img.offsetWidth * scale * offsetX - (e.clientX - container.getBoundingClientRect().left);
-    container.scrollTop = img.offsetHeight * scale * offsetY - (e.clientY - container.getBoundingClientRect().top);
-    img.style.cursor = 'zoom-out';
-    zoomed = true;
-  } else {
-    // Close lightbox: just reset zoom
-    img.style.transform = 'scale(1)';
-    container.style.overflow = 'hidden';
-    img.style.cursor = 'zoom-in';
-    zoomed = false;
-  }
-});
-    // Drag-to-pan
-    let isDragging = false, startX, startY, scrollLeft, scrollTop;
-
-    container.addEventListener('mousedown', (e) => {
-      if (!zoomed) return;
-      isDragging = true;
-      startX = e.pageX - container.offsetLeft;
-      startY = e.pageY - container.offsetTop;
-      scrollLeft = container.scrollLeft;
-      scrollTop = container.scrollTop;
-      container.style.cursor = 'grabbing';
-    });
-
-    container.addEventListener('mouseup', () => { isDragging = false; container.style.cursor = zoomed ? 'zoom-out' : 'zoom-in'; });
-    container.addEventListener('mouseleave', () => { isDragging = false; container.style.cursor = zoomed ? 'zoom-out' : 'zoom-in'; });
-
-    container.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      e.preventDefault();
-      const x = e.pageX - container.offsetLeft;
-      const y = e.pageY - container.offsetTop;
-      container.scrollLeft = scrollLeft - (x - startX);
-      container.scrollTop = scrollTop - (y - startY);
-    });
-  </script>
 </body>
 </html>
