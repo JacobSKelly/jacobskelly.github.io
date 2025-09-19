@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>No Smoking 2025 - Jacob Samuel Kelly</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Helvetica, Arial, sans-serif;
+      height: 100%;
+      width: 100%;
+      background: #fff;
+      color: #111;
+    }
+
+    body {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .text-area {
+      width: 30%;
+      padding: 40px;
+      box-sizing: border-box;
+      font-size: 1em;
+      line-height: 1.6;
+      color: #555;
+      overflow-y: auto;
+      height: 100vh;
+    }
+
+    .image-area {
+      width: 70%;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .image-area img {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      cursor: zoom-in;
+      transition: transform 0.5s ease;
+      transform-origin: top left;
+    }
+
+    a.back {
+      display: inline-block;
+      margin-top: 20px;
+      text-decoration: none;
+      color: #111;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    @media(max-width:900px){
+      body { flex-direction: column; }
+      .text-area { width: 90%; height: auto; }
+      .image-area { width: 90%; margin-top: 20px; height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="text-area">
+    <h1>No Smoking 2025</h1>
+    <p><strong>Digital Painting</strong></p>
+    <p>Praying Mantis, Graffiti, waiting room.</p>
+    <a href="index.html" class="back">← Back to Portfolio</a>
+  </div>
+
+  <div class="image-area">
+    <img src="images/layer1.png" alt="No Smoking 2025">
+  </div>
+
+  <script>
+    const img = document.querySelector('.image-area img');
+    const container = img.parentElement;
+    let zoomed = false;
+    const scale = 4;
+
+img.addEventListener('click', (e) => {
+  if (!zoomed) {
+    // Zoom in at cursor
+    const rect = img.getBoundingClientRect();
+    const offsetX = (e.clientX - rect.left) / rect.width;
+    const offsetY = (e.clientY - rect.top) / rect.height;
+
+    container.style.overflow = 'auto';
+    img.style.transformOrigin = `${offsetX * 100}% ${offsetY * 100}%`;
+    img.style.transform = `scale(${scale})`;
+    container.scrollLeft = img.offsetWidth * scale * offsetX - (e.clientX - container.getBoundingClientRect().left);
+    container.scrollTop = img.offsetHeight * scale * offsetY - (e.clientY - container.getBoundingClientRect().top);
+    img.style.cursor = 'zoom-out';
+    zoomed = true;
+  } else {
+    // Close lightbox: just reset zoom
+    img.style.transform = 'scale(1)';
+    container.style.overflow = 'hidden';
+    img.style.cursor = 'zoom-in';
+    zoomed = false;
+  }
+});
+    // Drag-to-pan
+    let isDragging = false, startX, startY, scrollLeft, scrollTop;
+
+    container.addEventListener('mousedown', (e) => {
+      if (!zoomed) return;
+      isDragging = true;
+      startX = e.pageX - container.offsetLeft;
+      startY = e.pageY - container.offsetTop;
+      scrollLeft = container.scrollLeft;
+      scrollTop = container.scrollTop;
+      container.style.cursor = 'grabbing';
+    });
+
+    container.addEventListener('mouseup', () => { isDragging = false; container.style.cursor = zoomed ? 'zoom-out' : 'zoom-in'; });
+    container.addEventListener('mouseleave', () => { isDragging = false; container.style.cursor = zoomed ? 'zoom-out' : 'zoom-in'; });
+
+    container.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const x = e.pageX - container.offsetLeft;
+      const y = e.pageY - container.offsetTop;
+      container.scrollLeft = scrollLeft - (x - startX);
+      container.scrollTop = scrollTop - (y - startY);
+    });
+  </script>
+</body>
+</html>
