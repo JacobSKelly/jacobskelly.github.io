@@ -3,98 +3,133 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kiss The Ring 2025</title>
+<title>Jacob Samuel Kelly - Artist Portfolio</title>
 <style>
-  body {
-    display: flex;
-    margin: 0;
-    font-family: Helvetica, Arial, sans-serif;
-    height: 100vh;
-    overflow: hidden;
-    background-color: #000; /* entire background black */
-    color: #fff;            /* default text color white */
-  }
+body {
+  margin: 0;
+  font-family: Helvetica, Arial, sans-serif;
+  background: #fff;
+  color: #111;
+  text-align: center;
+  overflow: hidden; /* Prevent scrolling by default */
+  height: 100vh;
+}
 
-  /* LEFT PANEL */
-  .info-container {
-    width: 30%;
-    padding: 40px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background-color: #000; /* black panel */
-    color: #fff;            /* white text */
-  }
+header {
+  padding: 50px 20px 20px 20px;
+  line-height: 1.2;
+}
 
-  .info-container h1 {
-    margin: 0 0 10px 0;
-    font-size: clamp(1.5rem, 5vw, 2em); /* scales for responsiveness */
-    color: #fff;
-  }
+header h1 {
+  font-size: 3em;
+  letter-spacing: 1.5px;
+  margin: 0 0 10px 0;
+}
 
-  .info-container p {
-    margin: 5px 0;
-    color: #fff;
-    font-size: clamp(0.9rem, 2.5vw, 1.2em);
-    line-height: 1.4;
-  }
+header p {
+  font-size: 1.1em;
+  color: #555;
+  margin: 0;
+  letter-spacing: 1px;
+}
 
-  /* RIGHT IMAGE AREA */
-  .image-area {
-    width: 70%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    overflow: hidden;
-    background-color: #000; /* make it black too */
-  }
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Three thumbnails */
+  gap: 20px;
+  max-width: 1200px;
+  margin: 20px auto 40px auto;
+  padding: 0 20px;
+}
 
-  .image-area img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: transform 0.3s ease;
-  }
+.gallery a {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1/1; /* square thumbnails */
+  background: #f5f5f5;
+  overflow: hidden;
+  text-decoration: none;
+}
 
-  .image-area img:hover {
-    transform: scale(1.05);
-  }
+.gallery a img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: bottom center;
+  display: block;
+}
 
-  /* RESPONSIVE LAYOUT */
-  @media (max-width: 768px) {
-    body {
-      flex-direction: column;
-      height: auto;
-    }
-    .info-container, .image-area {
-      width: 100%;
-      padding: 20px;
-    }
-    .image-area {
-      height: 50vh;
-    }
-  }
+.bio-container {
+  margin: 20px auto;
+  max-width: 800px;
+}
+
+.bio-container p {
+  white-space: pre-line;
+  font-size: 1.2em;
+  line-height: 1.6;
+  text-align: center;
+}
+
+footer {
+  font-size: 0.7em;
+  color: #777;
+  margin-bottom: 20px;
+}
+
+footer a {
+  color: #777;
+  text-decoration: none;
+}
 </style>
 </head>
 <body>
 
-  <div class="info-container">
-    <h1>Kiss The Ring 2025</h1>
-    <p><strong>Digital Painting</strong></p>
-    <p>The hand of harsh reality.</p>
-  </div>
+<header>
+  <h1>Jacob Samuel Kelly</h1>
+  <p>Jacob_Kelly@hotmail.co.uk / 07575722181 / Manchester</p>
+</header>
 
-  <div class="image-area">
-    <img src="https://i.imgur.com/RaeVRby.jpeg" alt="Kiss The Ring 2025" id="mainImage">
-  </div>
+<section class="gallery">
+  <a href="layer1.html"><img src="https://i.imgur.com/5jTEm6F.jpeg" alt="Artwork 1"></a>
+  <a href="layer2.html"><img src="https://i.imgur.com/RaeVRby.jpeg" alt="Artwork 2"></a>
+  <a href="layer3.html"><img src="https://i.imgur.com/eprCFiG.jpeg" alt="Artwork 3"></a>
+</section>
+
+<div class="bio-container">
+  <p>
+A body of work exploring irrepressible trauma. An attempt to uncover an
+unsettling realism in dream like imagery. Gleaned from the surface of the
+unconscious; a dark urgency for communication.
+  </p>
+</div>
+
+<footer>
+  <p>
+    <a href="https://www.instagram.com/the_fruit_that_ate_itself" target="_blank">@the_fruit_that_ate_itself</a><br>
+    53.4808° N, -2.2426° W
+  </p>
+</footer>
 
 <script>
-  // Clicking the image goes to zoom page
-  const img = document.getElementById('mainImage');
-  img.addEventListener('click', () => {
-    window.location.href = 'zoom2.html';
+  // Conditional scroll: only works while holding "5"
+  let allowScroll = false;
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === '5') allowScroll = true;
+  });
+
+  window.addEventListener('keyup', (e) => {
+    if (e.key === '5') allowScroll = false;
+  });
+
+  window.addEventListener('wheel', (e) => {
+    if (!allowScroll) e.preventDefault();
+  }, { passive: false });
+
+  window.addEventListener('keydown', (e) => {
+    const keys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'];
+    if (keys.includes(e.key) && !allowScroll) e.preventDefault();
   });
 </script>
 

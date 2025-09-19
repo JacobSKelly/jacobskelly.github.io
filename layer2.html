@@ -22,22 +22,25 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start; /* move text slightly higher */
+    margin-top: 20px;
     background-color: #000; /* black panel */
-    color: #fff;            /* white text */
+    color: #fff;
   }
 
   .info-container h1 {
-    margin: 0 0 10px 0;
-    font-size: clamp(1.5rem, 5vw, 2em); /* scales for responsiveness */
+    margin: 0 0 5px 0; /* smaller gap below heading */
+    font-size: clamp(1.8rem, 5vw, 2.2em); /* slightly larger for bold emphasis */
+    font-weight: 900; /* boldest for "Kiss The Ring" */
     color: #fff;
   }
 
   .info-container p {
-    margin: 5px 0;
+    margin: 2px 0; /* closer together */
+    font-size: clamp(1rem, 2.5vw, 1.2em);
+    line-height: 1.2; /* tighter lines */
+    font-weight: 600;  /* slightly thicker for visibility */
     color: #fff;
-    font-size: clamp(0.9rem, 2.5vw, 1.2em);
-    line-height: 1.4;
   }
 
   /* RIGHT IMAGE AREA */
@@ -48,7 +51,7 @@
     align-items: center;
     cursor: pointer;
     overflow: hidden;
-    background-color: #000; /* make it black too */
+    background-color: #000;
   }
 
   .image-area img {
@@ -81,13 +84,13 @@
 <body>
 
   <div class="info-container">
-    <h1>Kiss The Ring 2025</h1>
+    <h1>Kiss The Ring <span style="font-size:0.8em;">2025</span></h1>
     <p><strong>Digital Painting</strong></p>
-    <p>The hand of harsh reality.</p>
+    <p>The hand of harsh reality</p>
   </div>
 
   <div class="image-area">
-    <img src="https://i.imgur.com/RaeVRby.jpeg" alt="Kiss The Ring 2025" id="mainImage">
+    <img src="https://i.imgur.com/eprCFiG.jpeg" alt="Kiss The Ring 2025" id="mainImage">
   </div>
 
 <script>

@@ -11,33 +11,33 @@
     font-family: Helvetica, Arial, sans-serif;
     height: 100vh;
     overflow: hidden;
-    background-color: #000; /* entire background black */
-    color: #fff;            /* default text color white */
+    background-color: #000;
+    color: #fff;
   }
 
   /* LEFT PANEL */
   .info-container {
     width: 30%;
-    padding: 40px;
+    padding: 30px 40px; /* slightly less top padding to move text up */
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    background-color: #000; /* black panel */
-    color: #fff;            /* white text */
+    justify-content: flex-start; /* align text to top */
+    background-color: #000;
+    color: #fff;
   }
 
   .info-container h1 {
-    margin: 0 0 10px 0;
-    font-size: clamp(1.5rem, 5vw, 2em); /* scales for responsiveness */
+    margin: 0 0 5px 0; /* closer to next line */
+    font-size: clamp(1.5rem, 5vw, 2em);
     color: #fff;
   }
 
   .info-container p {
-    margin: 5px 0;
+    margin: 2px 0;      /* lines closer together */
     color: #fff;
     font-size: clamp(0.9rem, 2.5vw, 1.2em);
-    line-height: 1.4;
+    line-height: 1.2;   /* tighter line spacing */
   }
 
   /* RIGHT IMAGE AREA */
@@ -48,7 +48,7 @@
     align-items: center;
     cursor: pointer;
     overflow: hidden;
-    background-color: #000; /* make it black too */
+    background-color: #000;
   }
 
   .image-area img {
@@ -76,6 +76,19 @@
       height: 50vh;
     }
   }
+
+  /* DIAGNOSTIC TOOL */
+  #diagnostic {
+    position: fixed;
+    bottom: 5px;
+    right: 5px;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    padding: 5px 10px;
+    font-size: 0.8em;
+    border-radius: 5px;
+    z-index: 9999;
+  }
 </style>
 </head>
 <body>
@@ -87,8 +100,10 @@
   </div>
 
   <div class="image-area">
-    <img src="https://xlportplus.s3.eu-west-2.amazonaws.com/praying+hands+3.jpg" alt="No Smoking 2025" id="mainImage">
+    <img src="https://i.imgur.com/5jTEm6F.jpeg" alt="No Smoking 2025" id="mainImage">
   </div>
+
+<div id="diagnostic"></div>
 
 <script>
   // Clicking the image goes to zoom page
@@ -96,6 +111,27 @@
   img.addEventListener('click', () => {
     window.location.href = 'zoom1.html';
   });
+
+  // Diagnostic: outputs container position, height, line spacing
+  const diag = document.getElementById('diagnostic');
+  const infoContainer = document.querySelector('.info-container');
+
+  function updateDiagnostic() {
+    const rect = infoContainer.getBoundingClientRect();
+    const lines = infoContainer.querySelectorAll('h1, p');
+    let lineHeights = [];
+    lines.forEach(line => {
+      const lh = parseFloat(getComputedStyle(line).lineHeight);
+      lineHeights.push(lh);
+    });
+
+    diag.textContent = `
+Top: ${rect.top.toFixed(1)}px | Height: ${rect.height.toFixed(1)}px | Line Heights: ${lineHeights.map(h => h.toFixed(1)).join(', ')}
+    `;
+  }
+
+  window.addEventListener('resize', updateDiagnostic);
+  window.addEventListener('load', updateDiagnostic);
 </script>
 
 </body>
