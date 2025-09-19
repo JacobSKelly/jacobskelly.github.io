@@ -11,7 +11,7 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #000; /* Black background */
+    background: #000;
   }
 
   #container {
@@ -25,8 +25,8 @@
   #zoomImage {
     display: block;
     position: absolute;
-    top: 200px; /* initial padding from top */
-    left: 200px; /* initial padding from left */
+    top: 200px; /* initial padding */
+    left: 200px;
     transform-origin: top left;
     user-select: none;
     -webkit-user-drag: none;
@@ -55,30 +55,55 @@ function updateBounds() {
   img.style.width = imgWidth + 'px';
   img.style.height = imgHeight + 'px';
 
-  const maxScrollX = imgWidth + padding - container.clientWidth;
-  const maxScrollY = imgHeight + padding - container.clientHeight;
+  // If image smaller than container, center it using CSS
+  if (imgWidth < container.clientWidth) {
+    img.style.left = (container.clientWidth - imgWidth) / 2 + 'px';
+  } else {
+    img.style.left = padding + 'px';
+  }
 
-  container.scrollLeft = Math.min(Math.max(container.scrollLeft, -padding), maxScrollX);
-  container.scrollTop = Math.min(Math.max(container.scrollTop, -padding), maxScrollY);
+  if (imgHeight < container.clientHeight) {
+    img.style.top = (container.clientHeight - imgHeight) / 2 + 'px';
+  } else {
+    img.style.top = padding + 'px';
+  }
+
+  // Only scroll if image bigger than container
+  let maxScrollX = imgWidth + padding - container.clientWidth;
+  let maxScrollY = imgHeight + padding - container.clientHeight;
+
+  if (imgWidth > container.clientWidth) {
+    container.scrollLeft = Math.min(Math.max(container.scrollLeft, -padding), maxScrollX);
+  }
+
+  if (imgHeight > container.clientHeight) {
+    container.scrollTop = Math.min(Math.max(container.scrollTop, -padding), maxScrollY);
+  }
 }
 
+// Keep initial zoomed-in position
 function centerImage() {
-  const viewportWidth = container.clientWidth;
-  const viewportHeight = container.clientHeight;
+  container.scrollLeft = padding;
+  container.scrollTop = padding;
+}
 
-  const imgWidth = img.naturalWidth * scale;
-  const imgHeight = img.naturalHeight * scale;
+// Optional: center fully zoomed out image
+function centerFullZoomOut() {
+  scale = Math.min(container.clientWidth / img.naturalWidth, container.clientHeight / img.naturalHeight);
+  img.style.width = img.naturalWidth * scale + 'px';
+  img.style.height = img.naturalHeight * scale + 'px';
 
-  const startX = Math.max((imgWidth - viewportWidth) / 2, 0);
-  const startY = Math.max((imgHeight - viewportHeight) / 2, 0);
+  img.style.left = (container.clientWidth - img.naturalWidth * scale) / 2 + 'px';
+  img.style.top = (container.clientHeight - img.naturalHeight * scale) / 2 + 'px';
 
-  container.scrollLeft = startX;
-  container.scrollTop = startY;
+  container.scrollLeft = 0;
+  container.scrollTop = 0;
 }
 
 // Initialize
 window.addEventListener('load', () => {
   centerImage();
+  updateBounds();
 });
 
 // Zoom with Ctrl/Cmd + scroll
@@ -107,7 +132,37 @@ window.addEventListener('wheel', e => {
   }
 }, { passive: false });
 
-window.addEventListener('resize', centerImage);
+window.addEventListener('resize', updateBounds);
+</script>
+
+// Debug function to diagnose centering
+function debugCentering() {
+  const containerWidth = container.clientWidth;
+  const containerHeight = container.clientHeight;
+  const imgWidth = img.offsetWidth;
+  const imgHeight = img.offsetHeight;
+
+  const scrollX = (imgWidth - containerWidth) / 2;
+  const scrollY = (imgHeight - containerHeight) / 2;
+
+  console.log("----- DEBUG CENTERING -----");
+  console.log("Container size:", containerWidth, containerHeight);
+  console.log("Image size:", imgWidth, imgHeight);
+  console.log("Calculated scroll positions:", scrollX, scrollY);
+  console.log("Current scroll positions:", container.scrollLeft, container.scrollTop);
+}
+
+// Initialize
+window.addEventListener('load', () => {
+  centerImage();
+  debugCentering();
+});
+
+// Also debug on resize
+window.addEventListener('resize', () => {
+  centerImage();
+  debugCentering();
+});
 </script>
 
 </body>
