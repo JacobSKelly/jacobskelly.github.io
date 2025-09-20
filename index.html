@@ -5,20 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jacob Samuel Kelly - Stone Letters</title>
 <style>
-:root {
-  --bio-vertical-offset: 6vh;
+/* -------------------------
+   CSS Reset for Consistency
+------------------------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-body {
-  margin: 0;
+html, body {
+  width: 100%;
+  height: 100%;
   font-family: Helvetica, Arial, sans-serif;
+  overflow: hidden;
   background: #fff;
   color: #111;
   text-align: center;
-  height: 100vh;
+}
+
+/* -------------------------
+   Page Layout
+------------------------- */
+:root { --bio-vertical-offset: 6vh; }
+
+body {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 header {
@@ -67,7 +80,6 @@ header h1, header p {
 .bio-container p {
   font-size: 1.6vh;
   line-height: 1.4;
-  margin: 0;
   max-width: 40ch;
   text-align: justify;
   text-align-last: left;
@@ -86,7 +98,7 @@ footer a {
   text-decoration: none;
 }
 
-/* Letters that can be pushed */
+/* Tangible Letters */
 .stone span {
   display: inline-block;
   position: relative;
@@ -94,10 +106,10 @@ footer a {
   will-change: transform;
 }
 
-/* Invisible spacers between words */
+/* Invisible word spacers */
 .word-spacer {
   display: inline-block;
-  width: 0.3em; /* adjust to taste */
+  width: 0.3em;
 }
 </style>
 </head>
@@ -109,19 +121,13 @@ footer a {
 </header>
 
 <section class="gallery">
-  <a href="layer1.html">
-    <img src="https://i.imgur.com/5jTEm6F.jpeg" alt="Artwork 1">
-  </a>
-  <a href="layer2.html">
-    <img src="https://i.imgur.com/RaeVRby.jpeg" alt="Artwork 2">
-  </a>
-  <a href="layer3.html">
-    <img src="https://i.imgur.com/eprCFiG.jpeg" alt="Artwork 3">
-  </a>
+  <a href="layer1.html"><img src="https://i.imgur.com/5jTEm6F.jpeg" alt="Artwork 1"></a>
+  <a href="layer2.html"><img src="https://i.imgur.com/RaeVRby.jpeg" alt="Artwork 2"></a>
+  <a href="layer3.html"><img src="https://i.imgur.com/eprCFiG.jpeg" alt="Artwork 3"></a>
 </section>
 
 <div class="bio-container stone">
-  <p id="bioText">
+  <p>
     A body of work exploring irrepressible trauma. An attempt to uncover an unsettling realism in dream like imagery. Gleaned from the surface of the unconscious; a dark urgency for communication.
   </p>
 </div>
@@ -134,22 +140,34 @@ footer a {
 </footer>
 
 <script>
-// Wrap letters, preserving spaces and line breaks
+// --------------------------
+// Mobile Redirect
+// --------------------------
+if (/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+  window.location.href = 'og.html';
+}
+
+// --------------------------
+// Wrap letters & preserve spacing
+// --------------------------
 document.querySelectorAll('.stone').forEach(el => {
   const text = el.textContent.trim();
-  // Split into sentences by full stop, then words
-  const html = text.split('.').map(sentence => {
+  const html = text.split('.').map((sentence, index, arr) => {
     if(!sentence.trim()) return '';
     const words = sentence.trim().split(' ');
-    const wordSpans = words.map(word => {
-      return word.split('').map(c => `<span>${c}</span>`).join('') + '<span class="word-spacer"></span>';
-    });
-    return wordSpans.join('') + '.';
+    const wordSpans = words.map(word =>
+      word.split('').map(c => `<span>${c}</span>`).join('') + '<span class="word-spacer"></span>'
+    );
+    let sentenceHtml = wordSpans.join('');
+    if(index < arr.length - 1) sentenceHtml += '<span>.</span><span class="word-spacer"></span>';
+    return sentenceHtml;
   }).join('');
   el.innerHTML = html;
 });
 
-// Initialize letters
+// --------------------------
+// Initialize letters for interaction
+// --------------------------
 const letters = [];
 document.querySelectorAll('.stone span:not(.word-spacer)').forEach(span => {
   letters.push({el: span, x:0, y:0, vx:0, vy:0});
@@ -162,13 +180,14 @@ document.addEventListener('mousemove', e => {
   cursor.y = e.clientY;
 });
 
+// --------------------------
 // Main animation loop
+// --------------------------
 function updateLetters() {
   letters.forEach(letter => {
     const rect = letter.el.getBoundingClientRect();
     const cx = rect.left + rect.width/2;
     const cy = rect.top + rect.height/2;
-
     const dx = cx - cursor.x;
     const dy = cy - cursor.y;
     const dist = Math.sqrt(dx*dx + dy*dy);
@@ -181,7 +200,7 @@ function updateLetters() {
       letter.vy += Math.sin(angle) * strength;
     }
 
-    // Update position with velocity
+    // Update position
     letter.x += letter.vx;
     letter.y += letter.vy;
 
@@ -196,6 +215,16 @@ function updateLetters() {
 }
 
 updateLetters();
+
+// --------------------------
+// Background click redirect
+// --------------------------
+document.body.addEventListener('click', function(e) {
+  // Only redirect if click is outside links/images
+  if (!e.target.closest('a, img, span')) {
+    window.location.href = 'og.html';
+  }
+});
 </script>
 
 </body>

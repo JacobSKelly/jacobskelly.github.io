@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jacob Samuel Kelly - Artist Portfolio</title>
+<style>
+/* -------------------
+   Adjustable vertical position for bio text
+------------------- */
+:root {
+  --bio-vertical-offset: 6vh; /* ⬅️ change this to raise/lower the bio column */
+}
+
+body {
+  margin: 0;
+  font-family: Helvetica, Arial, sans-serif;
+  background: #fff;
+  color: #111;
+  text-align: center;
+  height: 100vh;              /* lock page height to viewport */
+  display: flex;
+  flex-direction: column;     /* stack vertically */
+  overflow: hidden;           /* prevent scrolling */
+}
+
+header {
+  flex: 0 0 auto;
+  padding: 2vh 20px 1vh 20px;
+  line-height: 1.2;
+}
+
+header h1 {
+  font-size: 4vh;
+  margin: 0 0 1vh 0;
+}
+
+header p {
+  font-size: 1.8vh;
+  color: #555;
+  margin: 0;
+}
+
+.gallery {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5vh;
+  max-width: 90vw;
+  margin: 0 auto;
+}
+
+.gallery a {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background: #f5f5f5;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.gallery a img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: bottom center;
+}
+
+.bio-container {
+  flex: 0 0 auto;
+  padding: 1vh 20px;
+  display: flex;
+  justify-content: center;           /* centers the column */
+  margin-top: var(--bio-vertical-offset);    /* adjustable vertical position */
+  margin-bottom: var(--bio-vertical-offset); /* adjustable vertical position */
+}
+
+.bio-container p {
+  font-size: 1.6vh;
+  line-height: 1.4;
+  margin: 0;
+  max-width: 40ch;                   /* column width */
+  text-align: justify;                  /* text alignment inside column */
+}
+
+footer {
+  flex: 0 0 auto;
+  font-size: 1.2vh;
+  color: #777;
+  padding: 1vh 0;
+}
+
+footer a {
+  color: #777;
+  text-decoration: none;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Jacob Samuel Kelly</h1>
+  <p>Jacob_Kelly@hotmail.co.uk / 07575722181 / Manchester</p>
+</header>
+
+<section class="gallery">
+  <a href="layer1.html">
+    <img src="https://i.imgur.com/5jTEm6F.jpeg" alt="Artwork 1">
+  </a>
+  <a href="layer2.html">
+    <img src="https://i.imgur.com/RaeVRby.jpeg" alt="Artwork 2">
+  </a>
+  <a href="layer3.html">
+    <img src="https://i.imgur.com/eprCFiG.jpeg" alt="Artwork 3">
+  </a>
+</section>
+
+<div class="bio-container">
+  <p>
+A body of work exploring irrepressible trauma. An attempt to uncover an
+unsettling realism in dream like imagery. Gleaned from the surface of the
+unconscious; a dark urgency for communication.
+  </p>
+</div>
+
+<footer>
+  <p>
+    <a href="https://www.instagram.com/the_fruit_that_ate_itself" target="_blank">@the_fruit_that_ate_itself</a><br>
+    53.4808° N, -2.2426° W
+  </p>
+</footer>
+
+</body>
+</html>
