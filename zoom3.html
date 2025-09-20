@@ -2,120 +2,28 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-<title>Kiss The Ring 2025 - Zoom</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Painting</title>
 <style>
   html, body {
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden;
     background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
-  #container {
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    position: relative;
-    background: #000;
-  }
-
-  #zoomImage {
+  img {
+    max-width: 100%;
+    max-height: 100%;
     display: block;
-    position: absolute;
-    transform-origin: top left;
-    user-select: none;
-    -webkit-user-drag: none;
-    transition: transform 0.3s ease;
   }
 </style>
 </head>
 <body>
-
-<div id="container">
-  <img src="https://i.imgur.com/eprCFiG.jpeg" id="zoomImage" alt="Seven Billion Tonne">
-</div>
-
-<script>
-const container = document.getElementById('container');
-const img = document.getElementById('zoomImage');
-
-let scale = 1;
-const zoomStep = 0.1;
-let minScale = 1;
-
-// Calculate initial scale to fit image in viewport
-function fitImage() {
-  const containerWidth = container.clientWidth;
-  const containerHeight = container.clientHeight;
-  const imgWidth = img.naturalWidth;
-  const imgHeight = img.naturalHeight;
-
-  // Fit image inside container
-  scale = Math.min(containerWidth / imgWidth, containerHeight / imgHeight);
-  minScale = scale;
-
-  img.style.width = imgWidth * scale + 'px';
-  img.style.height = imgHeight * scale + 'px';
-  img.style.left = (containerWidth - imgWidth * scale) / 2 + 'px';
-  img.style.top = (containerHeight - imgHeight * scale) / 2 + 'px';
-}
-
-// Update bounds if image smaller than container
-function updateBounds() {
-  const imgWidth = img.naturalWidth * scale;
-  const imgHeight = img.naturalHeight * scale;
-
-  if (imgWidth < container.clientWidth) {
-    img.style.left = (container.clientWidth - imgWidth) / 2 + 'px';
-  }
-
-  if (imgHeight < container.clientHeight) {
-    img.style.top = (container.clientHeight - imgHeight) / 2 + 'px';
-  }
-}
-
-// Zoom with Ctrl/Cmd + scroll
-window.addEventListener('wheel', e => {
-  if (e.ctrlKey || e.metaKey) {
-    e.preventDefault();
-
-    const oldWidth = img.offsetWidth;
-    const oldHeight = img.offsetHeight;
-
-    // Zoom in/out
-    let newScale = scale + (e.deltaY < 0 ? zoomStep : -zoomStep);
-    scale = Math.max(newScale, minScale); // cannot zoom out smaller than fit
-
-    img.style.width = img.naturalWidth * scale + 'px';
-    img.style.height = img.naturalHeight * scale + 'px';
-
-    // Keep cursor point fixed
-    const rect = img.getBoundingClientRect();
-    const offsetX = e.clientX - rect.left;
-    const offsetY = e.clientY - rect.top;
-
-    container.scrollLeft += offsetX * (scale - (oldWidth / img.naturalWidth));
-    container.scrollTop += offsetY * (scale - (oldHeight / img.naturalHeight));
-
-    updateBounds();
-  }
-}, { passive: false });
-
-// Initialize on load
-window.addEventListener('load', () => {
-  fitImage();
-  updateBounds();
-});
-
-// Recalculate on resize
-window.addEventListener('resize', () => {
-  fitImage();
-  updateBounds();
-});
-</script>
-
+  <img src="https://i.imgur.com/eprCFiG.jpeg" alt="Your Painting">
 </body>
 </html>

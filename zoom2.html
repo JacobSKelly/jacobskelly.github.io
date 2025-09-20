@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.1, maximum-scale=10, user-scalable=yes">
 <title>Kiss The Ring 2025 - Zoom</title>
 <style>
   html, body {
@@ -20,17 +20,18 @@
     overflow: auto;
     position: relative;
     background: #000;
+    touch-action: pan-x pan-y; /* mobile natural pinch/scroll */
   }
 
   #zoomImage {
     display: block;
     position: absolute;
-    top: 200px; /* initial padding */
+    top: 200px;
     left: 200px;
     transform-origin: top left;
     user-select: none;
     -webkit-user-drag: none;
-    transition: transform 0.3s ease;
+    will-change: transform; /* smoother animation */
   }
 </style>
 </head>
@@ -70,13 +71,8 @@ function updateBounds() {
   const maxScrollX = imgWidth + padding - container.clientWidth;
   const maxScrollY = imgHeight + padding - container.clientHeight;
 
-  if (imgWidth > container.clientWidth) {
-    container.scrollLeft = Math.min(Math.max(container.scrollLeft, -padding), maxScrollX);
-  }
-
-  if (imgHeight > container.clientHeight) {
-    container.scrollTop = Math.min(Math.max(container.scrollTop, -padding), maxScrollY);
-  }
+  container.scrollLeft = Math.min(Math.max(container.scrollLeft, -padding), maxScrollX);
+  container.scrollTop = Math.min(Math.max(container.scrollTop, -padding), maxScrollY);
 }
 
 function centerImage() {
@@ -84,19 +80,7 @@ function centerImage() {
   container.scrollTop = padding;
 }
 
-function centerFullZoomOut() {
-  scale = Math.min(container.clientWidth / img.naturalWidth, container.clientHeight / img.naturalHeight);
-  img.style.width = img.naturalWidth * scale + 'px';
-  img.style.height = img.naturalHeight * scale + 'px';
-
-  img.style.left = (container.clientWidth - img.naturalWidth * scale) / 2 + 'px';
-  img.style.top = (container.clientHeight - img.naturalHeight * scale) / 2 + 'px';
-
-  container.scrollLeft = 0;
-  container.scrollTop = 0;
-}
-
-// Zoom with Ctrl/Cmd + scroll
+// Zoom using Ctrl/Cmd + scroll, cursor-focused
 window.addEventListener('wheel', e => {
   if (e.ctrlKey || e.metaKey) {
     e.preventDefault();
@@ -105,7 +89,7 @@ window.addEventListener('wheel', e => {
     const oldHeight = img.offsetHeight;
 
     let newScale = scale + (e.deltaY < 0 ? zoomStep : -zoomStep);
-    const minScale = container.clientHeight / img.naturalHeight;
+    const minScale = 0.1; // allow extreme zoom out
     scale = Math.max(newScale, minScale);
 
     img.style.width = img.naturalWidth * scale + 'px';
@@ -119,38 +103,27 @@ window.addEventListener('wheel', e => {
     container.scrollTop += offsetY * (scale - (oldHeight / img.naturalHeight));
 
     updateBounds();
+
+    console.log("Zoom debug:", {
+      scale: scale.toFixed(2),
+      cursorX: e.clientX,
+      cursorY: e.clientY,
+      scrollLeft: container.scrollLeft,
+      scrollTop: container.scrollTop
+    });
   }
 }, { passive: false });
-
-// Debug function to diagnose centering
-function debugCentering() {
-  const containerWidth = container.clientWidth;
-  const containerHeight = container.clientHeight;
-  const imgWidth = img.offsetWidth;
-  const imgHeight = img.offsetHeight;
-
-  const scrollX = (imgWidth - containerWidth) / 2;
-  const scrollY = (imgHeight - containerHeight) / 2;
-
-  console.log("----- DEBUG CENTERING -----");
-  console.log("Container size:", containerWidth, containerHeight);
-  console.log("Image size:", imgWidth, imgHeight);
-  console.log("Calculated scroll positions:", scrollX, scrollY);
-  console.log("Current scroll positions:", container.scrollLeft, container.scrollTop);
-}
 
 // Initialize
 window.addEventListener('load', () => {
   centerImage();
   updateBounds();
-  debugCentering();
 });
 
-// Also debug on resize
+// Update on resize
 window.addEventListener('resize', () => {
   centerImage();
   updateBounds();
-  debugCentering();
 });
 </script>
 

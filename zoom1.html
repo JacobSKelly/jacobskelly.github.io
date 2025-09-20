@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=5.0, user-scalable=yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.1, maximum-scale=10, user-scalable=yes">
 <title>No Smoking 2025 - Zoom</title>
 <style>
   html, body {
@@ -10,9 +10,9 @@
     padding: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden; /* container scroll handles scrolling */
+    overflow: hidden;
     background: #000;
-    touch-action: none; /* needed for JS pinch handling */
+    touch-action: none;
   }
 
   #container {
@@ -31,7 +31,7 @@
     transform-origin: top left;
     user-select: none;
     -webkit-user-drag: none;
-    transition: transform 0.05s linear;
+    will-change: transform;
   }
 </style>
 </head>
@@ -58,8 +58,7 @@ function handleWheel(e) {
     const oldHeight = img.offsetHeight;
 
     let newScale = scale + (e.deltaY < 0 ? zoomStep : -zoomStep);
-    const minScale = container.clientHeight / img.naturalHeight;
-    scale = Math.max(newScale, minScale);
+    scale = Math.max(newScale, 0.1); // allow extreme zoom out
 
     img.style.width = img.naturalWidth * scale + 'px';
     img.style.height = img.naturalHeight * scale + 'px';
@@ -72,6 +71,14 @@ function handleWheel(e) {
     container.scrollTop += offsetY * (scale - (oldHeight / img.naturalHeight));
 
     updateBounds();
+
+    console.log("Zoom debug:", {
+      scale: scale.toFixed(2),
+      cursorX: e.clientX,
+      cursorY: e.clientY,
+      scrollLeft: container.scrollLeft,
+      scrollTop: container.scrollTop
+    });
   }
 }
 
@@ -86,10 +93,9 @@ container.addEventListener('touchmove', e => {
     const distance = Math.sqrt(dx*dx + dy*dy);
 
     if (lastDistance) {
-      let delta = (distance - lastDistance) / 200; // adjust sensitivity
+      let delta = (distance - lastDistance) / 200;
       scale += delta;
-      const minScale = container.clientHeight / img.naturalHeight;
-      scale = Math.max(scale, minScale);
+      scale = Math.max(scale, 0.1);
 
       img.style.width = img.naturalWidth * scale + 'px';
       img.style.height = img.naturalHeight * scale + 'px';
@@ -108,27 +114,14 @@ function updateBounds() {
   const imgWidth = img.naturalWidth * scale;
   const imgHeight = img.naturalHeight * scale;
 
-  if (imgWidth < container.clientWidth) {
-    img.style.left = (container.clientWidth - imgWidth)/2 + 'px';
-  } else {
-    img.style.left = padding + 'px';
-  }
-
-  if (imgHeight < container.clientHeight) {
-    img.style.top = (container.clientHeight - imgHeight)/2 + 'px';
-  } else {
-    img.style.top = padding + 'px';
-  }
+  img.style.left = imgWidth < container.clientWidth ? (container.clientWidth - imgWidth)/2 + 'px' : padding + 'px';
+  img.style.top = imgHeight < container.clientHeight ? (container.clientHeight - imgHeight)/2 + 'px' : padding + 'px';
 
   const maxScrollX = imgWidth + padding - container.clientWidth;
   const maxScrollY = imgHeight + padding - container.clientHeight;
 
-  if (imgWidth > container.clientWidth) {
-    container.scrollLeft = Math.min(Math.max(container.scrollLeft, -padding), maxScrollX);
-  }
-  if (imgHeight > container.clientHeight) {
-    container.scrollTop = Math.min(Math.max(container.scrollTop, -padding), maxScrollY);
-  }
+  container.scrollLeft = Math.min(Math.max(container.scrollLeft, -padding), maxScrollX);
+  container.scrollTop = Math.min(Math.max(container.scrollTop, -padding), maxScrollY);
 }
 
 // Initial zoomed-in position
@@ -152,12 +145,12 @@ window.addEventListener('load', () => {
   debugCentering();
 });
 
-// Event listeners
 window.addEventListener('resize', () => {
   centerImage();
   updateBounds();
   debugCentering();
 });
+
 window.addEventListener('wheel', handleWheel, { passive: false });
 </script>
 
