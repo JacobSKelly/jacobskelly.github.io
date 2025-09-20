@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>No Smoking 2025</title>
 <style>
-   body {
+  body {
     display: flex;
     margin: 0;
     font-family: Helvetica, Arial, sans-serif;
@@ -30,16 +30,16 @@
 
   .info-container h1 {
     margin: 0 0 5px 0; /* smaller gap below heading */
-    font-size: clamp(1.8rem, 5vw, 2.2em); /* slightly larger for bold emphasis */
-    font-weight: 900; /* boldest for "No Smoking" */
+    font-size: clamp(1.8rem, 5vw, 2.2em);
+    font-weight: 900;
     color: #fff;
   }
 
   .info-container p {
-    margin: 2px 0; /* closer together */
+    margin: 2px 0; 
     font-size: clamp(1rem, 2.5vw, 1.2em);
-    line-height: 1.2; /* tighter lines */
-    font-weight: 600;  /* slightly thicker for visibility */
+    line-height: 1.2;
+    font-weight: 600;  
     color: #fff;
   }
 
@@ -93,35 +93,12 @@
     <img src="https://i.imgur.com/5jTEm6F.jpeg" alt="No Smoking 2025" id="mainImage">
   </div>
 
-<div id="diagnostic"></div>
-
 <script>
   // Clicking the image goes to zoom page
   const img = document.getElementById('mainImage');
   img.addEventListener('click', () => {
     window.location.href = 'zoom1.html';
   });
-
-  // Diagnostic: outputs container position, height, line spacing
-  const diag = document.getElementById('diagnostic');
-  const infoContainer = document.querySelector('.info-container');
-
-  function updateDiagnostic() {
-    const rect = infoContainer.getBoundingClientRect();
-    const lines = infoContainer.querySelectorAll('h1, p');
-    let lineHeights = [];
-    lines.forEach(line => {
-      const lh = parseFloat(getComputedStyle(line).lineHeight);
-      lineHeights.push(lh);
-    });
-
-    diag.textContent = `
-Top: ${rect.top.toFixed(1)}px | Height: ${rect.height.toFixed(1)}px | Line Heights: ${lineHeights.map(h => h.toFixed(1)).join(', ')}
-    `;
-  }
-
-  window.addEventListener('resize', updateDiagnostic);
-  window.addEventListener('load', updateDiagnostic);
 </script>
 
 </body>
