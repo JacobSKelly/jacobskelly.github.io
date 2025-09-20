@@ -2,130 +2,30 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.1, maximum-scale=10, user-scalable=yes">
-<title>Kiss The Ring 2025 - Zoom</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Zoom 2</title>
 <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #000;
-  }
-
-  #container {
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    position: relative;
-    background: #000;
-    touch-action: pan-x pan-y; /* mobile natural pinch/scroll */
-  }
-
-  #zoomImage {
-    display: block;
-    position: absolute;
-    top: 200px;
-    left: 200px;
-    transform-origin: top left;
-    user-select: none;
-    -webkit-user-drag: none;
-    will-change: transform; /* smoother animation */
-  }
+  html, body { margin:0; padding:0; background:#000; height:100%; overflow:hidden; display:flex; justify-content:center; align-items:center; }
+  img { max-width:none; transition: transform 0.05s linear; touch-action:none; }
 </style>
 </head>
 <body>
-
-<div id="container">
-  <img src="https://i.imgur.com/RaeVRby.jpeg" id="zoomImage" alt="Kiss The Ring 2025">
-</div>
-
+<img src="https://i.imgur.com/eprCFiG.jpeg" id="img">
 <script>
-const container = document.getElementById('container');
-const img = document.getElementById('zoomImage');
+const img=document.getElementById('img');
+let scale=1, lastDist=0;
 
-let scale = 1;
-const zoomStep = 0.1;
-const padding = 200;
+window.addEventListener('wheel', e=>{ if(e.ctrlKey||e.metaKey){ e.preventDefault(); scale+=e.deltaY<0?0.1:-0.1; scale=Math.max(scale,0.1); img.style.transform=`scale(${scale})`; }},{passive:false});
 
-function updateBounds() {
-  const imgWidth = img.naturalWidth * scale;
-  const imgHeight = img.naturalHeight * scale;
-
-  img.style.width = imgWidth + 'px';
-  img.style.height = imgHeight + 'px';
-
-  if (imgWidth < container.clientWidth) {
-    img.style.left = (container.clientWidth - imgWidth) / 2 + 'px';
-  } else {
-    img.style.left = padding + 'px';
+window.addEventListener('touchmove', e=>{
+  if(e.touches.length===2){ e.preventDefault();
+    const dx=e.touches[0].clientX-e.touches[1].clientX, dy=e.touches[0].clientY-e.touches[1].clientY;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    if(lastDist){ scale += (dist-lastDist)/200; scale=Math.max(scale,0.1); img.style.transform=`scale(${scale})`; }
+    lastDist=dist;
   }
-
-  if (imgHeight < container.clientHeight) {
-    img.style.top = (container.clientHeight - imgHeight) / 2 + 'px';
-  } else {
-    img.style.top = padding + 'px';
-  }
-
-  const maxScrollX = imgWidth + padding - container.clientWidth;
-  const maxScrollY = imgHeight + padding - container.clientHeight;
-
-  container.scrollLeft = Math.min(Math.max(container.scrollLeft, -padding), maxScrollX);
-  container.scrollTop = Math.min(Math.max(container.scrollTop, -padding), maxScrollY);
-}
-
-function centerImage() {
-  container.scrollLeft = padding;
-  container.scrollTop = padding;
-}
-
-// Zoom using Ctrl/Cmd + scroll, cursor-focused
-window.addEventListener('wheel', e => {
-  if (e.ctrlKey || e.metaKey) {
-    e.preventDefault();
-
-    const oldWidth = img.offsetWidth;
-    const oldHeight = img.offsetHeight;
-
-    let newScale = scale + (e.deltaY < 0 ? zoomStep : -zoomStep);
-    const minScale = 0.1; // allow extreme zoom out
-    scale = Math.max(newScale, minScale);
-
-    img.style.width = img.naturalWidth * scale + 'px';
-    img.style.height = img.naturalHeight * scale + 'px';
-
-    const rect = img.getBoundingClientRect();
-    const offsetX = e.clientX - rect.left;
-    const offsetY = e.clientY - rect.top;
-
-    container.scrollLeft += offsetX * (scale - (oldWidth / img.naturalWidth));
-    container.scrollTop += offsetY * (scale - (oldHeight / img.naturalHeight));
-
-    updateBounds();
-
-    console.log("Zoom debug:", {
-      scale: scale.toFixed(2),
-      cursorX: e.clientX,
-      cursorY: e.clientY,
-      scrollLeft: container.scrollLeft,
-      scrollTop: container.scrollTop
-    });
-  }
-}, { passive: false });
-
-// Initialize
-window.addEventListener('load', () => {
-  centerImage();
-  updateBounds();
-});
-
-// Update on resize
-window.addEventListener('resize', () => {
-  centerImage();
-  updateBounds();
-});
+},{passive:false});
+window.addEventListener('touchend', e=>{ if(e.touches.length<2) lastDist=0; });
 </script>
-
 </body>
 </html>
