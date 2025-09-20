@@ -3,133 +3,101 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jacob Samuel Kelly - Artist Portfolio</title>
+<title>Seven Billion Tonne 2024</title>
 <style>
-body {
-  margin: 0;
-  font-family: Helvetica, Arial, sans-serif;
-  background: #fff;
-  color: #111;
-  text-align: center;
-  overflow: hidden; /* Prevent scrolling by default */
-  height: 100vh;
-}
+  body {
+    display: flex;
+    margin: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #000; /* entire background black */
+    color: #fff;            /* default text color white */
+  }
 
-header {
-  padding: 50px 20px 20px 20px;
-  line-height: 1.2;
-}
+  /* LEFT PANEL */
+  .info-container {
+    width: 30%;
+    padding: 40px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* move text slightly higher */
+    margin-top: 20px;
+    background-color: #000; /* black panel */
+    color: #fff;
+  }
 
-header h1 {
-  font-size: 3em;
-  letter-spacing: 1.5px;
-  margin: 0 0 10px 0;
-}
+  .info-container h1 {
+    margin: 0 0 5px 0; /* smaller gap below heading */
+    font-size: clamp(1.8rem, 5vw, 2.2em); /* slightly larger for bold emphasis */
+    font-weight: 900; /* boldest for "Seven Billion Tonne" */
+    color: #fff;
+  }
 
-header p {
-  font-size: 1.1em;
-  color: #555;
-  margin: 0;
-  letter-spacing: 1px;
-}
+  .info-container p {
+    margin: 2px 0; /* closer together */
+    font-size: clamp(1rem, 2.5vw, 1.2em);
+    line-height: 1.2; /* tighter lines */
+    font-weight: 600;  /* slightly thicker for visibility */
+    color: #fff;
+  }
 
-.gallery {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Three thumbnails */
-  gap: 20px;
-  max-width: 1200px;
-  margin: 20px auto 40px auto;
-  padding: 0 20px;
-}
+  /* RIGHT IMAGE AREA */
+  .image-area {
+    width: 70%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    overflow: hidden;
+    background-color: #000;
+  }
 
-.gallery a {
-  display: block;
-  width: 100%;
-  aspect-ratio: 1/1; /* square thumbnails */
-  background: #f5f5f5;
-  overflow: hidden;
-  text-decoration: none;
-}
+  .image-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+  }
 
-.gallery a img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: bottom center;
-  display: block;
-}
+  .image-area img:hover {
+    transform: scale(1.05);
+  }
 
-.bio-container {
-  margin: 20px auto;
-  max-width: 800px;
-}
-
-.bio-container p {
-  white-space: pre-line;
-  font-size: 1.2em;
-  line-height: 1.6;
-  text-align: center;
-}
-
-footer {
-  font-size: 0.7em;
-  color: #777;
-  margin-bottom: 20px;
-}
-
-footer a {
-  color: #777;
-  text-decoration: none;
-}
+  /* RESPONSIVE LAYOUT */
+  @media (max-width: 768px) {
+    body {
+      flex-direction: column;
+      height: auto;
+    }
+    .info-container, .image-area {
+      width: 100%;
+      padding: 20px;
+    }
+    .image-area {
+      height: 50vh;
+    }
+  }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Jacob Samuel Kelly</h1>
-  <p>Jacob_Kelly@hotmail.co.uk / 07575722181 / Manchester</p>
-</header>
+  <div class="info-container">
+    <h1>Seven Billion Tonne <span style="font-size:0.8em;">2024</span></h1>
+    <p><strong>Digital Painting</strong></p>
+    <p>The hand that ties the knot.</p>
+  </div>
 
-<section class="gallery">
-  <a href="layer1.html"><img src="https://i.imgur.com/5jTEm6F.jpeg" alt="Artwork 1"></a>
-  <a href="layer2.html"><img src="https://i.imgur.com/RaeVRby.jpeg" alt="Artwork 2"></a>
-  <a href="layer3.html"><img src="https://i.imgur.com/eprCFiG.jpeg" alt="Artwork 3"></a>
-</section>
-
-<div class="bio-container">
-  <p>
-A body of work exploring irrepressible trauma. An attempt to uncover an
-unsettling realism in dream like imagery. Gleaned from the surface of the
-unconscious; a dark urgency for communication.
-  </p>
-</div>
-
-<footer>
-  <p>
-    <a href="https://www.instagram.com/the_fruit_that_ate_itself" target="_blank">@the_fruit_that_ate_itself</a><br>
-    53.4808° N, -2.2426° W
-  </p>
-</footer>
+  <div class="image-area">
+    <img src="https://i.imgur.com/eprCFiG.jpeg" alt="Seven Billion Tonne 2024" id="mainImage">
+  </div>
 
 <script>
-  // Conditional scroll: only works while holding "5"
-  let allowScroll = false;
-
-  window.addEventListener('keydown', (e) => {
-    if (e.key === '5') allowScroll = true;
-  });
-
-  window.addEventListener('keyup', (e) => {
-    if (e.key === '5') allowScroll = false;
-  });
-
-  window.addEventListener('wheel', (e) => {
-    if (!allowScroll) e.preventDefault();
-  }, { passive: false });
-
-  window.addEventListener('keydown', (e) => {
-    const keys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'];
-    if (keys.includes(e.key) && !allowScroll) e.preventDefault();
+  // Clicking the image goes to zoom page
+  const img = document.getElementById('mainImage');
+  img.addEventListener('click', () => {
+    window.location.href = 'zoom3.html';
   });
 </script>
 

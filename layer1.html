@@ -5,39 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>No Smoking 2025</title>
 <style>
-  body {
+   body {
     display: flex;
     margin: 0;
     font-family: Helvetica, Arial, sans-serif;
     height: 100vh;
     overflow: hidden;
-    background-color: #000;
-    color: #fff;
+    background-color: #000; /* entire background black */
+    color: #fff;            /* default text color white */
   }
 
   /* LEFT PANEL */
   .info-container {
     width: 30%;
-    padding: 30px 40px; /* slightly less top padding to move text up */
+    padding: 40px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* align text to top */
-    background-color: #000;
+    justify-content: flex-start; /* move text slightly higher */
+    margin-top: 20px;
+    background-color: #000; /* black panel */
     color: #fff;
   }
 
   .info-container h1 {
-    margin: 0 0 5px 0; /* closer to next line */
-    font-size: clamp(1.5rem, 5vw, 2em);
+    margin: 0 0 5px 0; /* smaller gap below heading */
+    font-size: clamp(1.8rem, 5vw, 2.2em); /* slightly larger for bold emphasis */
+    font-weight: 900; /* boldest for "No Smoking" */
     color: #fff;
   }
 
   .info-container p {
-    margin: 2px 0;      /* lines closer together */
+    margin: 2px 0; /* closer together */
+    font-size: clamp(1rem, 2.5vw, 1.2em);
+    line-height: 1.2; /* tighter lines */
+    font-weight: 600;  /* slightly thicker for visibility */
     color: #fff;
-    font-size: clamp(0.9rem, 2.5vw, 1.2em);
-    line-height: 1.2;   /* tighter line spacing */
   }
 
   /* RIGHT IMAGE AREA */
@@ -76,25 +79,12 @@
       height: 50vh;
     }
   }
-
-  /* DIAGNOSTIC TOOL */
-  #diagnostic {
-    position: fixed;
-    bottom: 5px;
-    right: 5px;
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-    padding: 5px 10px;
-    font-size: 0.8em;
-    border-radius: 5px;
-    z-index: 9999;
-  }
 </style>
 </head>
 <body>
 
   <div class="info-container">
-    <h1>No Smoking 2025</h1>
+    <h1>No Smoking <span style="font-size:0.8em;">2025</span></h1>
     <p><strong>Digital Painting</strong></p>
     <p>Praying hands.</p>
   </div>
