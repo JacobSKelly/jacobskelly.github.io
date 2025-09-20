@@ -3,13 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jacob Samuel Kelly - Artist Portfolio</title>
+<title>Jacob Samuel Kelly - Stone Letters</title>
 <style>
-/* -------------------
-   Adjustable vertical position for bio text
-------------------- */
 :root {
-  --bio-vertical-offset: 6vh; /* ⬅️ change this to raise/lower the bio column */
+  --bio-vertical-offset: 6vh;
 }
 
 body {
@@ -18,10 +15,10 @@ body {
   background: #fff;
   color: #111;
   text-align: center;
-  height: 100vh;              /* lock page height to viewport */
+  height: 100vh;
   display: flex;
-  flex-direction: column;     /* stack vertically */
-  overflow: hidden;           /* prevent scrolling */
+  flex-direction: column;
+  overflow: hidden;
 }
 
 header {
@@ -30,15 +27,8 @@ header {
   line-height: 1.2;
 }
 
-header h1 {
-  font-size: 4vh;
-  margin: 0 0 1vh 0;
-}
-
-header p {
-  font-size: 1.8vh;
-  color: #555;
-  margin: 0;
+header h1, header p {
+  cursor: default;
 }
 
 .gallery {
@@ -69,17 +59,19 @@ header p {
   flex: 0 0 auto;
   padding: 1vh 20px;
   display: flex;
-  justify-content: center;           /* centers the column */
-  margin-top: var(--bio-vertical-offset);    /* adjustable vertical position */
-  margin-bottom: var(--bio-vertical-offset); /* adjustable vertical position */
+  justify-content: center;
+  margin-top: var(--bio-vertical-offset);
+  margin-bottom: var(--bio-vertical-offset);
 }
 
 .bio-container p {
   font-size: 1.6vh;
   line-height: 1.4;
   margin: 0;
-  max-width: 40ch;                   /* column width */
-  text-align: justify;                  /* text alignment inside column */
+  max-width: 40ch;
+  text-align: justify;
+  text-align-last: left;
+  letter-spacing: normal;
 }
 
 footer {
@@ -93,11 +85,25 @@ footer a {
   color: #777;
   text-decoration: none;
 }
+
+/* Letters that can be pushed */
+.stone span {
+  display: inline-block;
+  position: relative;
+  user-select: none;
+  will-change: transform;
+}
+
+/* Invisible spacers between words */
+.word-spacer {
+  display: inline-block;
+  width: 0.3em; /* adjust to taste */
+}
 </style>
 </head>
 <body>
 
-<header>
+<header class="stone">
   <h1>Jacob Samuel Kelly</h1>
   <p>Jacob_Kelly@hotmail.co.uk / 07575722181 / Manchester</p>
 </header>
@@ -114,20 +120,83 @@ footer a {
   </a>
 </section>
 
-<div class="bio-container">
-  <p>
-A body of work exploring irrepressible trauma. An attempt to uncover an
-unsettling realism in dream like imagery. Gleaned from the surface of the
-unconscious; a dark urgency for communication.
+<div class="bio-container stone">
+  <p id="bioText">
+    A body of work exploring irrepressible trauma. An attempt to uncover an unsettling realism in dream like imagery. Gleaned from the surface of the unconscious; a dark urgency for communication.
   </p>
 </div>
 
-<footer>
+<footer class="stone">
   <p>
     <a href="https://www.instagram.com/the_fruit_that_ate_itself" target="_blank">@the_fruit_that_ate_itself</a><br>
     53.4808° N, -2.2426° W
   </p>
 </footer>
+
+<script>
+// Wrap letters, preserving spaces and line breaks
+document.querySelectorAll('.stone').forEach(el => {
+  const text = el.textContent.trim();
+  // Split into sentences by full stop, then words
+  const html = text.split('.').map(sentence => {
+    if(!sentence.trim()) return '';
+    const words = sentence.trim().split(' ');
+    const wordSpans = words.map(word => {
+      return word.split('').map(c => `<span>${c}</span>`).join('') + '<span class="word-spacer"></span>';
+    });
+    return wordSpans.join('') + '.';
+  }).join('');
+  el.innerHTML = html;
+});
+
+// Initialize letters
+const letters = [];
+document.querySelectorAll('.stone span:not(.word-spacer)').forEach(span => {
+  letters.push({el: span, x:0, y:0, vx:0, vy:0});
+});
+
+// Cursor tracking
+let cursor = {x:0, y:0};
+document.addEventListener('mousemove', e => {
+  cursor.x = e.clientX;
+  cursor.y = e.clientY;
+});
+
+// Main animation loop
+function updateLetters() {
+  letters.forEach(letter => {
+    const rect = letter.el.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top + rect.height/2;
+
+    const dx = cx - cursor.x;
+    const dy = cy - cursor.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const radius = 30;
+
+    if(dist < radius){
+      const strength = (1 - dist/radius) * 1.5;
+      const angle = Math.atan2(dy, dx);
+      letter.vx += Math.cos(angle) * strength;
+      letter.vy += Math.sin(angle) * strength;
+    }
+
+    // Update position with velocity
+    letter.x += letter.vx;
+    letter.y += letter.vy;
+
+    // Friction
+    letter.vx *= 0.85;
+    letter.vy *= 0.85;
+
+    letter.el.style.transform = `translate(${letter.x}px, ${letter.y}px)`;
+  });
+
+  requestAnimationFrame(updateLetters);
+}
+
+updateLetters();
+</script>
 
 </body>
 </html>
