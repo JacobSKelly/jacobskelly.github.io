@@ -3,26 +3,44 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zoom 3</title>
+<title>Your Painting</title>
 <style>
-html,body{margin:0;padding:0;height:100%;background:#000;overflow:hidden;}
-#c{width:100%;height:100%;overflow:auto;position:relative;}
-#i{position:absolute;top:200px;left:200px;user-select:none;-webkit-user-drag:none;}
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  img {
+    display: block;
+    max-width: none; /* remove original scaling restriction */
+    max-height: none;
+    width: auto;
+    height: auto;
+    transform-origin: center center;
+  }
 </style>
 </head>
 <body>
-<div id="c">
-<img id="i" src="https://i.imgur.com/5jTEm6F.jpeg">
-</div>
+  <img src="https://xlportplus.s3.eu-west-2.amazonaws.com/PH3.jpg" alt="Your Painting" id="img">
 <script>
-const c=document.getElementById('c'), i=document.getElementById('i'); let s=1;
-c.addEventListener('wheel', e=>{ if(e.ctrlKey||e.metaKey){ e.preventDefault();
-  const ow=i.offsetWidth, oh=i.offsetHeight;
-  s+=e.deltaY<0?0.1:-0.1; s=Math.max(s,0.1);
-  i.style.width=i.naturalWidth*s+'px'; i.style.height=i.naturalHeight*s+'px';
-  const r=i.getBoundingClientRect();
-  c.scrollLeft+=e.clientX-(r.left), c.scrollTop+=e.clientY-(r.top);
-}},{passive:false});
+  const img = document.getElementById('img');
+
+  window.addEventListener('load', () => {
+    // Compute natural fit scale
+    const fitScale = Math.min(window.innerWidth / img.naturalWidth, window.innerHeight / img.naturalHeight);
+    // Double it
+    const scale = fitScale * 2;
+
+    // Apply scale
+    img.style.width = img.naturalWidth * scale + 'px';
+    img.style.height = img.naturalHeight * scale + 'px';
+  });
 </script>
 </body>
 </html>
