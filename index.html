@@ -1,143 +1,11 @@
-<!-- go fuck yourself -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jacob Samuel Kelly - Stone Letters</title>
 <style>
-/* -------------------------
-   CSS Reset for Consistency
-------------------------- */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html, body {
-  width: 100%;
-  height: 100%;
-  font-family: Helvetica, Arial, sans-serif;
-  overflow: hidden;
-  background: #fff;
-  color: #111;
-  text-align: center;
-}
-
-/* -------------------------
-   Page Layout
-------------------------- */
-:root { --bio-vertical-offset: 6vh; }
-
-body {
-  display: flex;
-  flex-direction: column;
-}
-
-header {
-  flex: 0 0 auto;
-  padding: 2vh 20px 1vh 20px;
-  line-height: 1.2;
-}
-
-header h1, header p {
-  cursor: default;
-}
-.gallery {
-  flex: 1 1 auto;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5vh;
-  max-width: 90vw;
-  margin: 0 auto;
-}
-
-.gallery a {
-  width: 100%;
-  aspect-ratio: 1/1;
-  background: #f5f5f5;
-  overflow: hidden;
-  text-decoration: none;
-}
-
-.gallery a img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: bottom center;
-}
-
-.bio-container {
-  flex: 0 0 auto;
-  padding: 1vh 20px;
-  display: flex;
-  justify-content: center;
-  margin-top: var(--bio-vertical-offset);
-  margin-bottom: var(--bio-vertical-offset);
-}
-
-.bio-container p {
-  font-size: 1.6vh;
-  line-height: 1.4;
-  max-width: 40ch;
-  text-align: justify;
-  text-align-last: left;
-  letter-spacing: normal;
-}
-
-footer {
-  flex: 0 0 auto;
-  font-size: 1.2vh;
-  color: #777;
-  padding: 1vh 0;
-}
-
-footer a {
-  color: #777;
-  text-decoration: none;
-}
-
-/* Tangible Letters */
 .stone span {
-  display: inline-block;
+  display: inline;       /* ✅ preserve normal text flow */
   position: relative;
   user-select: none;
   will-change: transform;
 }
-
-/* Invisible word spacers */
-.word-spacer {
-  display: inline-block;
-  width: 0.3em;
-}
 </style>
-</head>
-<body>
-
-<header class="stone">
-  <h1>Jacob Samuel Kelly</h1>
-  <p>Jacob_Kelly@hotmail.co.uk / 07575722181 / Manchester</p>
-</header>
-
-<section class="gallery">
-  <a href="layer1.html"><img src="https://i.imgur.com/5jTEm6F.jpeg" alt="Artwork 1"></a>
-  <a href="layer2.html"><img src="https://i.imgur.com/RaeVRby.jpeg" alt="Artwork 2"></a>
-  <a href="layer3.html"><img src="https://i.imgur.com/eprCFiG.jpeg" alt="Artwork 3"></a>
-</section>
-
-<div class="bio-container stone">
-  <p>
-    A body of work exploring irrepressible trauma. An attempt to uncover an unsettling realism in dream like imagery. Gleaned from the surface of the unconscious; a dark urgency for communication.
-  </p>
-</div>
-
-<footer class="stone">
-  <p>
-    <a href="https://www.instagram.com/the_fruit_that_ate_itself" target="_blank">@the_fruit_that_ate_itself</a><br>
-    53.4808° N, -2.2426° W
-  </p>
-</footer>
 
 <script>
 // --------------------------
@@ -148,20 +16,19 @@ if (/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigat
 }
 
 // --------------------------
-// Wrap letters & preserve spacing
+// Wrap letters & preserve spacing + layout
 // --------------------------
 document.querySelectorAll('.stone').forEach(el => {
   const text = el.textContent.trim();
-  const html = text.split('.').map((sentence, index, arr) => {
-    if(!sentence.trim()) return '';
-    const words = sentence.trim().split(' ');
-    const wordSpans = words.map(word =>
-      word.split('').map(c => `<span>${c}</span>`).join('') + '<span class="word-spacer"></span>'
-    );
-    let sentenceHtml = wordSpans.join('');
-    if(index < arr.length - 1) sentenceHtml += '<span>.</span><span class="word-spacer"></span>';
-    return sentenceHtml;
-  }).join('');
+
+  // Split into words, then characters
+  const words = text.split(' ');
+  const wordSpans = words.map(word =>
+    word.split('').map(c => `<span>${c}</span>`).join('') // wrap each letter
+  );
+
+  // Rejoin with real spaces
+  const html = wordSpans.join(' ');
   el.innerHTML = html;
 });
 
@@ -169,7 +36,7 @@ document.querySelectorAll('.stone').forEach(el => {
 // Initialize letters for interaction
 // --------------------------
 const letters = [];
-document.querySelectorAll('.stone span:not(.word-spacer)').forEach(span => {
+document.querySelectorAll('.stone span').forEach(span => {
   letters.push({el: span, x:0, y:0, vx:0, vy:0});
 });
 
@@ -193,7 +60,7 @@ function updateLetters() {
     const dist = Math.sqrt(dx*dx + dy*dy);
     const radius = 30;
 
-    if(dist < radius){
+    if (dist < radius) {
       const strength = (1 - dist/radius) * 1.5;
       const angle = Math.atan2(dy, dx);
       letter.vx += Math.cos(angle) * strength;
@@ -208,6 +75,7 @@ function updateLetters() {
     letter.vx *= 0.85;
     letter.vy *= 0.85;
 
+    // Apply transform
     letter.el.style.transform = `translate(${letter.x}px, ${letter.y}px)`;
   });
 
@@ -220,12 +88,8 @@ updateLetters();
 // Background click redirect
 // --------------------------
 document.body.addEventListener('click', function(e) {
-  // Only redirect if click is outside links/images
   if (!e.target.closest('a, img, span')) {
     window.location.href = 'og.html';
   }
 });
 </script>
-
-</body>
-</html>
