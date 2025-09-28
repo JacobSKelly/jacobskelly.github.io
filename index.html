@@ -74,13 +74,22 @@ header h1, header p { cursor: default; }
 .bio-container p {
   font-size: clamp(14px, 1.6vh, 18px);
   line-height:1.5;
-  max-width:40ch;
+  max-width:90%;         /* fit to viewport width */
+  margin:0 auto;
   text-align:justify;
   text-align-last:left;
   letter-spacing:normal;
-  margin:0 auto;
+  overflow-wrap: break-word; /* break long words if needed */
 }
 
+/* On very small screens, disable justification */
+@media (max-width: 480px) {
+  .bio-container p {
+    font-size: 0.9rem;
+    text-align:left;
+    max-width:95%;
+  }
+}
 /* Footer */
 footer { flex:0 0 auto; font-size:0.8rem; color:#777; padding:1vh 0; }
 footer a { color:#777; text-decoration:none; }
