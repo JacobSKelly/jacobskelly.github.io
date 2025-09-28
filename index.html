@@ -7,106 +7,27 @@
 <title>Jacob Samuel Kelly - Stone Letters</title>
 
 <style>
-/* -------------------------
-   CSS Reset for Consistency
-------------------------- */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* Basic reset & layout */
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; font-family: Helvetica, Arial, sans-serif; overflow:hidden; background:#fff; color:#111; text-align:center; }
+:root { --bio-vertical-offset:6vh; }
+body { display:flex; flex-direction:column; }
 
-html, body {
-  width: 100%;
-  height: 100%;
-  font-family: Helvetica, Arial, sans-serif;
-  overflow: hidden;
-  background: #fff;
-  color: #111;
-  text-align: center;
-}
+header { flex:0 0 auto; padding:2vh 20px 1vh 20px; line-height:1.2; }
+header h1, header p { cursor: default; }
 
-/* -------------------------
-   Page Layout
-------------------------- */
-:root { --bio-vertical-offset: 6vh; }
+.gallery { flex:1 1 auto; display:grid; grid-template-columns:repeat(3,1fr); gap:1.5vh; max-width:90vw; margin:0 auto; }
+.gallery a { width:100%; aspect-ratio:1/1; background:#f5f5f5; overflow:hidden; text-decoration:none; }
+.gallery a img { width:100%; height:100%; object-fit:cover; object-position:bottom center; }
 
-body {
-  display: flex;
-  flex-direction: column;
-}
+.bio-container { flex:0 0 auto; padding:1vh 20px; display:flex; justify-content:center; margin-top:var(--bio-vertical-offset); margin-bottom:var(--bio-vertical-offset); }
+.bio-container p { font-size:1.6vh; line-height:1.4; max-width:40ch; text-align:justify; text-align-last:left; letter-spacing:normal; }
 
-header {
-  flex: 0 0 auto;
-  padding: 2vh 20px 1vh 20px;
-  line-height: 1.2;
-}
+footer { flex:0 0 auto; font-size:1.2vh; color:#777; padding:1vh 0; }
+footer a { color:#777; text-decoration:none; }
 
-header h1, header p {
-  cursor: default;
-}
-
-.gallery {
-  flex: 1 1 auto;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5vh;
-  max-width: 90vw;
-  margin: 0 auto;
-}
-
-.gallery a {
-  width: 100%;
-  aspect-ratio: 1/1;
-  background: #f5f5f5;
-  overflow: hidden;
-  text-decoration: none;
-}
-
-.gallery a img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: bottom center;
-}
-
-.bio-container {
-  flex: 0 0 auto;
-  padding: 1vh 20px;
-  display: flex;
-  justify-content: center;
-  margin-top: var(--bio-vertical-offset);
-  margin-bottom: var(--bio-vertical-offset);
-}
-
-.bio-container p {
-  font-size: 1.6vh;
-  line-height: 1.4;
-  max-width: 40ch;
-  text-align: justify;
-  text-align-last: left;
-  letter-spacing: normal;
-}
-
-footer {
-  flex: 0 0 auto;
-  font-size: 1.2vh;
-  color: #777;
-  padding: 1vh 0;
-}
-
-footer a {
-  color: #777;
-  text-decoration: none;
-}
-
-/* Tangible Letters - using inline spans so layout doesn’t break */
-.stone span {
-  display: inline;       /* preserve normal text flow */
-  position: relative;
-  user-select: none;
-  will-change: transform;
-}
+/* Letters styles */
+.stone span { display:inline; position:relative; user-select:none; will-change:transform; }
 </style>
 </head>
 <body>
@@ -137,81 +58,108 @@ footer a {
 
 <script>
 // --------------------------
-// Mobile Redirect
+// Global error handler
+// --------------------------
+window.onerror = function(message, source, line, col, error) {
+  console.warn("Caught error:", message);
+  return true; // prevent console crash
+};
+
+// --------------------------
+// Mobile redirect
 // --------------------------
 if (/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
   window.location.href = 'og.html';
 }
 
 // --------------------------
-// Wrap letters & preserve spacing
+// Wrap letters safely
 // --------------------------
-document.querySelectorAll('.stone').forEach(el => {
-  const text = el.textContent.trim();
-  const words = text.split(' ');
-  const html = words.map(word =>
-    word.split('').map(c => `<span>${c}</span>`).join('')
-  ).join(' ');
-  el.innerHTML = html;
-});
+function wrapLettersSafe() {
+  try {
+    document.querySelectorAll('.stone').forEach(el => {
+      const text = el.textContent.trim();
+      const words = text.split(' ');
+      const html = words.map(word => word.split('').map(c => `<span>${c}</span>`).join('')).join(' ');
+      el.innerHTML = html;
+    });
+  } catch(e) {
+    console.warn("Letter wrapping failed:", e);
+  }
+}
+wrapLettersSafe();
 
 // --------------------------
-// Initialize letters for interaction
+// Initialize letters array
 // --------------------------
 const letters = [];
 document.querySelectorAll('.stone span').forEach(span => {
   letters.push({el: span, x:0, y:0, vx:0, vy:0});
 });
 
-// Cursor tracking
+// --------------------------
+// Throttled cursor tracking
+// --------------------------
 let cursor = {x:0, y:0};
+let lastMove = 0;
 document.addEventListener('mousemove', e => {
-  cursor.x = e.clientX;
-  cursor.y = e.clientY;
+  const now = performance.now();
+  if(now - lastMove > 16) { // ~60fps
+    cursor.x = e.clientX;
+    cursor.y = e.clientY;
+    lastMove = now;
+  }
 });
 
 // --------------------------
-// Main animation loop
+// Animation loop with safety
 // --------------------------
-function updateLetters() {
-  letters.forEach(letter => {
-    const rect = letter.el.getBoundingClientRect();
-    const cx = rect.left + rect.width/2;
-    const cy = rect.top + rect.height/2;
-    const dx = cx - cursor.x;
-    const dy = cy - cursor.y;
-    const dist = Math.sqrt(dx*dx + dy*dy);
-    const radius = 30;
+function updateLettersSafe() {
+  try {
+    letters.forEach(letter => {
+      const rect = letter.el.getBoundingClientRect();
+      const cx = rect.left + rect.width/2;
+      const cy = rect.top + rect.height/2;
+      const dx = cx - cursor.x;
+      const dy = cy - cursor.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      const radius = 30;
 
-    if(dist < radius){
-      const strength = (1 - dist/radius) * 1.5;
-      const angle = Math.atan2(dy, dx);
-      letter.vx += Math.cos(angle) * strength;
-      letter.vy += Math.sin(angle) * strength;
-    }
+      if(dist < radius){
+        const strength = (1 - dist/radius) * 1.5;
+        const angle = Math.atan2(dy, dx);
+        letter.vx += Math.cos(angle) * strength;
+        letter.vy += Math.sin(angle) * strength;
+      }
 
-    letter.x += letter.vx;
-    letter.y += letter.vy;
-    letter.vx *= 0.85;
-    letter.vy *= 0.85;
+      letter.x += letter.vx;
+      letter.y += letter.vy;
+      letter.vx *= 0.85;
+      letter.vy *= 0.85;
 
-    letter.el.style.transform = `translate(${letter.x}px, ${letter.y}px)`;
-  });
+      letter.el.style.transform = `translate(${letter.x}px, ${letter.y}px)`;
+    });
+  } catch(e) {
+    console.warn("Animation failed:", e);
+  }
 
-  requestAnimationFrame(updateLetters);
+  requestAnimationFrame(updateLettersSafe);
 }
-
-updateLetters();
+updateLettersSafe();
 
 // --------------------------
-// Background click redirect
+// Safe background click redirect
 // --------------------------
 document.body.addEventListener('click', function(e) {
-  if (!e.target.closest('a, img, span')) {
-    window.location.href = 'og.html';
+  try {
+    if(!e.target.closest('a,img,span')) {
+      window.location.href = 'og.html';
+    }
+  } catch(e) {
+    console.warn("Redirect failed:", e);
   }
 });
 </script>
-
 </body>
 </html>
+
