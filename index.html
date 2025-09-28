@@ -28,7 +28,7 @@ footer a { color:#777; text-decoration:none; }
 
 /* Letters styles */
 .stone span {
-  display: inline-block;   /* keeps letters separate but respects layout */
+  display: inline-block;
   position: relative;
   user-select: none;
   will-change: transform;
@@ -36,8 +36,11 @@ footer a { color:#777; text-decoration:none; }
 
 .word-spacer {
   display: inline-block;
-  width: 0.3ch;            /* small fixed width, behaves like a space */
+  width: 0.3ch;
 }
+</style>
+</head>
+<body>
 
 <header class="stone">
   <h1>Jacob Samuel Kelly</h1>
@@ -69,7 +72,7 @@ footer a { color:#777; text-decoration:none; }
 // --------------------------
 window.onerror = function(message, source, line, col, error) {
   console.warn("Caught error:", message);
-  return true; // prevent console crash
+  return true;
 };
 
 // --------------------------
@@ -87,7 +90,10 @@ function wrapLettersSafe() {
     document.querySelectorAll('.stone').forEach(el => {
       const text = el.textContent.trim();
       const words = text.split(' ');
-      const html = words.map(word => word.split('').map(c => `<span>${c}</span>`).join('')).join(' ');
+      const html = words.map(word =>
+        word.split('').map(c => `<span>${c}</span>`).join('') +
+        '<span class="word-spacer"></span>'
+      ).join('');
       el.innerHTML = html;
     });
   } catch(e) {
@@ -104,21 +110,14 @@ document.querySelectorAll('.stone span').forEach(span => {
   letters.push({el: span, x:0, y:0, vx:0, vy:0});
 });
 
-document.querySelectorAll('.stone').forEach(el => {
-  const text = el.textContent.trim();
-  const words = text.split(' ');
-
-  const html = words.map(word =>
-    word.split('').map(c => `<span>${c}</span>`).join('') +
-    '<span class="word-spacer"></span>'   // keep spacer
-  ).join('');
-
-  el.innerHTML = html;
+let cursor = {x: window.innerWidth/2, y: window.innerHeight/2};
+document.addEventListener('mousemove', e => {
+  cursor.x = e.clientX;
+  cursor.y = e.clientY;
 });
 
-
 // --------------------------
-// Animation loop with safety
+// Animation loop
 // --------------------------
 function updateLettersSafe() {
   try {
