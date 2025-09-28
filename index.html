@@ -27,10 +27,17 @@ footer { flex:0 0 auto; font-size:1.2vh; color:#777; padding:1vh 0; }
 footer a { color:#777; text-decoration:none; }
 
 /* Letters styles */
-.stone span { display:inline; position:relative; user-select:none; will-change:transform; }
-</style>
-</head>
-<body>
+.stone span {
+  display: inline-block;   /* keeps letters separate but respects layout */
+  position: relative;
+  user-select: none;
+  will-change: transform;
+}
+
+.word-spacer {
+  display: inline-block;
+  width: 0.3ch;            /* small fixed width, behaves like a space */
+}
 
 <header class="stone">
   <h1>Jacob Samuel Kelly</h1>
@@ -97,19 +104,18 @@ document.querySelectorAll('.stone span').forEach(span => {
   letters.push({el: span, x:0, y:0, vx:0, vy:0});
 });
 
-// --------------------------
-// Throttled cursor tracking
-// --------------------------
-let cursor = {x:0, y:0};
-let lastMove = 0;
-document.addEventListener('mousemove', e => {
-  const now = performance.now();
-  if(now - lastMove > 16) { // ~60fps
-    cursor.x = e.clientX;
-    cursor.y = e.clientY;
-    lastMove = now;
-  }
+document.querySelectorAll('.stone').forEach(el => {
+  const text = el.textContent.trim();
+  const words = text.split(' ');
+
+  const html = words.map(word =>
+    word.split('').map(c => `<span>${c}</span>`).join('') +
+    '<span class="word-spacer"></span>'   // keep spacer
+  ).join('');
+
+  el.innerHTML = html;
 });
+
 
 // --------------------------
 // Animation loop with safety
