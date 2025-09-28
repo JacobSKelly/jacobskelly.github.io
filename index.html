@@ -7,7 +7,6 @@
 <title>Jacob Samuel Kelly - Stone Letters</title>
 
 <style>
-/* Basic reset & layout */
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body {
   width:100%;
@@ -16,15 +15,13 @@ html, body {
   background:#fff;
   color:#111;
   text-align:center;
-  overflow-x:hidden;   /* prevent sideways scroll */
+  overflow-x:hidden;
 }
 body { display:flex; flex-direction:column; }
 
-/* Header */
 header { flex:0 0 auto; padding:2vh 20px 1vh 20px; line-height:1.2; }
 header h1, header p { cursor: default; }
 
-/* Desktop gallery (default) */
 .gallery {
   flex:1 1 auto;
   display:grid;
@@ -47,7 +44,6 @@ header h1, header p { cursor: default; }
   object-position:bottom center;
 }
 
-/* Mobile: horizontal scroll strip */
 @media (max-width: 768px) {
   .gallery {
     display:flex;
@@ -56,15 +52,15 @@ header h1, header p { cursor: default; }
     padding: 1vh 2vw;
     max-width:100%;
     margin:0;
-    scroll-snap-type: x mandatory; /* smooth snapping */
+    scroll-snap-type: x mandatory;
   }
   .gallery a {
-    flex: 0 0 100%;    /* each image ~70% of screen width */
+    flex: 0 0 90%;
     aspect-ratio: 1/1;
     scroll-snap-align: center;
   }
 }
-/* Bio */
+
 .bio-container {
   flex:0 0 auto;
   padding:2vh 20px;
@@ -74,15 +70,14 @@ header h1, header p { cursor: default; }
 .bio-container p {
   font-size: clamp(14px, 1.6vh, 18px);
   line-height:1.5;
-  max-width:90%;         /* fit to viewport width */
+  max-width:90%;
   margin:0 auto;
   text-align:justify;
   text-align-last:left;
   letter-spacing:normal;
-  overflow-wrap: break-word; /* break long words if needed */
+  overflow-wrap: break-word;
 }
 
-/* On very small screens, disable justification */
 @media (max-width: 480px) {
   .bio-container p {
     font-size: 0.9rem;
@@ -90,15 +85,14 @@ header h1, header p { cursor: default; }
     max-width:95%;
   }
 }
-/* Footer */
+
 footer { flex:0 0 auto; font-size:0.8rem; color:#777; padding:1vh 0; }
 footer a { color:#777; text-decoration:none; }
 
-/* Letters styles */
 .stone span {
   display:inline-block;
   position:relative;
-  user-select:none;
+  user-select:text;
   will-change:transform;
 }
 .word-spacer {
@@ -134,17 +128,11 @@ footer a { color:#777; text-decoration:none; }
 </footer>
 
 <script>
-// --------------------------
-// Global error handler
-// --------------------------
 window.onerror = function(message, source, line, col, error) {
   console.warn("Caught error:", message);
   return true;
 };
 
-// --------------------------
-// Wrap letters safely
-// --------------------------
 function wrapLettersSafe() {
   try {
     document.querySelectorAll('.stone').forEach(el => {
@@ -162,18 +150,12 @@ function wrapLettersSafe() {
 }
 wrapLettersSafe();
 
-// --------------------------
-// Initialize letters array
-// --------------------------
 const letters = [];
 document.querySelectorAll('.stone span').forEach(span => {
   letters.push({el: span, x:0, y:0, vx:0, vy:0});
 });
 
-// Cursor position
 let cursor = {x: window.innerWidth/2, y: window.innerHeight/2};
-
-// Detect touch vs mouse
 let isTouch = 'ontouchstart' in window;
 if (isTouch) {
   document.addEventListener('touchmove', e => {
@@ -189,9 +171,6 @@ if (isTouch) {
   });
 }
 
-// --------------------------
-// Animation loop
-// --------------------------
 function updateLettersSafe() {
   try {
     letters.forEach(letter => {
@@ -202,7 +181,6 @@ function updateLettersSafe() {
       const dy = cy - cursor.y;
       const dist = Math.sqrt(dx*dx + dy*dy);
 
-      // Different behavior for mobile vs desktop
       const radius = isTouch ? 20 : 40;
       const maxStrength = isTouch ? 0.5 : 1.5;
 
@@ -228,9 +206,6 @@ function updateLettersSafe() {
 }
 updateLettersSafe();
 
-// --------------------------
-// Safe background click redirect
-// --------------------------
 document.body.addEventListener('click', function(e) {
   try {
     if(!e.target.closest('a,img,span')) {
