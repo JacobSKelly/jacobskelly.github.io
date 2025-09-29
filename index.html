@@ -1,20 +1,10 @@
-<!-- go fuck yourself -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Jacob Samuel Kelly - Stone Letters</title>
-</head>
-<body>
-<script>
-// If screen width is small (mobile), redirect to og.html
-if (window.innerWidth <= 768) {
-  window.location.href = "og.html";
-}
-</script>
-</body>
-</html>
+
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body {
@@ -112,6 +102,13 @@ footer a { color:#777; text-decoration:none; }
 </head>
 <body>
 
+<script>
+// If screen width is small (mobile), redirect to og.html
+if (window.innerWidth <= 768) {
+  window.location.href = "og.html";
+}
+</script>
+
 <header class="stone">
   <h1>Jacob Samuel Kelly</h1>
   <p>Jacob_Kelly@hotmail.co.uk / 07575722181 / Manchester</p>
@@ -123,10 +120,21 @@ footer a { color:#777; text-decoration:none; }
   <a href="layer3.html"><img src="https://i.imgur.com/eprCFiG.jpeg" alt="Artwork 3"></a>
 </section>
 
+<!-- Split bio into four stacked interactive layers -->
 <div class="bio-container stone">
-  <p>
-    A body of work exploring irrepressible trauma. An attempt to uncover an unsettling realism in dream like imagery. Gleaned from the surface of the unconscious; a dark urgency for communication.
-  </p>
+  <p>A body of work exploring irrepressible trauma.</p>
+</div>
+
+<div class="bio-container stone">
+  <p>An attempt to uncover an unsettling realism in dream like imagery.</p>
+</div>
+
+<div class="bio-container stone">
+  <p>Gleaned from the surface of the unconscious;</p>
+</div>
+
+<div class="bio-container stone">
+  <p>a dark urgency for communication.</p>
 </div>
 
 <footer class="stone">
@@ -144,14 +152,43 @@ window.onerror = function(message, source, line, col, error) {
 
 function wrapLettersSafe() {
   try {
-    document.querySelectorAll('.stone').forEach(el => {
-      const text = el.textContent.trim();
-      const words = text.split(' ');
-      const html = words.map(word =>
+    // Helper: wrap a plain text string into letter spans preserving word spacers
+    const wrapText = (text) => {
+      // Split on any whitespace sequence so we collapse multiple spaces/newlines sensibly
+      const words = text.trim().split(/\s+/);
+      return words.map(word =>
         word.split('').map(c => `<span>${c}</span>`).join('') +
         '<span class="word-spacer"></span>'
       ).join('');
-      el.innerHTML = html;
+    };
+
+    // Process each .stone element but preserve existing element structure (e.g. <a>, <h1>, etc.)
+    document.querySelectorAll('.stone').forEach(el => {
+      const processNode = (node) => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const txt = node.textContent;
+          if (!txt || !txt.trim()) return '';
+          return wrapText(txt);
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          const tag = node.tagName.toLowerCase();
+          // Build attributes string safely
+          let attrs = '';
+          for (let i = 0; i < node.attributes.length; i++) {
+            const a = node.attributes[i];
+            const val = String(a.value).replace(/"/g, '&quot;');
+            attrs += ` ${a.name}="${val}"`;
+          }
+          // Recursively process children
+          const childrenHTML = Array.from(node.childNodes).map(processNode).join('');
+          return `<${tag}${attrs}>${childrenHTML}</${tag}>`;
+        } else {
+          return '';
+        }
+      };
+
+      const newHTML = Array.from(el.childNodes).map(processNode).join('');
+      // Replace only when different to avoid unnecessary reflows
+      if (newHTML) el.innerHTML = newHTML;
     });
   } catch(e) {
     console.warn("Letter wrapping failed:", e);
