@@ -15,14 +15,14 @@ html, body {
   background:#fff;
   color:#111;
   text-align:center;
-  overflow-x:hidden;
+  overflow:hidden; /* prevent scrolling */
 }
 body { display:flex; flex-direction:column; }
 
 header { flex:0 0 auto; padding:2vh 20px 1vh 20px; line-height:1.2; }
 header h1, header p { cursor: default; }
 
-.gallery {
+gallery {
   flex:0 0 auto; /* don't push bio/footer down */
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -87,11 +87,14 @@ header h1, header p { cursor: default; }
 }
 
 footer { 
-  flex:0 0 auto; 
+  position:fixed; 
+  bottom:0; 
+  left:0; 
+  width:100%; 
   font-size:0.8rem; 
   color:#777; 
   padding:1vh 0; 
-  margin-top:4vh; /* clear visual gap above footer */
+  background:#fff; 
 }
 footer a { color:#777; text-decoration:none; }
 
@@ -261,6 +264,11 @@ document.body.addEventListener('click', function(e) {
   } catch(e) {
     console.warn("Redirect failed:", e);
   }
+});
+</script>
+</body>
+</html>
+
 });
 </script>
 </body>
