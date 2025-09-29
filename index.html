@@ -62,13 +62,13 @@ header h1, header p { cursor: default; }
 
 .bio-container {
   flex:0 0 auto;
-  padding:2vh 20px;
+  padding:0.5vh 20px; /* reduced vertical padding */
   display:flex;
   justify-content:center;
 }
 .bio-container p {
   font-size: clamp(14px, 1.6vh, 18px);
-  line-height:1.5;
+  line-height:1.4; /* slightly tighter line-height */
   max-width:90%;
   margin:0 auto;
   text-align:justify;
@@ -85,7 +85,13 @@ header h1, header p { cursor: default; }
   }
 }
 
-footer { flex:0 0 auto; font-size:0.8rem; color:#777; padding:1vh 0; }
+footer { 
+  flex:0 0 auto; 
+  font-size:0.8rem; 
+  color:#777; 
+  padding:1vh 0; 
+  margin-top:2vh; /* distinct gap above footer */
+}
 footer a { color:#777; text-decoration:none; }
 
 .stone span {
