@@ -1,3 +1,4 @@
+<!-- go fuck yourself -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,12 +23,12 @@ header { flex:0 0 auto; padding:2vh 20px 1vh 20px; line-height:1.2; }
 header h1, header p { cursor: default; }
 
 .gallery {
-  flex:1 1 auto;
+  flex:0 0 auto; /* don't push bio/footer down */
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:1.5vh;
   max-width:90vw;
-  margin:0 auto;
+  margin:0 auto 3vh auto; /* add bottom space before bio */
 }
 .gallery a {
   width:100%;
@@ -50,7 +51,7 @@ header h1, header p { cursor: default; }
     gap:2vw;
     padding: 1vh 2vw;
     max-width:100%;
-    margin:0;
+    margin:0 0 3vh 0;
     scroll-snap-type: x mandatory;
   }
   .gallery a {
@@ -62,14 +63,14 @@ header h1, header p { cursor: default; }
 
 .bio-container {
   flex:0 0 auto;
-  padding:0.5vh 20px; /* reduced vertical padding */
+  padding:0.2vh 20px; /* much tighter vertical padding */
   display:flex;
   justify-content:center;
 }
 .bio-container p {
   font-size: clamp(14px, 1.6vh, 18px);
-  line-height:1.4; /* slightly tighter line-height */
-  max-width:90%;
+  line-height:1.2; /* tighter line spacing */
+  max-width:70%; /* narrower so text sits more centered vertically */
   margin:0 auto;
   text-align:justify;
   text-align-last:left;
@@ -90,7 +91,7 @@ footer {
   font-size:0.8rem; 
   color:#777; 
   padding:1vh 0; 
-  margin-top:2vh; /* distinct gap above footer */
+  margin-top:4vh; /* clear visual gap above footer */
 }
 footer a { color:#777; text-decoration:none; }
 
@@ -158,9 +159,7 @@ window.onerror = function(message, source, line, col, error) {
 
 function wrapLettersSafe() {
   try {
-    // Helper: wrap a plain text string into letter spans preserving word spacers
     const wrapText = (text) => {
-      // Split on any whitespace sequence so we collapse multiple spaces/newlines sensibly
       const words = text.trim().split(/\s+/);
       return words.map(word =>
         word.split('').map(c => `<span>${c}</span>`).join('') +
@@ -168,7 +167,6 @@ function wrapLettersSafe() {
       ).join('');
     };
 
-    // Process each .stone element but preserve existing element structure (e.g. <a>, <h1>, etc.)
     document.querySelectorAll('.stone').forEach(el => {
       const processNode = (node) => {
         if (node.nodeType === Node.TEXT_NODE) {
@@ -177,14 +175,12 @@ function wrapLettersSafe() {
           return wrapText(txt);
         } else if (node.nodeType === Node.ELEMENT_NODE) {
           const tag = node.tagName.toLowerCase();
-          // Build attributes string safely
           let attrs = '';
           for (let i = 0; i < node.attributes.length; i++) {
             const a = node.attributes[i];
             const val = String(a.value).replace(/"/g, '&quot;');
             attrs += ` ${a.name}="${val}"`;
           }
-          // Recursively process children
           const childrenHTML = Array.from(node.childNodes).map(processNode).join('');
           return `<${tag}${attrs}>${childrenHTML}</${tag}>`;
         } else {
@@ -193,7 +189,6 @@ function wrapLettersSafe() {
       };
 
       const newHTML = Array.from(el.childNodes).map(processNode).join('');
-      // Replace only when different to avoid unnecessary reflows
       if (newHTML) el.innerHTML = newHTML;
     });
   } catch(e) {
