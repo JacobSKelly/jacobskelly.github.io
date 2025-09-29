@@ -1,4 +1,3 @@
-<!-- go fuck yourself -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,7 +15,6 @@ html, body {
   color:#111;
   text-align:center;
   overflow-x:hidden;
-  position: relative;
 }
 body { display:flex; flex-direction:column; }
 
@@ -29,7 +27,7 @@ header h1, header p { cursor: default; }
   grid-template-columns:repeat(3,1fr);
   gap:1.5vh;
   max-width:90vw;
-  margin:0 auto 12vh auto; /* bottom space before bio */
+  margin:0 auto 12vh auto; /* increased bottom space before bio */
 }
 .gallery a {
   width:100%;
@@ -64,16 +62,204 @@ header h1, header p { cursor: default; }
 
 .bio-container {
   flex:0 0 auto;
-  padding:0.2vh 20px; /* tight vertical padding */
+  padding:0.2vh 20px; /* much tighter vertical padding */
   display:flex;
   justify-content:center;
 }
 .bio-container p {
   font-size: clamp(14px, 1.6vh, 18px);
-  line-height:1.2; /* tight line spacing */
-  max-width:70%; 
-  m
+  line-height:1.2; /* tighter line spacing */
+  max-width:70%; /* narrower so text sits more centered vertically */
+  margin:0 auto;
+  text-align:justify;
+  text-align-last:left;
+  letter-spacing:normal;
+  overflow-wrap: break-word;
+}
 
+@media (max-width: 480px) {
+  .bio-container p {
+    font-size: 0.9rem;
+    text-align:left;
+    max-width:95%;
+  }
+}
+
+footer { 
+  flex:0 0 auto; 
+  font-size:0.8rem; 
+  color:#777; 
+  padding:1vh 0; 
+  margin-top:4vh; /* clear visual gap above footer */
+}
+footer a { color:#777; text-decoration:none; }
+
+.stone span {
+  display:inline-block;
+  position:relative;
+  user-select:text;
+  will-change:transform;
+}
+.word-spacer {
+  display:inline-block;
+  width:0.3ch;
+}
+</style>
+</head>
+<body>
+
+<script>
+// If screen width is small (mobile), redirect to og.html
+if (window.innerWidth <= 768) {
+  window.location.href = "og.html";
+}
+</script>
+
+<header class="stone">
+  <h1>Jacob Samuel Kelly</h1>
+  <p>Jacob_Kelly@hotmail.co.uk / 07575722181 / Manchester</p>
+</header>
+
+<section class="gallery">
+  <a href="layer1.html"><img src="https://i.imgur.com/5jTEm6F.jpeg" alt="Artwork 1"></a>
+  <a href="layer2.html"><img src="https://i.imgur.com/RaeVRby.jpeg" alt="Artwork 2"></a>
+  <a href="layer3.html"><img src="https://i.imgur.com/eprCFiG.jpeg" alt="Artwork 3"></a>
+</section>
+
+<!-- Split bio into four stacked interactive layers -->
+<div class="bio-container stone">
+  <p>A body of work exploring irrepressible trauma.</p>
+</div>
+
+<div class="bio-container stone">
+  <p>An attempt to uncover an unsettling realism in dream like imagery.</p>
+</div>
+
+<div class="bio-container stone">
+  <p>Gleaned from the surface of the unconscious;</p>
+</div>
+
+<div class="bio-container stone">
+  <p>a dark urgency for communication.</p>
+</div>
+
+<footer class="stone">
+  <p>
+    <a href="https://www.instagram.com/the_fruit_that_ate_itself" target="_blank">@the_fruit_that_ate_itself</a><br>
+    53.4808° N, -2.2426° W
+  </p>
+</footer>
+
+<script>
+window.onerror = function(message, source, line, col, error) {
+  console.warn("Caught error:", message);
+  return true;
+};
+
+function wrapLettersSafe() {
+  try {
+    const wrapText = (text) => {
+      const words = text.trim().split(/\s+/);
+      return words.map(word =>
+        word.split('').map(c => `<span>${c}</span>`).join('') +
+        '<span class="word-spacer"></span>'
+      ).join('');
+    };
+
+    document.querySelectorAll('.stone').forEach(el => {
+      const processNode = (node) => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const txt = node.textContent;
+          if (!txt || !txt.trim()) return '';
+          return wrapText(txt);
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          const tag = node.tagName.toLowerCase();
+          let attrs = '';
+          for (let i = 0; i < node.attributes.length; i++) {
+            const a = node.attributes[i];
+            const val = String(a.value).replace(/"/g, '&quot;');
+            attrs += ` ${a.name}="${val}"`;
+          }
+          const childrenHTML = Array.from(node.childNodes).map(processNode).join('');
+          return `<${tag}${attrs}>${childrenHTML}</${tag}>`;
+        } else {
+          return '';
+        }
+      };
+
+      const newHTML = Array.from(el.childNodes).map(processNode).join('');
+      if (newHTML) el.innerHTML = newHTML;
+    });
+  } catch(e) {
+    console.warn("Letter wrapping failed:", e);
+  }
+}
+wrapLettersSafe();
+
+const letters = [];
+document.querySelectorAll('.stone span').forEach(span => {
+  letters.push({el: span, x:0, y:0, vx:0, vy:0});
+});
+
+let cursor = {x: window.innerWidth/2, y: window.innerHeight/2};
+let isTouch = 'ontouchstart' in window;
+if (isTouch) {
+  document.addEventListener('touchmove', e => {
+    if (e.touches[0]) {
+      cursor.x = e.touches[0].clientX;
+      cursor.y = e.touches[0].clientY;
+    }
+  }, {passive:true});
+} else {
+  document.addEventListener('mousemove', e => {
+    cursor.x = e.clientX;
+    cursor.y = e.clientY;
+  });
+}
+
+function updateLettersSafe() {
+  try {
+    letters.forEach(letter => {
+      const rect = letter.el.getBoundingClientRect();
+      const cx = rect.left + rect.width/2;
+      const cy = rect.top + rect.height/2;
+      const dx = cx - cursor.x;
+      const dy = cy - cursor.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+
+      const radius = isTouch ? 20 : 40;
+      const maxStrength = isTouch ? 0.5 : 1.5;
+
+      if(dist < radius){
+        const strength = (1 - dist/radius) * maxStrength;
+        const angle = Math.atan2(dy, dx);
+        letter.vx += Math.cos(angle) * strength;
+        letter.vy += Math.sin(angle) * strength;
+      }
+
+      letter.x += letter.vx;
+      letter.y += letter.vy;
+      letter.vx *= 0.85;
+      letter.vy *= 0.85;
+
+      letter.el.style.transform = `translate(${letter.x}px, ${letter.y}px)`;
+    });
+  } catch(e) {
+    console.warn("Animation failed:", e);
+  }
+
+  requestAnimationFrame(updateLettersSafe);
+}
+updateLettersSafe();
+
+document.body.addEventListener('click', function(e) {
+  try {
+    if(!e.target.closest('a,img,span')) {
+      window.location.href = 'og.html';
+    }
+  } catch(e) {
+    console.warn("Redirect failed:", e);
+  }
 });
 </script>
 </body>
