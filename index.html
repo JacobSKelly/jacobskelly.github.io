@@ -1,128 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Jacob Samuel Kelly - Portfolio</title>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jacob Samuel Kelly - Artist Portfolio</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-html, body {
-  width:100%;
-  font-family: Helvetica, Arial, sans-serif;
-  background:#fff;
-  color:#111;
-  text-align:center;
-  overflow-x:hidden;
+:root {
+  --bio-vertical-offset: 6vh;
 }
-body { display:flex; flex-direction:column; min-height:100vh; }
 
-header { flex:0 0 auto; padding:2vh 20px 1vh 20px; line-height:1.2; }
-header h1, header p { cursor: default; }
+body {
+  margin: 0;
+  font-family: Helvetica, Arial, sans-serif;
+  background: #fff;
+  color: #111;
+  text-align: center;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+header {
+  flex: 0 0 auto;
+  padding: 2vh 20px 1vh 20px;
+  line-height: 1.2;
+}
+
+header h1 {
+  font-size: 4vh;
+  margin: 0 0 1vh 0;
+}
+
+header p {
+  font-size: 1.8vh;
+  color: #555;
+  margin: 0;
+}
 
 .gallery {
-  flex:0 0 auto;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:1.5vh;
-  max-width:90vw;
-  margin:0 auto 12vh auto;
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5vh;
+  max-width: 90vw;
+  margin: 0 auto;
 }
+
 .gallery a {
-  width:100%;
-  aspect-ratio:1/1;
-  background:#f5f5f5;
-  overflow:hidden;
-  text-decoration:none;
+  width: 100%;
+  aspect-ratio: 1/1;
+  background: #f5f5f5;
+  overflow: hidden;
+  text-decoration: none;
 }
+
 .gallery a img {
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  object-position:bottom center;
-}
-
-@media (max-width: 768px) {
-  .gallery {
-    display:flex;
-    flex-wrap:nowrap;
-    overflow-x:auto;
-    gap:2vw;
-    padding: 1vh 2vw;
-    max-width:100%;
-    margin:0 0 12vh 0;
-    scroll-snap-type: x mandatory;
-  }
-  .gallery a {
-    flex: 0 0 90%;
-    aspect-ratio:1/1;
-    scroll-snap-align:center;
-  }
-}
-
-@media (min-width: 769px) {
-  /* Force fourth image to wrap to next row */
-  .gallery a:nth-child(4) {
-    grid-column: 1 / 2; /* first column on new row */
-  }
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: bottom center;
 }
 
 .bio-container {
-  flex:0 0 auto;
-  padding:0.2vh 20px;
-  display:flex;
-  justify-content:center;
+  flex: 0 0 auto;
+  padding: 1vh 20px;
+  display: flex;
+  justify-content: center;
+  margin-top: var(--bio-vertical-offset);
+  margin-bottom: var(--bio-vertical-offset);
 }
+
 .bio-container p {
-  font-size: clamp(14px, 1.6vh, 18px);
-  line-height:1.2;
-  max-width:70%;
-  margin:0 auto;
-  text-align:justify;
-  text-align-last:left;
-  letter-spacing:normal;
-  overflow-wrap: break-word;
+  font-size: 1.6vh;
+  line-height: 1.4;
+  margin: 0;
+  max-width: 40ch;
+  text-align: justify;
 }
 
-@media (max-width: 480px) {
-  .bio-container p {
-    font-size: 0.9rem;
-    text-align:left;
-    max-width:95%;
-  }
+footer {
+  flex: 0 0 auto;
+  font-size: 1.2vh;
+  color: #777;
+  padding: 1vh 0;
 }
 
-footer { 
-  flex:0 0 auto; 
-  font-size:0.8rem; 
-  color:#777; 
-  padding:1vh 0; 
-  margin-top:4vh;
-}
-footer a { color:#777; text-decoration:none; }
-
-/* Stone letters styling kept but no interactivity */
-.stone span {
-  display:inline-block;
-  position:relative;
-  user-select:text;
-}
-.word-spacer {
-  display:inline-block;
-  width:0.3ch;
+footer a {
+  color: #777;
+  text-decoration: none;
 }
 </style>
 </head>
 <body>
 
-<script>
-// Mobile redirect stays
-if (window.innerWidth <= 768) {
-  window.location.href = "og.html";
-}
-</script>
-
-<header class="stone">
+<header>
   <h1>Jacob Samuel Kelly</h1>
   <p>Jacob_Kelly@hotmail.co.uk / 07575722181 / Manchester</p>
 </header>
@@ -131,36 +103,22 @@ if (window.innerWidth <= 768) {
   <a href="layer1.html"><img src="https://phfinal.s3.eu-west-2.amazonaws.com/praying+hands+2.jpg" alt="Artwork 1"></a>
   <a href="layer2.html"><img src="https://phfinal.s3.eu-west-2.amazonaws.com/layer2.jpg" alt="Artwork 2"></a>
   <a href="layer3.html"><img src="https://phfinal.s3.eu-west-2.amazonaws.com/hand+knot1.png" alt="Artwork 3"></a>
-    <!-- Placeholder for fourth page -->
-  <a href="layer4.html" style="background:#ccc; display:flex; align-items:center; justify-content:center; color:#111; font-weight:bold; font-size:1rem;">
-    PAGE 4
-  </a>
 </section>
 
-<div class="bio-container stone">
-  <p>A body of work exploring irrepressible trauma.</p>
+<div class="bio-container">
+  <p>
+    A body of work exploring irrepressible trauma. An attempt to uncover an
+    unsettling realism in dream like imagery. Gleaned from the surface of the
+    unconscious; a dark urgency for communication.
+  </p>
 </div>
 
-<div class="bio-container stone">
-  <p>An attempt to uncover an unsettling realism in dream like imagery.</p>
-</div>
-
-<div class="bio-container stone">
-  <p>Gleaned from the surface of the unconscious;</p>
-</div>
-
-<div class="bio-container stone">
-  <p>a dark urgency for communication.</p>
-</div>
-
-<footer class="stone">
+<footer>
   <p>
     <a href="https://www.instagram.com/the_fruit_that_ate_itself" target="_blank">@the_fruit_that_ate_itself</a><br>
     53.4808° N, -2.2426° W
   </p>
 </footer>
-
-<!-- Stone letters interactivity removed -->
 
 </body>
 </html>
