@@ -4,101 +4,129 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kiss The Ring 2025</title>
+
 <style>
-  body {
-    display: flex;
-    margin: 0;
-    font-family: Helvetica, Arial, sans-serif;
-    height: 100vh;
-    overflow: hidden;
-    background-color: #000; /* entire background black */
-    color: #fff;            /* default text color white */
+
+body{
+  display:flex;
+  margin:0;
+  font-family: Helvetica, Arial, sans-serif;
+  height:100vh;
+  overflow:hidden;
+  background:#000;
+  color:#fff;
+}
+
+/* LEFT PANEL */
+
+.info-container{
+  width:30%;
+  padding:40px;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  margin-top:20px;
+}
+
+.info-container h1{
+  margin:0 0 5px 0;
+  font-size:clamp(1.8rem,5vw,2.2em);
+  font-weight:900;
+}
+
+.info-container p{
+  margin:2px 0;
+  font-size:clamp(1rem,2.5vw,1.2em);
+  line-height:1.2;
+  font-weight:600;
+}
+
+/* BACK BUTTON */
+
+.back{
+  display:inline-block;
+  margin-bottom:20px;
+  text-decoration:none;
+  color:#fff;
+  font-weight:bold;
+  letter-spacing:1px;
+  font-size:0.9rem;
+}
+
+/* IMAGE AREA */
+
+.image-area{
+  width:70%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  overflow:hidden;
+}
+
+.image-area img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  transition:transform 0.3s ease;
+}
+
+.image-area img:hover{
+  transform:scale(1.05);
+}
+
+/* MOBILE */
+
+@media (max-width:768px){
+
+  body{
+    flex-direction:column;
+    height:auto;
   }
 
-  /* LEFT PANEL */
-  .info-container {
-    width: 30%;
-    padding: 40px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* move text slightly higher */
-    margin-top: 20px;
-    background-color: #000; /* black panel */
-    color: #fff;
+  .info-container,
+  .image-area{
+    width:100%;
+    padding:20px;
   }
 
-  .info-container h1 {
-    margin: 0 0 5px 0; /* smaller gap below heading */
-    font-size: clamp(1.8rem, 5vw, 2.2em); /* slightly larger for bold emphasis */
-    font-weight: 900; /* boldest for "Kiss The Ring" */
-    color: #fff;
+  .image-area{
+    height:50vh;
   }
 
-  .info-container p {
-    margin: 2px 0; /* closer together */
-    font-size: clamp(1rem, 2.5vw, 1.2em);
-    line-height: 1.2; /* tighter lines */
-    font-weight: 600;  /* slightly thicker for visibility */
-    color: #fff;
-  }
+}
 
-  /* RIGHT IMAGE AREA */
-  .image-area {
-    width: 70%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    overflow: hidden;
-    background-color: #000;
-  }
-
-  .image-area img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: transform 0.3s ease;
-  }
-
-  .image-area img:hover {
-    transform: scale(1.05);
-  }
-
-  /* RESPONSIVE LAYOUT */
-  @media (max-width: 768px) {
-    body {
-      flex-direction: column;
-      height: auto;
-    }
-    .info-container, .image-area {
-      width: 100%;
-      padding: 20px;
-    }
-    .image-area {
-      height: 50vh;
-    }
-  }
 </style>
 </head>
+
 <body>
 
-  <div class="info-container">
-    <h1>Kiss The Ring <span style="font-size:0.8em;">2025</span></h1>
-    <p><strong>Digital Painting</strong></p>
-    <p>The hand of harsh reality.</p>
-  </div>
+<div class="info-container">
 
-  <div class="image-area">
-    <img src="https://phfinal.s3.eu-west-2.amazonaws.com/layer2.jpg" alt="Kiss The Ring 2025" id="mainImage">
-  </div>
+<a href="index.html" class="back">← Back to Portfolio</a>
+
+<h1>Kiss The Ring <span style="font-size:0.8em;">2025</span></h1>
+
+<p><strong>Digital Painting</strong></p>
+<p>The hand of harsh reality.</p>
+
+</div>
+
+<div class="image-area">
+<img src="https://phfinal.s3.eu-west-2.amazonaws.com/layer2.jpg" 
+alt="Kiss The Ring 2025" 
+id="mainImage">
+</div>
 
 <script>
-  // Clicking the image goes to zoom page
-  const img = document.getElementById('mainImage');
-  img.addEventListener('click', () => {
-    window.location.href = 'zoom2.html';
-  });
+
+const img = document.getElementById('mainImage');
+
+img.addEventListener('click', () => {
+  window.location.href = 'zoom2.html';
+});
+
 </script>
 
 </body>
