@@ -15,9 +15,13 @@ html, body {
   background:#fff;
   color:#111;
   text-align:center;
-  overflow-x:hidden;
+  height:100%;
 }
-body { display:flex; flex-direction:column; min-height:100vh; }
+body {
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
 
 /* Header */
 header {
@@ -30,12 +34,12 @@ header p { cursor: default; font-size:1.8vh; color:#555; }
 
 /* Gallery */
 .gallery {
-  flex:1 1 auto;
+  flex:1 1 auto; /* grow to fill space so footer sticks at bottom */
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:1.5vh;
   max-width:90vw;
-  margin:2vh auto 4vh auto;
+  margin:2vh auto 2vh auto;
 }
 .gallery a {
   width:100%;
@@ -66,22 +70,6 @@ header p { cursor: default; font-size:1.8vh; color:#555; }
     flex:0 0 90%;
     scroll-snap-align:center;
   }
-}
-
-/* Bio text */
-.bio-container {
-  flex:0 0 auto;
-  padding:1vh 20px;
-  display:flex;
-  justify-content:center;
-  margin:2vh 0;
-}
-.bio-container p {
-  font-size:clamp(14px,1.6vh,18px);
-  line-height:1.4;
-  max-width:70%;
-  text-align:justify;
-  overflow-wrap: break-word;
 }
 
 /* Footer */
@@ -129,12 +117,6 @@ if (window.innerWidth <= 768) {
     <img src="https://github.com/JacobSKelly/jacobskelly.github.io/blob/main/images/10mb.png?raw=true" alt="Nearly Six Eggs">
   </a>
 </section>
-
-<div class="bio-container">
-  <p>
-    A body of work exploring irrepressible trauma. An attempt to uncover an unsettling realism in dreamlike imagery. Gleaned from the surface of the unconscious; a dark urgency for communication.
-  </p>
-</div>
 
 <footer>
   <p>
