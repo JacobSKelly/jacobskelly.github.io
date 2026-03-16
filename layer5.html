@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>No Smoking 2025 - Jacob Samuel Kelly</title>
+  <title>Mercury 2026</title>
   <style>
     html, body {
       margin: 0;
@@ -70,46 +70,45 @@
   </style>
 </head>
 <body>
+
   <div class="text-area">
-    <h1>No Smoking 2025</h1>
+    <h1>Mercury 2026</h1>
     <p><strong>Digital Painting</strong></p>
-    <p>Praying Mantis, Graffiti, waiting room.</p>
+    <p>Transport Mackerel.</p>
     <a href="index.html" class="back">← Back to Portfolio</a>
   </div>
 
   <div class="image-area">
-    <img src="images/layer1.png" alt="No Smoking 2025">
+    <img src="https://phfinal.s3.eu-west-2.amazonaws.com/mid.jpg" alt="Mercury 2026" id="mainImage">
   </div>
 
   <script>
-    const img = document.querySelector('.image-area img');
+    const img = document.getElementById('mainImage');
     const container = img.parentElement;
     let zoomed = false;
     const scale = 4;
 
-img.addEventListener('click', (e) => {
-  if (!zoomed) {
-    // Zoom in at cursor
-    const rect = img.getBoundingClientRect();
-    const offsetX = (e.clientX - rect.left) / rect.width;
-    const offsetY = (e.clientY - rect.top) / rect.height;
+    img.addEventListener('click', (e) => {
+      if (!zoomed) {
+        // Zoom in at cursor
+        const rect = img.getBoundingClientRect();
+        const offsetX = (e.clientX - rect.left) / rect.width;
+        const offsetY = (e.clientY - rect.top) / rect.height;
 
-    container.style.overflow = 'auto';
-    img.style.transformOrigin = `${offsetX * 100}% ${offsetY * 100}%`;
-    img.style.transform = `scale(${scale})`;
-    container.scrollLeft = img.offsetWidth * scale * offsetX - (e.clientX - container.getBoundingClientRect().left);
-    container.scrollTop = img.offsetHeight * scale * offsetY - (e.clientY - container.getBoundingClientRect().top);
-    img.style.cursor = 'zoom-out';
-    zoomed = true;
-  } else {
-    // Close lightbox: just reset zoom
-    img.style.transform = 'scale(1)';
-    container.style.overflow = 'hidden';
-    img.style.cursor = 'zoom-in';
-    zoomed = false;
-  }
-});
-    // Drag-to-pan
+        container.style.overflow = 'auto';
+        img.style.transformOrigin = `${offsetX * 100}% ${offsetY * 100}%`;
+        img.style.transform = `scale(${scale})`;
+        container.scrollLeft = img.offsetWidth * scale * offsetX - (e.clientX - container.getBoundingClientRect().left);
+        container.scrollTop = img.offsetHeight * scale * offsetY - (e.clientY - container.getBoundingClientRect().top);
+        img.style.cursor = 'zoom-out';
+        zoomed = true;
+      } else {
+        // Second click redirects to zoom5.html
+        window.location.href = 'zoom5.html';
+      }
+    });
+
+    // Drag-to-pan functionality
     let isDragging = false, startX, startY, scrollLeft, scrollTop;
 
     container.addEventListener('mousedown', (e) => {
@@ -122,8 +121,15 @@ img.addEventListener('click', (e) => {
       container.style.cursor = 'grabbing';
     });
 
-    container.addEventListener('mouseup', () => { isDragging = false; container.style.cursor = zoomed ? 'zoom-out' : 'zoom-in'; });
-    container.addEventListener('mouseleave', () => { isDragging = false; container.style.cursor = zoomed ? 'zoom-out' : 'zoom-in'; });
+    container.addEventListener('mouseup', () => { 
+      isDragging = false; 
+      container.style.cursor = zoomed ? 'zoom-out' : 'zoom-in'; 
+    });
+
+    container.addEventListener('mouseleave', () => { 
+      isDragging = false; 
+      container.style.cursor = zoomed ? 'zoom-out' : 'zoom-in'; 
+    });
 
     container.addEventListener('mousemove', (e) => {
       if (!isDragging) return;
@@ -134,5 +140,6 @@ img.addEventListener('click', (e) => {
       container.scrollTop = scrollTop - (y - startY);
     });
   </script>
+
 </body>
 </html>
