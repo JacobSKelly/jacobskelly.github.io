@@ -1,98 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jacob Samuel Kelly - Artist Portfolio</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Jacob Samuel Kelly - Portfolio</title>
 <style>
-:root {
-  --bio-vertical-offset: 6vh;
-}
+/* Reset */
+* { margin:0; padding:0; box-sizing:border-box; }
 
-body {
-  margin: 0;
+/* Base styles */
+html, body {
+  width:100%;
   font-family: Helvetica, Arial, sans-serif;
-  background: #fff;
-  color: #111;
-  text-align: center;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  background:#fff;
+  color:#111;
+  text-align:center;
+  overflow-x:hidden;
 }
+body { display:flex; flex-direction:column; min-height:100vh; }
 
+/* Header */
 header {
-  flex: 0 0 auto;
-  padding: 2vh 20px 1vh 20px;
-  line-height: 1.2;
+  flex:0 0 auto;
+  padding:2vh 20px 1vh 20px;
+  line-height:1.2;
 }
+header h1 { cursor: default; font-size: 4vh; margin-bottom:1vh; }
+header p { cursor: default; font-size:1.8vh; color:#555; }
 
-header h1 {
-  font-size: 4vh;
-  margin: 0 0 1vh 0;
-}
-
-header p {
-  font-size: 1.8vh;
-  color: #555;
-  margin: 0;
-}
-
+/* Gallery */
 .gallery {
-  flex: 1 1 auto;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5vh;
-  max-width: 90vw;
-  margin: 0 auto;
+  flex:1 1 auto;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1.5vh;
+  max-width:90vw;
+  margin:2vh auto 4vh auto;
 }
-
 .gallery a {
-  width: 100%;
-  aspect-ratio: 1/1;
-  background: #f5f5f5;
-  overflow: hidden;
-  text-decoration: none;
+  width:100%;
+  aspect-ratio:1/1;
+  background:#f5f5f5;
+  overflow:hidden;
+  text-decoration:none;
 }
-
 .gallery a img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: bottom center;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:bottom center;
 }
 
+/* Mobile gallery scroll */
+@media (max-width: 768px) {
+  .gallery {
+    display:flex;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    gap:2vw;
+    padding:1vh 2vw;
+    max-width:100%;
+    scroll-snap-type: x mandatory;
+  }
+  .gallery a {
+    flex:0 0 90%;
+    scroll-snap-align:center;
+  }
+}
+
+/* Bio text */
 .bio-container {
-  flex: 0 0 auto;
-  padding: 1vh 20px;
-  display: flex;
-  justify-content: center;
-  margin-top: var(--bio-vertical-offset);
-  margin-bottom: var(--bio-vertical-offset);
+  flex:0 0 auto;
+  padding:1vh 20px;
+  display:flex;
+  justify-content:center;
+  margin:2vh 0;
 }
-
 .bio-container p {
-  font-size: 1.6vh;
-  line-height: 1.4;
-  margin: 0;
-  max-width: 40ch;
-  text-align: justify;
+  font-size:clamp(14px,1.6vh,18px);
+  line-height:1.4;
+  max-width:70%;
+  text-align:justify;
+  overflow-wrap: break-word;
 }
 
+/* Footer */
 footer {
-  flex: 0 0 auto;
-  font-size: 1.2vh;
-  color: #777;
-  padding: 1vh 0;
+  flex:0 0 auto;
+  font-size:0.8rem;
+  color:#777;
+  padding:1vh 0;
 }
+footer a { color:#777; text-decoration:none; }
 
-footer a {
-  color: #777;
-  text-decoration: none;
+/* Desktop: Force fourth image to new row */
+@media (min-width: 769px) {
+  .gallery a:nth-child(4) {
+    grid-column:1 / 2;
+  }
 }
 </style>
 </head>
 <body>
+
+<script>
+// Mobile redirect stays on the same index page now
+if (window.innerWidth <= 768) {
+  window.location.href = "index.html";
+}
+</script>
 
 <header>
   <h1>Jacob Samuel Kelly</h1>
@@ -100,16 +116,23 @@ footer a {
 </header>
 
 <section class="gallery">
-  <a href="layer1.html"><img src="https://phfinal.s3.eu-west-2.amazonaws.com/praying+hands+2.jpg" alt="Artwork 1"></a>
-  <a href="layer2.html"><img src="https://phfinal.s3.eu-west-2.amazonaws.com/layer2.jpg" alt="Artwork 2"></a>
-  <a href="layer3.html"><img src="https://phfinal.s3.eu-west-2.amazonaws.com/hand+knot1.png" alt="Artwork 3"></a>
+  <a href="layer1.html">
+    <img src="https://phfinal.s3.eu-west-2.amazonaws.com/praying+hands+2.jpg" alt="Artwork 1">
+  </a>
+  <a href="layer2.html">
+    <img src="https://phfinal.s3.eu-west-2.amazonaws.com/layer2.jpg" alt="Artwork 2">
+  </a>
+  <a href="layer3.html">
+    <img src="https://phfinal.s3.eu-west-2.amazonaws.com/hand+knot1.png" alt="Artwork 3">
+  </a>
+  <a href="layer4.html">
+    <img src="https://github.com/JacobSKelly/jacobskelly.github.io/blob/main/images/10mb.png?raw=true" alt="Nearly Six Eggs">
+  </a>
 </section>
 
 <div class="bio-container">
   <p>
-    A body of work exploring irrepressible trauma. An attempt to uncover an
-    unsettling realism in dream like imagery. Gleaned from the surface of the
-    unconscious; a dark urgency for communication.
+    A body of work exploring irrepressible trauma. An attempt to uncover an unsettling realism in dreamlike imagery. Gleaned from the surface of the unconscious; a dark urgency for communication.
   </p>
 </div>
 
