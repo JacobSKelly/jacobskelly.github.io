@@ -1,138 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Seven Billion Tonne 2024 - Jacob Samuel Kelly</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      font-family: Helvetica, Arial, sans-serif;
-      height: 100%;
-      width: 100%;
-      background: #fff;
-      color: #111;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seven Billion Tonne 2024</title>
 
-    body {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
+<style>
 
-    .text-area {
-      width: 30%;
-      padding: 40px;
-      box-sizing: border-box;
-      font-size: 1em;
-      line-height: 1.6;
-      color: #555;
-      overflow-y: auto;
-      height: 100vh;
-    }
+body{
+  display:flex;
+  margin:0;
+  font-family: Helvetica, Arial, sans-serif;
+  height:100vh;
+  overflow:hidden;
+  background:#000;
+  color:#fff;
+}
 
-    .image-area {
-      width: 70%;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
+/* LEFT PANEL */
 
-    .image-area img {
-      display: block;
-      max-width: 100%;
-      max-height: 100%;
-      cursor: zoom-in;
-      transition: transform 0.5s ease;
-      transform-origin: top left;
-    }
+.info-container{
+  width:30%;
+  padding:40px;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  margin-top:20px;
+}
 
-    a.back {
-      display: inline-block;
-      margin-top: 20px;
-      text-decoration: none;
-      color: #111;
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
+.info-container h1{
+  margin:0 0 5px 0;
+  font-size:clamp(1.8rem,5vw,2.2em);
+  font-weight:900;
+}
 
-    @media(max-width:900px){
-      body { flex-direction: column; }
-      .text-area { width: 90%; height: auto; }
-      .image-area { width: 90%; margin-top: 20px; height: auto; }
-    }
-  </style>
+.info-container p{
+  margin:2px 0;
+  font-size:clamp(1rem,2.5vw,1.2em);
+  line-height:1.2;
+  font-weight:600;
+}
+
+/* BACK BUTTON */
+
+.back{
+  display:inline-block;
+  margin-bottom:20px;
+  text-decoration:none;
+  color:#fff;
+  font-weight:bold;
+  letter-spacing:1px;
+  font-size:0.9rem;
+}
+
+/* IMAGE AREA */
+
+.image-area{
+  width:70%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  overflow:hidden;
+}
+
+.image-area img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  transition:transform 0.3s ease;
+}
+
+.image-area img:hover{
+  transform:scale(1.05);
+}
+
+/* MOBILE */
+
+@media (max-width:768px){
+
+  body{
+    flex-direction:column;
+    height:auto;
+  }
+
+  .info-container,
+  .image-area{
+    width:100%;
+    padding:20px;
+  }
+
+  .image-area{
+    height:50vh;
+  }
+
+}
+
+</style>
 </head>
+
 <body>
-  <div class="text-area">
-    <h1>Seven Billion Tonne 2024</h1>
-    <p><strong>Digital Painting</strong></p>
-    <p>Seven Billion Tonne</p>
-    <a href="index.html" class="back">← Back to Portfolio</a>
-  </div>
+
+<div class="info-container">
+
+<a href="index.html" class="back">← Back to Portfolio</a>
+
+<h1>Kiss The Ring <span style="font-size:0.8em;">2025</span></h1>
+
+<p><strong>Digital Painting</strong></p>
+<p>The Hand That Ties The Knot</p>
+
+</div>
+
 
  <div class="image-area">
     <img src="https://phfinal.s3.eu-west-2.amazonaws.com/hand+knot1.png " alt="Seven Billion Tonne 2024" id="mainImage">
   </div>
 
-  <script>
-    const img = document.querySelector('.image-area img');
-    const container = img.parentElement;
-    let zoomed = false;
-    const scale = 4;
+<script>
 
-img.addEventListener('click', (e) => {
-  if (!zoomed) {
-    // Zoom in at cursor
-    const rect = img.getBoundingClientRect();
-    const offsetX = (e.clientX - rect.left) / rect.width;
-    const offsetY = (e.clientY - rect.top) / rect.height;
+const img = document.getElementById('mainImage');
 
-    container.style.overflow = 'auto';
-    img.style.transformOrigin = `${offsetX * 100}% ${offsetY * 100}%`;
-    img.style.transform = `scale(${scale})`;
-    container.scrollLeft = img.offsetWidth * scale * offsetX - (e.clientX - container.getBoundingClientRect().left);
-    container.scrollTop = img.offsetHeight * scale * offsetY - (e.clientY - container.getBoundingClientRect().top);
-    img.style.cursor = 'zoom-out';
-    zoomed = true;
-  } else {
-    // Close lightbox: just reset zoom
-    img.style.transform = 'scale(1)';
-    container.style.overflow = 'hidden';
-    img.style.cursor = 'zoom-in';
-    zoomed = false;
-  }
+img.addEventListener('click', () => {
+  window.location.href = 'zoom2.html';
 });
-    // Drag-to-pan
-    let isDragging = false, startX, startY, scrollLeft, scrollTop;
 
-    container.addEventListener('mousedown', (e) => {
-      if (!zoomed) return;
-      isDragging = true;
-      startX = e.pageX - container.offsetLeft;
-      startY = e.pageY - container.offsetTop;
-      scrollLeft = container.scrollLeft;
-      scrollTop = container.scrollTop;
-      container.style.cursor = 'grabbing';
-    });
+</script>
 
-    container.addEventListener('mouseup', () => { isDragging = false; container.style.cursor = zoomed ? 'zoom-out' : 'zoom-in'; });
-    container.addEventListener('mouseleave', () => { isDragging = false; container.style.cursor = zoomed ? 'zoom-out' : 'zoom-in'; });
-
-    container.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      e.preventDefault();
-      const x = e.pageX - container.offsetLeft;
-      const y = e.pageY - container.offsetTop;
-      container.scrollLeft = scrollLeft - (x - startX);
-      container.scrollTop = scrollTop - (y - startY);
-    });
-  </script>
 </body>
 </html>
