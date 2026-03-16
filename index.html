@@ -72,13 +72,6 @@ header p { cursor: default; font-size:1.8vh; color:#555; }
   }
 }
 
-/* Desktop: Force fourth image to left of second row */
-@media (min-width: 769px) {
-  .gallery a:nth-child(4) {
-    grid-column: 1; /* first column of new row */
-  }
-}
-
 /* Footer */
 footer {
   flex:0 0 auto;
@@ -87,6 +80,13 @@ footer {
   padding:1vh 0;
 }
 footer a { color:#777; text-decoration:none; }
+
+/* Desktop: Force fourth image to new row */
+@media (min-width: 769px) {
+  .gallery a:nth-child(4) {
+    grid-column:1 / 2;
+  }
+}
 </style>
 </head>
 <body>
