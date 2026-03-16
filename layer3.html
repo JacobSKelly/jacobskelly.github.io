@@ -1,105 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Seven Billion Tonne 2024</title>
-<style>
-  body {
-    display: flex;
-    margin: 0;
-    font-family: Helvetica, Arial, sans-serif;
-    height: 100vh;
-    overflow: hidden;
-    background-color: #000; /* entire background black */
-    color: #fff;            /* default text color white */
-  }
-
-  /* LEFT PANEL */
-  .info-container {
-    width: 30%;
-    padding: 40px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* move text slightly higher */
-    margin-top: 20px;
-    background-color: #000; /* black panel */
-    color: #fff;
-  }
-
-  .info-container h1 {
-    margin: 0 0 5px 0; /* smaller gap below heading */
-    font-size: clamp(1.8rem, 5vw, 2.2em); /* slightly larger for bold emphasis */
-    font-weight: 900; /* boldest for "Seven Billion Tonne" */
-    color: #fff;
-  }
-
-  .info-container p {
-    margin: 2px 0; /* closer together */
-    font-size: clamp(1rem, 2.5vw, 1.2em);
-    line-height: 1.2; /* tighter lines */
-    font-weight: 600;  /* slightly thicker for visibility */
-    color: #fff;
-  }
-
-  /* RIGHT IMAGE AREA */
-  .image-area {
-    width: 70%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    overflow: hidden;
-    background-color: #000;
-  }
-
-  .image-area img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: transform 0.3s ease;
-  }
-
-  .image-area img:hover {
-    transform: scale(1.05);
-  }
-
-  /* RESPONSIVE LAYOUT */
-  @media (max-width: 768px) {
-    body {
-      flex-direction: column;
-      height: auto;
-    }
-    .info-container, .image-area {
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seven Billion Tonne 2024 - Jacob Samuel Kelly</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Helvetica, Arial, sans-serif;
+      height: 100%;
       width: 100%;
-      padding: 20px;
+      background: #fff;
+      color: #111;
     }
+
+    body {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .text-area {
+      width: 30%;
+      padding: 40px;
+      box-sizing: border-box;
+      font-size: 1em;
+      line-height: 1.6;
+      color: #555;
+      overflow-y: auto;
+      height: 100vh;
+    }
+
     .image-area {
-      height: 50vh;
+      width: 70%;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
     }
-  }
-</style>
+
+    .image-area img {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      cursor: zoom-in;
+      transition: transform 0.5s ease;
+      transform-origin: top left;
+    }
+
+    a.back {
+      display: inline-block;
+      margin-top: 20px;
+      text-decoration: none;
+      color: #111;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    @media(max-width:900px){
+      body { flex-direction: column; }
+      .text-area { width: 90%; height: auto; }
+      .image-area { width: 90%; margin-top: 20px; height: auto; }
+    }
+  </style>
 </head>
 <body>
-
-  <div class="info-container">
-    <h1>Seven Billion Tonne <span style="font-size:0.8em;">2024</span></h1>
+  <div class="text-area">
+    <h1>Seven Billion Tonne 2024</h1>
     <p><strong>Digital Painting</strong></p>
-    <p>The hand that ties the knot.</p>
+    <p>Seven Billion Tonne</p>
+    <a href="index.html" class="back">← Back to Portfolio</a>
   </div>
 
-  <div class="image-area">
+ <div class="image-area">
     <img src="https://phfinal.s3.eu-west-2.amazonaws.com/hand+knot1.png " alt="Seven Billion Tonne 2024" id="mainImage">
   </div>
 
-<script>
-  // Clicking the image goes to zoom page
-  const img = document.getElementById('mainImage');
-  img.addEventListener('click', () => {
-    window.location.href = 'zoom3.html';
-  });
-</script>
+  <script>
+    const img = document.querySelector('.image-area img');
+    const container = img.parentElement;
+    let zoomed = false;
+    const scale = 4;
 
+img.addEventListener('click', (e) => {
+  if (!zoomed) {
+    // Zoom in at cursor
+    const rect = img.getBoundingClientRect();
+    const offsetX = (e.clientX - rect.left) / rect.width;
+    const offsetY = (e.clientY - rect.top) / rect.height;
+
+    container.style.overflow = 'auto';
+    img.style.transformOrigin = `${offsetX * 100}% ${offsetY * 100}%`;
+    img.style.transform = `scale(${scale})`;
+    container.scrollLeft = img.offsetWidth * scale * offsetX - (e.clientX - container.getBoundingClientRect().left);
+    container.scrollTop = img.offsetHeight * scale * offsetY - (e.clientY - container.getBoundingClientRect().top);
+    img.style.cursor = 'zoom-out';
+    zoomed = true;
+  } else {
+    // Close lightbox: just reset zoom
+    img.style.transform = 'scale(1)';
+    container.style.overflow = 'hidden';
+    img.style.cursor = 'zoom-in';
+    zoomed = false;
+  }
+});
+    // Drag-to-pan
+    let isDragging = false, startX, startY, scrollLeft, scrollTop;
+
+    container.addEventListener('mousedown', (e) => {
+      if (!zoomed) return;
+      isDragging = true;
+      startX = e.pageX - container.offsetLeft;
+      startY = e.pageY - container.offsetTop;
+      scrollLeft = container.scrollLeft;
+      scrollTop = container.scrollTop;
+      container.style.cursor = 'grabbing';
+    });
+
+    container.addEventListener('mouseup', () => { isDragging = false; container.style.cursor = zoomed ? 'zoom-out' : 'zoom-in'; });
+    container.addEventListener('mouseleave', () => { isDragging = false; container.style.cursor = zoomed ? 'zoom-out' : 'zoom-in'; });
+
+    container.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const x = e.pageX - container.offsetLeft;
+      const y = e.pageY - container.offsetTop;
+      container.scrollLeft = scrollLeft - (x - startX);
+      container.scrollTop = scrollTop - (y - startY);
+    });
+  </script>
 </body>
 </html>
