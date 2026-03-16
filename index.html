@@ -42,14 +42,6 @@ header h1, header p { cursor: default; }
   object-position:bottom center;
 }
 
-/* Desktop: wrap fourth image to next row and align left */
-@media (min-width: 769px) {
-  .gallery a:nth-child(4) {
-    grid-column: 1 / 2; /* first column on new row */
-    justify-self: start; /* align left edge */
-  }
-}
-
 @media (max-width: 768px) {
   .gallery {
     display:flex;
@@ -66,9 +58,12 @@ header h1, header p { cursor: default; }
     aspect-ratio:1/1;
     scroll-snap-align:center;
   }
-  /* Optional: nudge fourth image slightly right for visual balance on mobile */
+}
+
+@media (min-width: 769px) {
+  /* Force fourth image to wrap to next row */
   .gallery a:nth-child(4) {
-    margin-left: 2vw;
+    grid-column: 1 / 2; /* first column on new row */
   }
 }
 
