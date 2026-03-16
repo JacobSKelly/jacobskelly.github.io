@@ -42,6 +42,14 @@ header h1, header p { cursor: default; }
   object-position:bottom center;
 }
 
+/* Fourth image aligns left on desktop */
+@media (min-width: 769px) {
+  .gallery a:nth-child(4) {
+    grid-column: 1 / 2; /* force next row */
+    justify-self: start; /* align left edge */
+  }
+}
+
 @media (max-width: 768px) {
   .gallery {
     display:flex;
@@ -58,12 +66,9 @@ header h1, header p { cursor: default; }
     aspect-ratio:1/1;
     scroll-snap-align:center;
   }
-}
-
-@media (min-width: 769px) {
-  /* Force fourth image to wrap to next row */
+  /* Optional: nudge fourth image slightly right for visual balance */
   .gallery a:nth-child(4) {
-    grid-column: 1 / 2; /* first column on new row */
+    margin-left: 2vw;
   }
 }
 
@@ -101,7 +106,7 @@ footer {
 }
 footer a { color:#777; text-decoration:none; }
 
-/* Stone letters styling kept but no interactivity */
+/* Stone letters styling kept but no animation */
 .stone span {
   display:inline-block;
   position:relative;
@@ -128,9 +133,9 @@ if (window.innerWidth <= 768) {
 </header>
 
 <section class="gallery">
-  <a href="layer1.html"><img src="https://phfinal.s3.eu-west-2.amazonaws.com/praying+hands+2.jpg" alt="Artwork 1"></a>
-  <a href="layer2.html"><img src="https://phfinal.s3.eu-west-2.amazonaws.com/layer2.jpg" alt="Artwork 2"></a>
-  <a href="layer3.html"><img src="https://phfinal.s3.eu-west-2.amazonaws.com/hand+knot1.png" alt="Artwork 3"></a>
+  <a href="layer1.html"><img src="images/praying+hands+2.jpg" alt="Artwork 1"></a>
+  <a href="layer2.html"><img src="images/layer2.jpg" alt="Artwork 2"></a>
+  <a href="layer3.html"><img src="images/hand+knot1.png" alt="Artwork 3"></a>
   <a href="layer4.html"><img src="images/10mb.png" alt="Nearly Six Eggs"></a>
 </section>
 
@@ -157,7 +162,7 @@ if (window.innerWidth <= 768) {
   </p>
 </footer>
 
-<!-- Stone letters interactivity removed -->
+<!-- Stone Letters interactivity disabled -->
 
 </body>
 </html>
