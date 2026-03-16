@@ -3,30 +3,31 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Jacob Samuel Kelly - Portfolio</title>
+<title>Jacob Samuel Kelly - Stone Letters</title>
 
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body {
   width:100%;
+  height:100%;
   font-family: Helvetica, Arial, sans-serif;
   background:#fff;
   color:#111;
   text-align:center;
   overflow-x:hidden;
 }
-body { display:flex; flex-direction:column; min-height:100vh; }
+body { display:flex; flex-direction:column; }
 
 header { flex:0 0 auto; padding:2vh 20px 1vh 20px; line-height:1.2; }
 header h1, header p { cursor: default; }
 
 .gallery {
-  flex:0 0 auto;
+  flex:0 0 auto; /* don't push bio/footer down */
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:1.5vh;
   max-width:90vw;
-  margin:0 auto 12vh auto;
+  margin:0 auto 12vh auto; /* increased bottom space before bio */
 }
 .gallery a {
   width:100%;
@@ -42,17 +43,9 @@ header h1, header p { cursor: default; }
   object-position:bottom center;
 }
 
-/* Fourth image on new row, left-aligned */
-@media (min-width: 769px) {
-  .gallery a:nth-child(4) {
-    grid-column: 1 / 2;
-  }
-}
-
 @media (max-width: 768px) {
   .gallery {
     display:flex;
-    flex-wrap:nowrap;
     overflow-x:auto;
     gap:2vw;
     padding: 1vh 2vw;
@@ -62,21 +55,21 @@ header h1, header p { cursor: default; }
   }
   .gallery a {
     flex: 0 0 90%;
-    aspect-ratio:1/1;
-    scroll-snap-align:center;
+    aspect-ratio: 1/1;
+    scroll-snap-align: center;
   }
 }
 
 .bio-container {
   flex:0 0 auto;
-  padding:0.2vh 20px;
+  padding:0.2vh 20px; /* much tighter vertical padding */
   display:flex;
   justify-content:center;
 }
 .bio-container p {
   font-size: clamp(14px, 1.6vh, 18px);
-  line-height:1.2;
-  max-width:70%;
+  line-height:1.2; /* tighter line spacing */
+  max-width:70%; /* narrower so text sits more centered vertically */
   margin:0 auto;
   text-align:justify;
   text-align-last:left;
@@ -97,15 +90,15 @@ footer {
   font-size:0.8rem; 
   color:#777; 
   padding:1vh 0; 
-  margin-top:4vh;
+  margin-top:4vh; /* clear visual gap above footer */
 }
 footer a { color:#777; text-decoration:none; }
 
-/* Stone letters styling kept but no interactivity */
 .stone span {
   display:inline-block;
   position:relative;
   user-select:text;
+  will-change:transform;
 }
 .word-spacer {
   display:inline-block;
@@ -116,7 +109,7 @@ footer a { color:#777; text-decoration:none; }
 <body>
 
 <script>
-// Mobile redirect
+// If screen width is small (mobile), redirect to og.html
 if (window.innerWidth <= 768) {
   window.location.href = "og.html";
 }
@@ -128,20 +121,12 @@ if (window.innerWidth <= 768) {
 </header>
 
 <section class="gallery">
-  <a href="layer1.html">
-    <img src="https://phfinal.s3.eu-west-2.amazonaws.com/praying+hands+2.jpg" alt="Artwork 1">
-  </a>
-  <a href="layer2.html">
-    <img src="https://phfinal.s3.eu-west-2.amazonaws.com/layer2.jpg" alt="Artwork 2">
-  </a>
-  <a href="layer3.html">
-    <img src="https://phfinal.s3.eu-west-2.amazonaws.com/hand+knot1.png" alt="Artwork 3">
-  </a>
-  <a href="layer4.html">
-    <img src="images/10mb.png" alt="Nearly Six Eggs 2026">
-  </a>
+  <a href="layer1.html"><img src="https://phfinal.s3.eu-west-2.amazonaws.com/praying+hands+2.jpg" alt="Artwork 1"></a>
+  <a href="layer2.html"><img src="https://phfinal.s3.eu-west-2.amazonaws.com/layer2.jpg" alt="Artwork 2"></a>
+  <a href="layer3.html"><img src="https://phfinal.s3.eu-west-2.amazonaws.com/hand+knot1.png" alt="Artwork 3"></a>
 </section>
 
+<!-- Split bio into four stacked interactive layers -->
 <div class="bio-container stone">
   <p>A body of work exploring irrepressible trauma.</p>
 </div>
@@ -165,7 +150,117 @@ if (window.innerWidth <= 768) {
   </p>
 </footer>
 
-<!-- Stone letters interactivity removed -->
+<script>
+window.onerror = function(message, source, line, col, error) {
+  console.warn("Caught error:", message);
+  return true;
+};
 
+function wrapLettersSafe() {
+  try {
+    const wrapText = (text) => {
+      const words = text.trim().split(/\s+/);
+      return words.map(word =>
+        word.split('').map(c => `<span>${c}</span>`).join('') +
+        '<span class="word-spacer"></span>'
+      ).join('');
+    };
+
+    document.querySelectorAll('.stone').forEach(el => {
+      const processNode = (node) => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const txt = node.textContent;
+          if (!txt || !txt.trim()) return '';
+          return wrapText(txt);
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          const tag = node.tagName.toLowerCase();
+          let attrs = '';
+          for (let i = 0; i < node.attributes.length; i++) {
+            const a = node.attributes[i];
+            const val = String(a.value).replace(/"/g, '&quot;');
+            attrs += ` ${a.name}="${val}"`;
+          }
+          const childrenHTML = Array.from(node.childNodes).map(processNode).join('');
+          return `<${tag}${attrs}>${childrenHTML}</${tag}>`;
+        } else {
+          return '';
+        }
+      };
+
+      const newHTML = Array.from(el.childNodes).map(processNode).join('');
+      if (newHTML) el.innerHTML = newHTML;
+    });
+  } catch(e) {
+    console.warn("Letter wrapping failed:", e);
+  }
+}
+wrapLettersSafe();
+
+const letters = [];
+document.querySelectorAll('.stone span').forEach(span => {
+  letters.push({el: span, x:0, y:0, vx:0, vy:0});
+});
+
+let cursor = {x: window.innerWidth/2, y: window.innerHeight/2};
+let isTouch = 'ontouchstart' in window;
+if (isTouch) {
+  document.addEventListener('touchmove', e => {
+    if (e.touches[0]) {
+      cursor.x = e.touches[0].clientX;
+      cursor.y = e.touches[0].clientY;
+    }
+  }, {passive:true});
+} else {
+  document.addEventListener('mousemove', e => {
+    cursor.x = e.clientX;
+    cursor.y = e.clientY;
+  });
+}
+
+function updateLettersSafe() {
+  try {
+    letters.forEach(letter => {
+      const rect = letter.el.getBoundingClientRect();
+      const cx = rect.left + rect.width/2;
+      const cy = rect.top + rect.height/2;
+      const dx = cx - cursor.x;
+      const dy = cy - cursor.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+
+      const radius = isTouch ? 20 : 40;
+      const maxStrength = isTouch ? 0.5 : 1.5;
+
+      if(dist < radius){
+        const strength = (1 - dist/radius) * maxStrength;
+        const angle = Math.atan2(dy, dx);
+        letter.vx += Math.cos(angle) * strength;
+        letter.vy += Math.sin(angle) * strength;
+      }
+
+      letter.x += letter.vx;
+      letter.y += letter.vy;
+      letter.vx *= 0.85;
+      letter.vy *= 0.85;
+
+      letter.el.style.transform = `translate(${letter.x}px, ${letter.y}px)`;
+    });
+  } catch(e) {
+    console.warn("Animation failed:", e);
+  }
+
+  requestAnimationFrame(updateLettersSafe);
+}
+updateLettersSafe();
+
+document.body.addEventListener('click', function(e) {
+  try {
+    if(!e.target.closest('a,img,span')) {
+      window.location.href = 'og.html';
+    }
+  } catch(e) {
+    console.warn("Redirect failed:", e);
+  }
+});
+</script>
 </body>
 </html>
