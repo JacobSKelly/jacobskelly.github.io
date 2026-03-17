@@ -94,8 +94,8 @@ overflow:hidden;
 
 .blur-box img{
 position:absolute;
-width:140%;
-height:140%;
+width:100%;
+height:100%;
 left:50%;
 top:50%;
 transform:translate(-50%,-50%) scale(1.14);
@@ -584,7 +584,7 @@ function animateLayer(img,now){
     s.blurFrom = s.blurTo;
     s.blurTo = rand(12,40);
     s.blurStart = now;
-    s.blurDuration = rand(12000,42000);
+    s.blurDuration = rand(10000,42000);
     blurT = 0;
   }
   const blurEase = easeInOut(Math.max(0,Math.min(1,blurT)));
