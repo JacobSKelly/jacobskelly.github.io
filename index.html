@@ -54,16 +54,26 @@ color:#555;
 margin-top:6px;
 }
 
+.controls-line{
+margin-top:2px;
+}
+
 .controls a{
 font-size:0.85rem;
 color:#111;
 text-decoration:none;
-margin:0 6px;
+margin:0 4px;
 cursor:pointer;
 }
 
 .controls a:hover{
 text-decoration:underline;
+}
+
+.controls .separator{
+font-size:0.85rem;
+color:#111;
+margin:0 2px;
 }
 
 /* BLUR CENTREPIECE */
@@ -274,9 +284,14 @@ text-decoration:none;
 <p>contact for order requests.</p>
 
 <div class="controls">
-<a id="bioBtn">bio</a>
+<div class="controls-line">
 <a id="galleryBtn">gallery</a>
-<a href="https://gofund.me/5230ddea1" target="_blank">support me</a>
+<span class="separator">/</span>
+<a id="bioBtn">bio</a>
+</div>
+<div class="controls-line">
+<a href="https://gofund.me/5230ddea1" target="_blank">support</a>
+</div>
 </div>
 
 </header>
@@ -298,19 +313,19 @@ text-decoration:none;
 
 <p>Jacob Kelly is a Manchester-based artist working across digital print, text, and sound. Jacob’s practice explores irrepressible trauma through dreamlike imagery, drawing from memory, the unconscious, and lived experience. Writing and poetry sit at the centre of the work, often forming the structure images emerge from—texts that fragment, loop, or break down as a way of reaching something beyond straightforward language.</p>
 
-<p>The work is driven by a need to communicate something that resists clear explanation—something felt in the body before it can be named. Jacob works with the idea that art is an extension of the body, and the body an extension of the land. Influenced by dark ecology, folklore, childhood imagery, and literature, the work moves between states—human and animal, conscious to the unconscious, surface and depth. Transformation is a recurring structure: amphibious, nocturnal, shifting between worlds, resisting fixed or binary ways of thinking. Blurring the lines and boundaries that restrain our live.</p>
+<p>The work is driven by a need to communicate something that resists clear explanation—something felt in the body before it can be named. Jacob works with the idea that art is an extension of the body, and the body an extension of the land. Influenced by dark ecology, folklore, childhood imagery, and literature, the work moves between states—human and animal, conscious and unconscious, surface and depth. Transformation is a recurring structure: amphibious, nocturnal, shifting between worlds, resisting fixed or binary ways of thinking. Blurring the lines and boundaries that restrain our lives.</p>
 
 <p>Much of Jacob’s practice is shaped by mental health, including experiences of depression, ADHD, autism, and PTSD, which have at times made it difficult to sustain a physical studio practice or engage with traditional production methods. In response, Jacob has developed a way of working that is largely self-contained and resourceful—building and maintaining computers from low-cost or salvaged parts, and working independently to produce large-scale digital images.</p>
 
-<p>Jacob is more driven by exploration than by finished projects: the urge to discover a new technique or a new approach, using mixed medie to emphasise the feeling of his work, rather than any particular message. The work is inspired by peripheral or overlooked developments in the history of art and film making, including matte paintings, analogue animation, and photographic effects.</p>
+<p>Jacob is more driven by exploration than by finished projects: the urge to discover a new technique or a new approach, using mixed media to emphasise the feeling of the work rather than any particular message. The work is inspired by peripheral or overlooked developments in the history of art and filmmaking, including matte paintings, analogue animation, and photographic effects.</p>
 
-<p>These images are often made at extreme resolutions—sometimes several metres in scale—in order to recreate effects associated with analogue photography and animation, such as grain, blur, halation, glow, lense abaration, refractions, chemical degradation. This process allows Jacob to move between high and low definition, and between high and low cultural references, using digital tools in ways that feel unstable, physical, and imperfect.</p>
+<p>These images are often made at extreme resolutions—sometimes several metres in scale—in order to recreate effects associated with analogue photography and animation, such as grain, blur, halation, glow, lens aberration, refraction, and chemical degradation. This process allows Jacob to move between high and low definition, and between high and low cultural references, using digital tools in ways that feel unstable, physical, and imperfect.</p>
 
 <p>The images often appear fragmented or collapsing. Narratives break apart, forms dissolve, and meaning slips. These works attempt to reconstruct images from dreams, holding onto something fleeting before it disappears. The instability within the work reflects both personal experience and a wider sense of social and ecological breakdown, where inherited trauma sits alongside cycles of decay and return.</p>
 
 <p>Jacob works entirely by hand within digital systems, rejecting AI-driven production. The process is slow, repetitive, and often involves pushing unreliable or limited hardware to its limits. This tension—between control and failure, clarity and distortion—is central to the work.</p>
 
-<p>Alongside the visual practice, Jacob produces ambient and experimental sound. The sound work treats landscape as something you move through rather than observe—layered environments where moments of melody or clarity emerge from dense, uneasy atmospheres. Across all mediums, the work returns to the same problem: how to form an image from a dream, and how to communicate it before it disappears. Trauma often acts as an impetus for forgetting but perhaps by building from the unkown we can releive ourselves from the nightmares that reemerge.</p>
+<p>Alongside the visual practice, Jacob produces ambient and experimental sound. The sound work treats landscape as something you move through rather than observe—layered environments where moments of melody or clarity emerge from dense, uneasy atmospheres. Across all mediums, the work returns to the same problem: how to form an image from a dream, and how to communicate it before it disappears. Trauma often acts as an impetus for forgetting, but perhaps by building from the unknown we can relieve ourselves of the nightmares that re-emerge.</p>
 
 <h3>Exhibitions &amp; Projects (Selected)</h3>
 
@@ -406,10 +421,6 @@ text-decoration:none;
 
 <a href="layer8.html">
 <img src="images/thumbnut.jpg" alt="">
-</a> 
-
-<a href="layer9.html">
-<img src="images/etrthumb.jpg" alt="">
 </a>
 
 </section>
@@ -501,7 +512,6 @@ const images = [
 "images/thumbnut.jpg",
 "images/midtripthumb.jpg",
 "images/mantisthumb.png"
-"images/etrthumb.jpg"
 ];
 
 
