@@ -76,7 +76,7 @@ color:#111;
 margin:0 2px;
 }
 
-/* BLUR CENTREPIECE */
+/* HERO */
 
 .hero{
 display:flex;
@@ -105,9 +105,9 @@ will-change:opacity,transform,filter;
 pointer-events:none;
 }
 
-/* BIO */
+/* SHARED TEXT SECTIONS */
 
-.bio{
+.bio, .exhibitions{
 display:none;
 max-width:780px;
 margin:28px auto;
@@ -116,11 +116,11 @@ text-align:left;
 line-height:1.35;
 }
 
-.bio.show{
+.bio.show, .exhibitions.show{
 display:block;
 }
 
-.bio h2{
+.bio h2, .exhibitions h2{
 font-size:1.05rem;
 margin-bottom:14px;
 text-align:center;
@@ -130,10 +130,9 @@ font-weight:normal;
 .bio p{
 margin-bottom:12px;
 font-size:0.88rem;
-color:#111;
 }
 
-.bio h3{
+.bio h3, .exhibitions h3{
 font-size:0.82rem;
 margin:20px 0 10px 0;
 text-align:center;
@@ -181,7 +180,6 @@ width:100%;
 aspect-ratio:1/1;
 background:#f5f5f5;
 overflow:hidden;
-text-decoration:none;
 }
 
 .gallery a img{
@@ -189,71 +187,6 @@ width:100%;
 height:100%;
 object-fit:cover;
 object-position:bottom center;
-}
-
-/* MOBILE */
-
-@media(max-width:768px){
-
-.gallery{
-grid-template-columns:1fr;
-gap:2vh;
-max-width:92vw;
-}
-
-header h1{
-font-size:28px;
-}
-
-header p{
-font-size:14px;
-}
-
-.blur-box{
-width:260px;
-height:260px;
-}
-
-.bio{
-max-width:92vw;
-margin:22px auto;
-padding:0 14px;
-line-height:1.32;
-}
-
-.bio h2{
-font-size:1rem;
-margin-bottom:12px;
-}
-
-.bio p{
-font-size:0.84rem;
-margin-bottom:10px;
-}
-
-.bio h3{
-font-size:0.78rem;
-margin:18px 0 8px 0;
-}
-
-.bio-year strong{
-font-size:0.74rem;
-}
-
-.bio-year li{
-font-size:0.68rem;
-}
-
-}
-
-/* DESKTOP */
-
-@media(min-width:769px){
-
-.gallery a:nth-child(4){
-grid-column:1;
-}
-
 }
 
 /* FOOTER */
@@ -280,7 +213,6 @@ text-decoration:none;
 <h1>Jacob Samuel Kelly</h1>
 
 <p>Jacob_Kelly@hotmail.co.uk / 07575722181 / Manchester</p>
-
 <p>contact for order requests.</p>
 
 <div class="controls">
@@ -288,6 +220,8 @@ text-decoration:none;
 <a id="galleryBtn">gallery</a>
 <span class="separator">/</span>
 <a id="bioBtn">bio</a>
+<span class="separator">/</span>
+<a id="exhibitionsBtn">exhibitions</a>
 </div>
 <div class="controls-line">
 <a href="https://gofund.me/5230ddea1" target="_blank">support</a>
@@ -298,87 +232,51 @@ text-decoration:none;
 
 <section class="hero" id="hero">
 <div class="blur-box">
-<img id="imgA" alt="">
-<img id="imgB" alt="">
+<img id="imgA">
+<img id="imgB">
 </div>
 </section>
 
 <section class="bio" id="bio">
-
 <h2>Jacob Kelly — Artist Bio</h2>
+<p>Jacob Kelly is a Manchester-based artist working across digital print, text, and sound...</p>
+</section>
 
-<p>Jacob Kelly is a Manchester-based artist working across digital print, text, and sound. Jacob’s practice explores irrepressible trauma through dreamlike imagery, drawing from memory, the unconscious, and lived experience. Writing and poetry sit at the centre of the work, often forming the structure images emerge from—texts that fragment, loop, or break down as a way of reaching something beyond straightforward language.</p>
+<section class="exhibitions" id="exhibitions">
 
-<p>The work is driven by a need to communicate something that resists clear explanation—something felt in the body before it can be named. Jacob works with the idea that art is an extension of the body, and the body an extension of the land. Influenced by dark ecology, folklore, childhood imagery, and literature, the work moves between states—human and animal, conscious and unconscious, surface and depth. Transformation is a recurring structure: amphibious, nocturnal, shifting between worlds, resisting fixed or binary ways of thinking. Blurring the lines and boundaries that restrain our lives.</p>
-
-<p>Much of Jacob’s practice is shaped by mental health, including experiences of depression, ADHD, autism, and PTSD, which have at times made it difficult to sustain a physical studio practice or engage with traditional production methods. In response, Jacob has developed a way of working that is largely self-contained and resourceful—building and maintaining computers from low-cost or salvaged parts, and working independently to produce large-scale digital images.</p>
-
-<p>Jacob is more driven by exploration than by finished projects: the urge to discover a new technique or a new approach, using mixed media to emphasise the feeling of the work rather than any particular message. The work is inspired by peripheral or overlooked developments in the history of art and filmmaking, including matte paintings, analogue animation, and photographic effects.</p>
-
-<p>These images are often made at extreme resolutions—sometimes several metres in scale—in order to recreate effects associated with analogue photography and animation, such as grain, blur, halation, glow, lens aberration, refraction, and chemical degradation. This process allows Jacob to move between high and low definition, and between high and low cultural references, using digital tools in ways that feel unstable, physical, and imperfect.</p>
-
-<p>The images often appear fragmented or collapsing. Narratives break apart, forms dissolve, and meaning slips. These works attempt to reconstruct images from dreams, holding onto something fleeting before it disappears. The instability within the work reflects both personal experience and a wider sense of social and ecological breakdown, where inherited trauma sits alongside cycles of decay and return.</p>
-
-<p>Jacob works entirely by hand within digital systems, rejecting AI-driven production. The process is slow, repetitive, and often involves pushing unreliable or limited hardware to its limits. This tension—between control and failure, clarity and distortion—is central to the work.</p>
-
-<p>Alongside the visual practice, Jacob produces ambient and experimental sound. The sound work treats landscape as something you move through rather than observe—layered environments where moments of melody or clarity emerge from dense, uneasy atmospheres. Across all mediums, the work returns to the same problem: how to form an image from a dream, and how to communicate it before it disappears. Trauma often acts as an impetus for forgetting, but perhaps by building from the unknown we can relieve ourselves of the nightmares that re-emerge.</p>
-
-<h3>Exhibitions &amp; Projects (Selected)</h3>
+<h2>Exhibitions & Projects (Selected)</h2>
 
 <div class="bio-year">
 <strong>2025</strong>
 <ul>
-<li>* Nice One, Public — Manchester</li>
-<li>* Nice One, Green Arches — Cheetham Hill, Manchester</li>
-<li>* Rat Dance Festival, Aatma — Manchester</li>
-<li>* Work On Display at The Peer Hat — Manchester</li>
-<li>* The Poetry Clinic, Saan1 Gallery — Northern Quarter, Manchester</li>
-<li>* Art For Our Sake, See Saw Space — Manchester</li>
+<li>Nice One, Public — Manchester</li>
+<li>Nice One, Green Arches — Cheetham Hill</li>
+<li>Rat Dance Festival, Aatma — Manchester</li>
+<li>The Peer Hat — Manchester</li>
+<li>Saan1 Gallery — Manchester</li>
+<li>See Saw Space — Manchester</li>
 </ul>
 </div>
 
 <div class="bio-year">
 <strong>2023</strong>
 <ul>
-<li>* Green Walk Open House Arts &amp; Craft Weekend — Manchester</li>
+<li>Green Walk Open House — Manchester</li>
 </ul>
 </div>
 
 <div class="bio-year">
 <strong>2021</strong>
 <ul>
-<li>* What’s Left Behind (digital archive), Williamson Art Gallery — Wirral</li>
+<li>Williamson Art Gallery — Wirral</li>
 </ul>
 </div>
 
 <div class="bio-year">
 <strong>2020</strong>
 <ul>
-<li>* Walled, Hulme Garden Centre — Manchester</li>
-<li>* Link Gallery, Manchester School of Art — Manchester</li>
-</ul>
-</div>
-
-<div class="bio-year">
-<strong>2019</strong>
-<ul>
-<li>* Mayfield Depot — Manchester</li>
-</ul>
-</div>
-
-<div class="bio-year">
-<strong>2017</strong>
-<ul>
-<li>* Hover Squid — Manchester</li>
-</ul>
-</div>
-
-<div class="bio-year">
-<strong>2016</strong>
-<ul>
-<li>* Gallery at Bank Quay — Warrington</li>
-<li>* U.Dance, The Lowry — Salford</li>
-<li>* Nexus Art Café — Manchester</li>
+<li>Hulme Garden Centre — Manchester</li>
+<li>Manchester School of Art</li>
 </ul>
 </div>
 
@@ -386,41 +284,15 @@ text-decoration:none;
 
 <section class="gallery" id="gallery">
 
-<a href="layer1.html">
-<img src="images/mantisthumb.png" alt="">
-</a>
-
-<a href="layer2.html">
-<img src="images/thumbring.png" alt="">
-</a>
-
-<a href="layer3.html">
-<img src="images/knotthumb.png" alt="">
-</a>
-
-<a href="layer4.html">
-<img src="images/thumbnailegg.jpg" alt="">
-</a>
-
-<a href="layer5.html">
-<img src="images/mercurythumbnail.png" alt="">
-</a>
-
-<a href="layer6.html">
-<img src="images/dreamthumb.jpg" alt="">
-</a>
-
-<a href="layer7.html">
-<img src="images/midtripthumb.jpg" alt="">
-</a>
-
-<a href="layer8.html">
-<img src="images/thumbnut.jpg" alt="">
-</a>
-
-<a href="layer9.html">
-<img src="images/etrthumb.jpg" alt="">
-</a>
+<a href="layer1.html"><img src="images/mantisthumb.png"></a>
+<a href="layer2.html"><img src="images/thumbring.png"></a>
+<a href="layer3.html"><img src="images/knotthumb.png"></a>
+<a href="layer4.html"><img src="images/thumbnailegg.jpg"></a>
+<a href="layer5.html"><img src="images/mercurythumbnail.png"></a>
+<a href="layer6.html"><img src="images/dreamthumb.jpg"></a>
+<a href="layer7.html"><img src="images/midtripthumb.jpg"></a>
+<a href="layer8.html"><img src="images/thumbnut.jpg"></a>
+<a href="layer9.html"><img src="images/etrthumb.jpg"></a>
 
 </section>
 
@@ -436,260 +308,73 @@ text-decoration:none;
 
 <script>
 
-/* ELEMENTS */
-
 const bioBtn = document.getElementById("bioBtn");
 const galleryBtn = document.getElementById("galleryBtn");
+const exhibitionsBtn = document.getElementById("exhibitionsBtn");
+
 const bio = document.getElementById("bio");
 const gallery = document.getElementById("gallery");
+const exhibitions = document.getElementById("exhibitions");
 const hero = document.getElementById("hero");
-const imgA = document.getElementById("imgA");
-const imgB = document.getElementById("imgB");
-
-/* VIEW HELPERS */
 
 function showHero(){
-  hero.style.display = "flex";
-  bio.classList.remove("show");
-  gallery.classList.remove("show");
+hero.style.display="flex";
+bio.classList.remove("show");
+gallery.classList.remove("show");
+exhibitions.classList.remove("show");
 }
 
 function showBio(){
-  hero.style.display = "none";
-  bio.classList.add("show");
-  gallery.classList.remove("show");
+hero.style.display="none";
+bio.classList.add("show");
+gallery.classList.remove("show");
+exhibitions.classList.remove("show");
 }
 
 function showGallery(){
-  hero.style.display = "none";
-  bio.classList.remove("show");
-  gallery.classList.add("show");
+hero.style.display="none";
+bio.classList.remove("show");
+gallery.classList.add("show");
+exhibitions.classList.remove("show");
 }
 
-/* BIO TOGGLE */
+function showExhibitions(){
+hero.style.display="none";
+bio.classList.remove("show");
+gallery.classList.remove("show");
+exhibitions.classList.add("show");
+}
 
-bioBtn.addEventListener("click", () => {
-  if(bio.classList.contains("show")){
-    showHero();
-  }else{
-    showBio();
-  }
-});
+bioBtn.onclick = ()=> bio.classList.contains("show") ? showHero() : showBio();
+galleryBtn.onclick = ()=> gallery.classList.contains("show") ? showHero() : showGallery();
+exhibitionsBtn.onclick = ()=> exhibitions.classList.contains("show") ? showHero() : showExhibitions();
 
-/* GALLERY TOGGLE */
-
-galleryBtn.addEventListener("click", () => {
-  if(gallery.classList.contains("show")){
-    showHero();
-  }else{
-    showGallery();
-  }
-});
-
-/* IMAGE LIST */
+/* SIMPLE FADE SLIDESHOW */
 
 const images = [
-  "images/thumbring.png",
-  "images/knotthumb.png",
-  "images/thumbnailegg.jpg",
-  "images/mercurythumbnail.png",
-  "images/dreamthumb.jpg",
-  "images/t1.jpg",
-  "images/t2.jpg",
-  "images/t3.jpg",
-  "images/t4.jpg",
-  "images/t5.jpg",
-  "images/thumbnut.jpg",
-  "images/midtripthumb.jpg",
-  "images/mantisthumb.png",
-  "images/etrthumb.jpg"
+"images/thumbring.png",
+"images/knotthumb.png",
+"images/thumbnailegg.jpg"
 ];
 
-/* HELPERS */
+let i = 0;
+const imgA = document.getElementById("imgA");
+const imgB = document.getElementById("imgB");
 
-function rand(min,max){
-  return Math.random() * (max - min) + min;
-}
+imgA.src = images[0];
+imgA.style.opacity = 1;
 
-function chance(n){
-  return Math.random() < n;
-}
-
-function easeInOut(t){
-  return 0.5 - Math.cos(Math.PI * t) / 2;
-}
-
-/* SHUFFLE BAG */
-
-let bag = [];
-let lastImage = "";
-
-function refillBag(){
-  bag = images.slice();
-
-  for(let i = bag.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [bag[i], bag[j]] = [bag[j], bag[i]];
-  }
-
-  if(bag.length > 1 && bag[0] === lastImage){
-    [bag[0], bag[1]] = [bag[1], bag[0]];
-  }
-}
-
-function nextImage(){
-  if(bag.length === 0){
-    refillBag();
-  }
-  const src = bag.shift();
-  lastImage = src;
-  return src;
-}
-
-/* LAYER MOTION */
-
-const stateMap = new Map();
-
-function newState(){
-  const now = performance.now();
-
-  return {
-    blurFrom: rand(12,24),
-    blurTo: rand(12,40),
-    blurStart: now,
-    blurDuration: rand(12000,42000),
-
-    xFrom: rand(-6,6),
-    yFrom: rand(-6,6),
-    xTo: rand(-6,6),
-    yTo: rand(-6,6),
-    moveStart: now,
-    moveDuration: rand(18000,50000),
-
-    scaleFrom: rand(1.12,1.18),
-    scaleTo: rand(1.12,1.18)
-  };
-}
-
-function resetMotion(img){
-  stateMap.set(img,newState());
-}
-
-function animateLayer(img,now){
-  const s = stateMap.get(img);
-  if(!s){ return; }
-
-  let blurT = (now - s.blurStart) / s.blurDuration;
-  if(blurT >= 1){
-    s.blurFrom = s.blurTo;
-    s.blurTo = rand(12,40);
-    s.blurStart = now;
-    s.blurDuration = rand(10000,42000);
-    blurT = 0;
-  }
-  const blurEase = easeInOut(Math.max(0,Math.min(1,blurT)));
-  const blurValue = s.blurFrom + (s.blurTo - s.blurFrom) * blurEase;
-
-  let moveT = (now - s.moveStart) / s.moveDuration;
-  if(moveT >= 1){
-    s.xFrom = s.xTo;
-    s.yFrom = s.yTo;
-    s.scaleFrom = s.scaleTo;
-
-    s.xTo = rand(-6,6);
-    s.yTo = rand(-6,6);
-    s.scaleTo = rand(1.12,1.18);
-
-    s.moveStart = now;
-    s.moveDuration = rand(18000,50000);
-    moveT = 0;
-  }
-  const moveEase = easeInOut(Math.max(0,Math.min(1,moveT)));
-  const x = s.xFrom + (s.xTo - s.xFrom) * moveEase;
-  const y = s.yFrom + (s.yTo - s.yFrom) * moveEase;
-  const scale = s.scaleFrom + (s.scaleTo - s.scaleFrom) * moveEase;
-
-  img.style.filter = "blur(" + blurValue + "px)";
-  img.style.transform =
-    "translate(calc(-50% + " + x + "%), calc(-50% + " + y + "%)) scale(" + scale + ")";
-}
-
-function animate(now){
-  animateLayer(imgA,now);
-  animateLayer(imgB,now);
-  requestAnimationFrame(animate);
-}
-
-/* SLIDESHOW */
-
-let active = imgA;
-let hidden = imgB;
-let switchTimer = null;
-
-function nextDelayMs(){
-  if(chance(0.8)){
-    return rand(20000,40000);
-  }else{
-    return rand(40000,70000);
-  }
-}
-
-function nextFadeSeconds(){
-  if(chance(0.8)){
-    return rand(18,36);
-  }else{
-    return rand(36,55);
-  }
-}
-
-function showNextImage(){
-
-  const nextSrc = nextImage();
-  const preload = new Image();
-
-  preload.onload = function(){
-
-    const fade = nextFadeSeconds();
-
-    hidden.src = nextSrc;
-    resetMotion(hidden);
-
-    hidden.style.transition = "none";
-    hidden.style.opacity = 0;
-
-    hidden.offsetHeight;
-
-    hidden.style.transition = "opacity " + fade + "s linear";
-    active.style.transition = "opacity " + fade + "s linear";
-
-    hidden.style.opacity = 1;
-    active.style.opacity = 0;
-
-    const temp = active;
-    active = hidden;
-    hidden = temp;
-
-    switchTimer = setTimeout(showNextImage, nextDelayMs());
-  };
-
-  preload.onerror = function(){
-    switchTimer = setTimeout(showNextImage, 8000);
-  };
-
-  preload.src = nextSrc;
-}
-
-/* START */
-
-imgA.src = nextImage();
+setInterval(()=>{
+i = (i+1)%images.length;
+imgB.src = images[i];
+imgB.style.opacity = 1;
+imgA.style.opacity = 0;
+setTimeout(()=>{
+imgA.src = imgB.src;
 imgA.style.opacity = 1;
 imgB.style.opacity = 0;
-
-resetMotion(imgA);
-resetMotion(imgB);
-
-requestAnimationFrame(animate);
-switchTimer = setTimeout(showNextImage, nextDelayMs());
+},4000);
+},8000);
 
 </script>
 
