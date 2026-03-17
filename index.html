@@ -6,163 +6,54 @@
 <title>Jacob Samuel Kelly - Portfolio</title>
 
 <style>
-
 /* RESET */
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
+* { margin:0; padding:0; box-sizing:border-box; }
 
 /* BASE */
-html, body{
-  width:100%;
-  font-family:Helvetica,Arial,sans-serif;
-  background:#fff;
-  color:#111;
-  text-align:center;
-}
-
-body{
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
-}
+html, body { width:100%; font-family:Helvetica,Arial,sans-serif; background:#fff; color:#111; text-align:center; }
+body { display:flex; flex-direction:column; min-height:100vh; }
 
 /* HEADER */
-header{
-  padding:2vh 20px 1vh 20px;
-  line-height:1.2;
-}
+header { padding:2vh 20px 1vh 20px; line-height:1.2; }
+header h1 { font-size:4vh; margin-bottom:1vh; }
+header p { font-size:1.8vh; color:#555; }
+.controls { margin-top:6px; }
+.controls a { font-size:0.85rem; color:#111; text-decoration:none; margin:0 6px; cursor:pointer; }
+.controls a:hover { text-decoration:underline; }
 
-header h1{
-  font-size:4vh;
-  margin-bottom:1vh;
-}
+/* HERO / BLUR BOX */
+.hero { display:flex; justify-content:center; align-items:center; margin:60px 0; }
+.blur-box { width:300px; height:300px; position:relative; overflow:hidden; background:#fff; }
 
-header p{
-  font-size:1.8vh;
-  color:#555;
-}
-
-/* BUTTONS */
-.controls{
-  margin-top:6px;
-}
-
-.controls a{
-  font-size:0.85rem;
-  color:#111;
-  text-decoration:none;
-  margin:0 6px;
-  cursor:pointer;
-}
-
-.controls a:hover{
-  text-decoration:underline;
-}
-
-/* BLUR CENTREPIECE */
-.hero{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  margin:60px 0;
-}
-
-.blur-box{
-  width:300px;
-  height:300px;
-  position:relative;
-  overflow:hidden;
-}
-
-.blur-box img{
+/* dynamically added images */
+.blur-box img {
   position:absolute;
   width:160%;
   height:160%;
   left:50%;
   top:50%;
-  transform:translate(-50%,-50%);
+  transform:translate(-50%, -50%);
   object-fit:cover;
   opacity:0;
 }
 
-.blur-box img.active{
-  opacity:1;
-  transition:opacity linear;
-}
-
 /* GALLERY */
-.gallery{
-  display:none;
-  grid-template-columns:repeat(3,1fr);
-  gap:1.5vh;
-  max-width:90vw;
-  margin:2vh auto;
-}
-
-.gallery.show{
-  display:grid;
-}
-
-.gallery a{
-  width:100%;
-  aspect-ratio:1/1;
-  background:#f5f5f5;
-  overflow:hidden;
-  text-decoration:none;
-}
-
-.gallery a img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  object-position:bottom center;
-}
+.gallery { display:none; grid-template-columns:repeat(3,1fr); gap:1.5vh; max-width:90vw; margin:2vh auto; }
+.gallery.show { display:grid; }
+.gallery a { width:100%; aspect-ratio:1/1; background:#f5f5f5; overflow:hidden; text-decoration:none; }
+.gallery a img { width:100%; height:100%; object-fit:cover; object-position:bottom center; }
 
 /* MOBILE */
 @media(max-width:768px){
-  .gallery{
-    grid-template-columns:1fr;
-    gap:2vh;
-    max-width:92vw;
-  }
-
-  header h1{
-    font-size:28px;
-  }
-
-  header p{
-    font-size:14px;
-  }
-
-  .blur-box{
-    width:260px;
-    height:260px;
-  }
-}
-
-/* DESKTOP */
-@media(min-width:769px){
-  .gallery a:nth-child(4){
-    grid-column:1;
-  }
+  .gallery { grid-template-columns:1fr; gap:2vh; max-width:92vw; }
+  header h1 { font-size:28px; }
+  header p { font-size:14px; }
+  .blur-box { width:260px; height:260px; }
 }
 
 /* FOOTER */
-footer{
-  font-size:0.8rem;
-  color:#777;
-  padding:1vh 0;
-  margin-top:auto;
-}
-
-footer a{
-  color:#777;
-  text-decoration:none;
-}
-
+footer { font-size:0.8rem; color:#777; padding:1vh 0; margin-top:auto; }
+footer a { color:#777; text-decoration:none; }
 </style>
 </head>
 
@@ -172,7 +63,6 @@ footer a{
   <h1>Jacob Samuel Kelly</h1>
   <p>Jacob_Kelly@hotmail.co.uk / 07575722181 / Manchester</p>
   <p>contact for order requests.</p>
-
   <div class="controls">
     <a id="galleryBtn">gallery</a>
     <a href="https://gofund.me/5230ddea1" target="_blank">support me</a>
@@ -180,10 +70,7 @@ footer a{
 </header>
 
 <section class="hero" id="hero">
-  <div class="blur-box">
-    <img id="imgA" class="active">
-    <img id="imgB">
-  </div>
+  <div class="blur-box" id="blurBox"></div>
 </section>
 
 <section class="gallery" id="gallery">
@@ -208,18 +95,20 @@ footer a{
 </footer>
 
 <script>
-/* ELEMENTS */
+// Elements
 const btn = document.getElementById("galleryBtn");
 const gallery = document.getElementById("gallery");
 const hero = document.getElementById("hero");
+const blurBox = document.getElementById("blurBox");
 
+// Toggle gallery
 btn.addEventListener("click", () => {
   gallery.classList.toggle("show");
   hero.style.display = gallery.classList.contains("show") ? "none" : "flex";
 });
 
-/* IMAGE LIST */
-let images = [
+// Images list
+const images = [
   "images/thumbring.png",
   "images/knotthumb.png",
   "images/thumbnailegg.jpg",
@@ -235,83 +124,73 @@ let images = [
   "images/mantisthumb.png"
 ];
 
-/* SHUFFLE FUNCTION */
-function shuffle(array){
-  for(let i=array.length-1;i>0;i--){
-    let j=Math.floor(Math.random()*(i+1));
-    [array[i],array[j]]=[array[j],array[i]];
+// Active images pool
+const activeImages = [];
+
+// Spawn a single image with independent lifecycle
+function spawnImage() {
+  const img = document.createElement("img");
+  img.src = images[Math.floor(Math.random() * images.length)];
+  img.style.opacity = 0;
+  img.style.filter = `blur(${10 + Math.random() * 30}px)`;
+  
+  // Random start offset
+  const dx = (Math.random()*200)-100;
+  const dy = (Math.random()*200)-100;
+  img.style.transform = `translate(-50%, -50%) translate(${dx}px, ${dy}px)`;
+  
+  blurBox.appendChild(img);
+  activeImages.push(img);
+
+  // Animate blur drift continuously
+  let blurValue = parseFloat(img.style.filter.match(/(\d+\.?\d*)/)[0]);
+  function animateBlur(){
+    blurValue += (Math.random()*0.2-0.1);
+    blurValue = Math.max(10, Math.min(40, blurValue));
+    img.style.filter = `blur(${blurValue}px)`;
+    requestAnimationFrame(animateBlur);
   }
-}
-shuffle(images);
+  animateBlur();
 
-/* SLIDESHOW */
-const imgA = document.getElementById("imgA");
-const imgB = document.getElementById("imgB");
+  // Fade in after a short delay
+  setTimeout(() => { img.style.transition = `opacity ${2000 + Math.random()*5000}ms linear`; img.style.opacity = 1; }, 50);
 
-let index = 0;
-let showingA = true;
-imgA.src = images[0];
+  // Schedule random fade out
+  const lifeTime = 20000 + Math.random()*100000; // 20s–2min+
+  setTimeout(() => {
+    const fadeDuration = 2000 + Math.random()*5000;
+    img.style.transition = `opacity ${fadeDuration}ms linear`;
+    img.style.opacity = 0;
+    setTimeout(() => {
+      blurBox.removeChild(img);
+      activeImages.splice(activeImages.indexOf(img), 1);
+    }, fadeDuration);
+  }, lifeTime);
 
-/* BREATHING BLUR */
-let blurValue = 18;
-let blurDirection = 1;
-
-function animateBlur(){
-  blurValue += blurDirection*0.02;
-  if(blurValue>40) blurDirection=-1;
-  if(blurValue<18) blurDirection=1;
-  imgA.style.filter = "blur("+blurValue+"px)";
-  imgB.style.filter = "blur("+blurValue+"px)";
-  requestAnimationFrame(animateBlur);
-}
-animateBlur();
-
-/* DRIFT MOTION */
-function drift(){
-  let dx = (Math.random()*200)-100;
-  let dy = (Math.random()*200)-100;
-  let duration = Math.floor(Math.random()*80000)+40000;
-
-  imgA.style.transition = "transform "+duration+"ms linear";
-  imgB.style.transition = "transform "+duration+"ms linear";
-
-  imgA.style.transform = "translate(-50%,-50%) translate("+dx+"px,"+dy+"px)";
-  imgB.style.transform = "translate(-50%,-50%) translate("+dx+"px,"+dy+"px)";
-
-  setTimeout(drift, duration);
-}
-drift();
-
-/* IMAGE CHANGE WITH SYNCHRONIZED FADE */
-function changeImage(){
-  index++;
-  if(index >= images.length){
-    shuffle(images);
-    index = 0;
-  }
-
-  let fadeTime = Math.floor(Math.random()*130000)+20000; // 20s–150s
-
-  imgA.style.transition = "opacity "+fadeTime+"ms linear";
-  imgB.style.transition = "opacity "+fadeTime+"ms linear";
-
-  if(showingA){
-    imgB.src = images[index];
-    imgB.classList.add("active");
-    imgA.classList.remove("active");
-  } else {
-    imgA.src = images[index];
-    imgA.classList.add("active");
-    imgB.classList.remove("active");
-  }
-
-  showingA = !showingA;
-
-  setTimeout(changeImage, fadeTime); // wait for fade to finish before next change
+  // Chance to spawn another image independently
+  setTimeout(() => { if(Math.random() < 0.6) spawnImage(); }, Math.random()*60000);
 }
 
-// start slideshow with small delay
-setTimeout(changeImage, 2000);
+// Start with 2 images
+for(let i=0; i<2; i++) spawnImage();
+
+// Continuous random spawns
+setInterval(() => {
+  if(Math.random() < 0.6) spawnImage();
+}, 5000 + Math.random()*10000);
+
+// Drift all images slowly
+function driftAll(){
+  activeImages.forEach(img => {
+    const dx = (Math.random()*200)-100;
+    const dy = (Math.random()*200)-100;
+    const duration = 20000 + Math.random()*40000;
+    img.style.transition = `transform ${duration}ms linear`;
+    img.style.transform = `translate(-50%, -50%) translate(${dx}px, ${dy}px)`;
+  });
+  setTimeout(driftAll, 10000 + Math.random()*20000);
+}
+driftAll();
 </script>
 
 </body>
