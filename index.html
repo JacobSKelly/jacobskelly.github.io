@@ -7,15 +7,11 @@
 
 <style>
 
-/* RESET */
-
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
 }
-
-/* BASE */
 
 html,body{
 width:100%;
@@ -31,8 +27,6 @@ flex-direction:column;
 min-height:100vh;
 }
 
-/* HEADER */
-
 header{
 padding:2vh 20px 1vh 20px;
 line-height:1.2;
@@ -47,8 +41,6 @@ header p{
 font-size:1.8vh;
 color:#555;
 }
-
-/* BUTTONS */
 
 .controls{
 margin-top:6px;
@@ -71,12 +63,8 @@ text-decoration:underline;
 }
 
 .controls .separator{
-font-size:0.85rem;
-color:#111;
 margin:0 2px;
 }
-
-/* HERO */
 
 .hero{
 display:flex;
@@ -98,16 +86,13 @@ width:100%;
 height:100%;
 left:50%;
 top:50%;
-transform:translate(-50%,-50%) scale(1.14);
 object-fit:cover;
 opacity:0;
 will-change:opacity,transform,filter;
 pointer-events:none;
 }
 
-/* SHARED TEXT SECTIONS */
-
-.bio, .exhibitions{
+.bio,.exhibitions{
 display:none;
 max-width:780px;
 margin:28px auto;
@@ -116,52 +101,9 @@ text-align:left;
 line-height:1.35;
 }
 
-.bio.show, .exhibitions.show{
+.bio.show,.exhibitions.show{
 display:block;
 }
-
-.bio h2, .exhibitions h2{
-font-size:1.05rem;
-margin-bottom:14px;
-text-align:center;
-font-weight:normal;
-}
-
-.bio p{
-margin-bottom:12px;
-font-size:0.88rem;
-}
-
-.bio h3, .exhibitions h3{
-font-size:0.82rem;
-margin:20px 0 10px 0;
-text-align:center;
-font-weight:normal;
-}
-
-.bio-year{
-margin-bottom:10px;
-}
-
-.bio-year strong{
-display:block;
-margin-bottom:4px;
-font-size:0.78rem;
-font-weight:bold;
-}
-
-.bio-year ul{
-list-style:none;
-padding-left:0;
-}
-
-.bio-year li{
-margin-bottom:2px;
-font-size:0.72rem;
-line-height:1.2;
-}
-
-/* GALLERY */
 
 .gallery{
 display:none;
@@ -176,31 +118,21 @@ display:grid;
 }
 
 .gallery a{
-width:100%;
 aspect-ratio:1/1;
-background:#f5f5f5;
 overflow:hidden;
 }
 
-.gallery a img{
+.gallery img{
 width:100%;
 height:100%;
 object-fit:cover;
-object-position:bottom center;
 }
-
-/* FOOTER */
 
 footer{
 font-size:0.8rem;
 color:#777;
 padding:1vh 0;
 margin-top:auto;
-}
-
-footer a{
-color:#777;
-text-decoration:none;
 }
 
 </style>
@@ -211,16 +143,13 @@ text-decoration:none;
 <header>
 
 <h1>Jacob Samuel Kelly</h1>
-
 <p>Jacob_Kelly@hotmail.co.uk / 07575722181 / Manchester</p>
 <p>contact for order requests.</p>
 
 <div class="controls">
 <div class="controls-line">
-<a id="galleryBtn">gallery</a>
-<span class="separator">/</span>
-<a id="bioBtn">bio</a>
-<span class="separator">/</span>
+<a id="galleryBtn">gallery</a> /
+<a id="bioBtn">bio</a> /
 <a id="exhibitionsBtn">exhibitions</a>
 </div>
 <div class="controls-line">
@@ -239,74 +168,27 @@ text-decoration:none;
 
 <section class="bio" id="bio">
 <h2>Jacob Kelly — Artist Bio</h2>
-<p>Jacob Kelly is a Manchester-based artist working across digital print, text, and sound...</p>
+<p>Manchester-based artist working across digital print, text, and sound...</p>
 </section>
 
 <section class="exhibitions" id="exhibitions">
-
-<h2>Exhibitions & Projects (Selected)</h2>
-
-<div class="bio-year">
-<strong>2025</strong>
-<ul>
-<li>Nice One, Public — Manchester</li>
-<li>Nice One, Green Arches — Cheetham Hill</li>
-<li>Rat Dance Festival, Aatma — Manchester</li>
-<li>The Peer Hat — Manchester</li>
-<li>Saan1 Gallery — Manchester</li>
-<li>See Saw Space — Manchester</li>
-</ul>
-</div>
-
-<div class="bio-year">
-<strong>2023</strong>
-<ul>
-<li>Green Walk Open House — Manchester</li>
-</ul>
-</div>
-
-<div class="bio-year">
-<strong>2021</strong>
-<ul>
-<li>Williamson Art Gallery — Wirral</li>
-</ul>
-</div>
-
-<div class="bio-year">
-<strong>2020</strong>
-<ul>
-<li>Hulme Garden Centre — Manchester</li>
-<li>Manchester School of Art</li>
-</ul>
-</div>
-
+<h2>Exhibitions</h2>
+<p>Selected exhibitions list...</p>
 </section>
 
 <section class="gallery" id="gallery">
-
 <a href="layer1.html"><img src="images/mantisthumb.png"></a>
 <a href="layer2.html"><img src="images/thumbring.png"></a>
 <a href="layer3.html"><img src="images/knotthumb.png"></a>
-<a href="layer4.html"><img src="images/thumbnailegg.jpg"></a>
-<a href="layer5.html"><img src="images/mercurythumbnail.png"></a>
-<a href="layer6.html"><img src="images/dreamthumb.jpg"></a>
-<a href="layer7.html"><img src="images/midtripthumb.jpg"></a>
-<a href="layer8.html"><img src="images/thumbnut.jpg"></a>
-<a href="layer9.html"><img src="images/etrthumb.jpg"></a>
-
 </section>
 
 <footer>
-<p>
-<a href="https://www.instagram.com/the_fruit_that_ate_itself" target="_blank">
-@the_fruit_that_ate_itself
-</a>
-<br>
-53.4808° N, -2.2426° W
-</p>
+<p>@the_fruit_that_ate_itself<br>53.4808° N, -2.2426° W</p>
 </footer>
 
 <script>
+
+/* NAV */
 
 const bioBtn = document.getElementById("bioBtn");
 const galleryBtn = document.getElementById("galleryBtn");
@@ -317,64 +199,178 @@ const gallery = document.getElementById("gallery");
 const exhibitions = document.getElementById("exhibitions");
 const hero = document.getElementById("hero");
 
-function showHero(){
-hero.style.display="flex";
+function resetViews(){
+hero.style.display="none";
 bio.classList.remove("show");
 gallery.classList.remove("show");
 exhibitions.classList.remove("show");
 }
 
-function showBio(){
-hero.style.display="none";
-bio.classList.add("show");
-gallery.classList.remove("show");
-exhibitions.classList.remove("show");
-}
+bioBtn.onclick=()=> bio.classList.contains("show") ? (hero.style.display="flex",bio.classList.remove("show")):(resetViews(),bio.classList.add("show"));
+galleryBtn.onclick=()=> gallery.classList.contains("show") ? (hero.style.display="flex",gallery.classList.remove("show")):(resetViews(),gallery.classList.add("show"));
+exhibitionsBtn.onclick=()=> exhibitions.classList.contains("show") ? (hero.style.display="flex",exhibitions.classList.remove("show")):(resetViews(),exhibitions.classList.add("show"));
 
-function showGallery(){
-hero.style.display="none";
-bio.classList.remove("show");
-gallery.classList.add("show");
-exhibitions.classList.remove("show");
-}
+/* IMAGES */
 
-function showExhibitions(){
-hero.style.display="none";
-bio.classList.remove("show");
-gallery.classList.remove("show");
-exhibitions.classList.add("show");
-}
-
-bioBtn.onclick = ()=> bio.classList.contains("show") ? showHero() : showBio();
-galleryBtn.onclick = ()=> gallery.classList.contains("show") ? showHero() : showGallery();
-exhibitionsBtn.onclick = ()=> exhibitions.classList.contains("show") ? showHero() : showExhibitions();
-
-/* SIMPLE FADE SLIDESHOW */
-
-const images = [
+const images=[
 "images/thumbring.png",
 "images/knotthumb.png",
-"images/thumbnailegg.jpg"
+"images/thumbnailegg.jpg",
+"images/mercurythumbnail.png"
 ];
 
-let i = 0;
-const imgA = document.getElementById("imgA");
-const imgB = document.getElementById("imgB");
+const imgA=document.getElementById("imgA");
+const imgB=document.getElementById("imgB");
 
-imgA.src = images[0];
-imgA.style.opacity = 1;
+let active=imgA;
+let hidden=imgB;
 
-setInterval(()=>{
-i = (i+1)%images.length;
-imgB.src = images[i];
-imgB.style.opacity = 1;
-imgA.style.opacity = 0;
-setTimeout(()=>{
-imgA.src = imgB.src;
-imgA.style.opacity = 1;
-imgB.style.opacity = 0;
-},4000);
-},8000);
+/* RANDOM */
+
+function rand(min,max){return Math.random()*(max-min)+min;}
+function ease(t){return 0.5-Math.cos(Math.PI*t)/2;}
+
+const state=new Map();
+
+function newState(){
+
+const baseScale=rand(1,1.4);
+const now=performance.now();
+
+return{
+baseScale:baseScale,
+pulseTo:baseScale+rand(-0.05,0.05),
+pulseStart:now,
+pulseDuration:rand(12000,24000),
+
+blurFrom:rand(10,18),
+blurTo:rand(14,26),
+blurStart:now,
+blurDuration:rand(6000,12000),
+
+xFrom:0,yFrom:0,
+xTo:0,yTo:0,
+moveStart:now,
+moveDuration:rand(8000,16000)
+};
+
+}
+
+function resetMotion(img){
+state.set(img,newState());
+}
+
+/* ANIMATION */
+
+function animateLayer(img,now){
+
+const s=state.get(img);
+if(!s)return;
+
+/* PULSE SCALE */
+
+let pt=(now-s.pulseStart)/s.pulseDuration;
+if(pt>=1){
+s.baseScale=s.pulseTo;
+s.pulseTo=s.baseScale+rand(-0.05,0.05);
+s.pulseStart=now;
+pt=0;
+}
+const scale=s.baseScale+(s.pulseTo-s.baseScale)*ease(pt);
+
+/* MOVE RANGE FROM SCALE */
+const range=(scale-1)*40;
+
+/* MOVE */
+
+let mt=(now-s.moveStart)/s.moveDuration;
+if(mt>=1){
+s.xFrom=s.xTo;
+s.yFrom=s.yTo;
+s.xTo=rand(-range,range);
+s.yTo=rand(-range,range);
+s.moveStart=now;
+mt=0;
+}
+const x=s.xFrom+(s.xTo-s.xFrom)*ease(mt);
+const y=s.yFrom+(s.yTo-s.yFrom)*ease(mt);
+
+/* BLUR */
+
+let bt=(now-s.blurStart)/s.blurDuration;
+if(bt>=1){
+s.blurFrom=s.blurTo;
+s.blurTo=rand(14,26);
+s.blurStart=now;
+bt=0;
+}
+const blur=s.blurFrom+(s.blurTo-s.blurFrom)*ease(bt);
+
+/* APPLY */
+
+img.style.filter=`blur(${blur}px)`;
+img.style.transform=`translate(calc(-50% + ${x}%), calc(-50% + ${y}%)) scale(${scale})`;
+
+}
+
+/* LOOP */
+
+function animate(now){
+animateLayer(imgA,now);
+animateLayer(imgB,now);
+requestAnimationFrame(animate);
+}
+
+/* SWITCH */
+
+let i=0;
+
+function next(){
+i=(i+1)%images.length;
+return images[i];
+}
+
+function switchImage(){
+
+const src=next();
+const preload=new Image();
+
+preload.onload=()=>{
+
+hidden.src=src;
+resetMotion(hidden);
+
+hidden.style.transition="none";
+hidden.style.opacity=0;
+hidden.offsetHeight;
+
+hidden.style.transition="opacity 6s linear";
+active.style.transition="opacity 6s linear";
+
+hidden.style.opacity=1;
+active.style.opacity=0;
+
+const t=active;
+active=hidden;
+hidden=t;
+
+setTimeout(switchImage,12000);
+
+};
+
+preload.src=src;
+}
+
+/* START */
+
+imgA.src=images[0];
+imgA.style.opacity=1;
+
+resetMotion(imgA);
+resetMotion(imgB);
+
+requestAnimationFrame(animate);
+setTimeout(switchImage,8000);
 
 </script>
 
