@@ -8,159 +8,179 @@
 <style>
 
 /* RESET */
+
 *{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+margin:0;
+padding:0;
+box-sizing:border-box;
 }
 
 /* BASE */
-html, body{
-  width:100%;
-  font-family:Helvetica,Arial,sans-serif;
-  background:#fff;
-  color:#111;
-  text-align:center;
+
+html,body{
+width:100%;
+font-family:Helvetica,Arial,sans-serif;
+background:#fff;
+color:#111;
+text-align:center;
 }
 
 body{
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
+display:flex;
+flex-direction:column;
+min-height:100vh;
 }
 
 /* HEADER */
+
 header{
-  padding:2vh 20px 1vh 20px;
-  line-height:1.2;
+padding:2vh 20px 1vh 20px;
+line-height:1.2;
 }
 
 header h1{
-  font-size:4vh;
-  margin-bottom:1vh;
+font-size:4vh;
+margin-bottom:1vh;
 }
 
 header p{
-  font-size:1.8vh;
-  color:#555;
+font-size:1.8vh;
+color:#555;
 }
 
 /* BUTTONS */
+
 .controls{
-  margin-top:6px;
+margin-top:6px;
 }
 
 .controls a{
-  font-size:0.85rem;
-  color:#111;
-  text-decoration:none;
-  margin:0 6px;
-  cursor:pointer;
+font-size:0.85rem;
+color:#111;
+text-decoration:none;
+margin:0 6px;
+cursor:pointer;
 }
 
 .controls a:hover{
-  text-decoration:underline;
+text-decoration:underline;
 }
 
 /* BLUR CENTREPIECE */
+
 .hero{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  margin:60px 0;
+display:flex;
+justify-content:center;
+align-items:center;
+margin:60px 0;
 }
 
 .blur-box{
-  width:300px;
-  height:300px;
-  position:relative;
-  overflow:hidden;
+width:300px;
+height:300px;
+position:relative;
+overflow:hidden;
 }
 
 .blur-box img{
-  position:absolute;
-  width:160%;
-  height:160%;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
-  object-fit:cover;
-  opacity:0;
+
+position:absolute;
+width:160%;
+height:160%;
+
+left:50%;
+top:50%;
+
+transform:translate(-50%,-50%);
+
+object-fit:cover;
+
+opacity:0;
+
+transition:opacity 25s linear;
+
 }
 
 .blur-box img.active{
-  opacity:1;
-  transition:opacity linear;
+opacity:1;
 }
 
 /* GALLERY */
+
 .gallery{
-  display:none;
-  grid-template-columns:repeat(3,1fr);
-  gap:1.5vh;
-  max-width:90vw;
-  margin:2vh auto;
+display:none;
+grid-template-columns:repeat(3,1fr);
+gap:1.5vh;
+max-width:90vw;
+margin:2vh auto;
 }
 
 .gallery.show{
-  display:grid;
+display:grid;
 }
 
 .gallery a{
-  width:100%;
-  aspect-ratio:1/1;
-  background:#f5f5f5;
-  overflow:hidden;
-  text-decoration:none;
+width:100%;
+aspect-ratio:1/1;
+background:#f5f5f5;
+overflow:hidden;
+text-decoration:none;
 }
 
 .gallery a img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  object-position:bottom center;
+width:100%;
+height:100%;
+object-fit:cover;
+object-position:bottom center;
 }
 
 /* MOBILE */
+
 @media(max-width:768px){
-  .gallery{
-    grid-template-columns:1fr;
-    gap:2vh;
-    max-width:92vw;
-  }
 
-  header h1{
-    font-size:28px;
-  }
+.gallery{
+grid-template-columns:1fr;
+gap:2vh;
+max-width:92vw;
+}
 
-  header p{
-    font-size:14px;
-  }
+header h1{
+font-size:28px;
+}
 
-  .blur-box{
-    width:260px;
-    height:260px;
-  }
+header p{
+font-size:14px;
+}
+
+.blur-box{
+width:260px;
+height:260px;
+}
+
 }
 
 /* DESKTOP */
+
 @media(min-width:769px){
-  .gallery a:nth-child(4){
-    grid-column:1;
-  }
+
+.gallery a:nth-child(4){
+grid-column:1;
+}
+
 }
 
 /* FOOTER */
+
 footer{
-  font-size:0.8rem;
-  color:#777;
-  padding:1vh 0;
-  margin-top:auto;
+font-size:0.8rem;
+color:#777;
+padding:1vh 0;
+margin-top:auto;
 }
 
 footer a{
-  color:#777;
-  text-decoration:none;
+color:#777;
+text-decoration:none;
 }
 
 </style>
@@ -169,149 +189,228 @@ footer a{
 <body>
 
 <header>
-  <h1>Jacob Samuel Kelly</h1>
-  <p>Jacob_Kelly@hotmail.co.uk / 07575722181 / Manchester</p>
-  <p>contact for order requests.</p>
 
-  <div class="controls">
-    <a id="galleryBtn">gallery</a>
-    <a href="https://gofund.me/5230ddea1" target="_blank">support me</a>
-  </div>
+<h1>Jacob Samuel Kelly</h1>
+
+<p>Jacob_Kelly@hotmail.co.uk / 07575722181 / Manchester</p>
+
+<p>contact for order requests.</p>
+
+<div class="controls">
+<a id="galleryBtn">gallery</a>
+<a href="https://gofund.me/5230ddea1" target="_blank">support me</a>
+</div>
+
 </header>
 
+
 <section class="hero" id="hero">
-  <div class="blur-box">
-    <img id="imgA" class="active">
-    <img id="imgB">
-  </div>
+
+<div class="blur-box">
+
+<img id="imgA" class="active">
+<img id="imgB">
+
+</div>
+
 </section>
+
 
 <section class="gallery" id="gallery">
-  <a href="layer1.html"><img src="images/mantisthumb.png"></a>
-  <a href="layer2.html"><img src="images/thumbring.png"></a>
-  <a href="layer3.html"><img src="images/knotthumb.png"></a>
-  <a href="layer4.html"><img src="images/thumbnailegg.jpg"></a>
-  <a href="layer5.html"><img src="images/mercurythumbnail.png"></a>
-  <a href="layer6.html"><img src="images/dreamthumb.jpg"></a>
-  <a href="layer7.html"><img src="images/midtripthumb.jpg"></a>
-  <a href="layer8.html"><img src="images/thumbnut.jpg"></a>
+
+<a href="layer1.html"><img src="images/mantisthumb.png"></a>
+<a href="layer2.html"><img src="images/thumbring.png"></a>
+<a href="layer3.html"><img src="images/knotthumb.png"></a>
+<a href="layer4.html"><img src="images/thumbnailegg.jpg"></a>
+<a href="layer5.html"><img src="images/mercurythumbnail.png"></a>
+<a href="layer6.html"><img src="images/dreamthumb.jpg"></a>
+<a href="layer7.html"><img src="images/midtripthumb.jpg"></a>
+<a href="layer8.html"><img src="images/thumbnut.jpg"></a>
+
 </section>
 
+
 <footer>
-  <p>
-    <a href="https://www.instagram.com/the_fruit_that_ate_itself" target="_blank">
-      @the_fruit_that_ate_itself
-    </a>
-    <br>
-    53.4808° N, -2.2426° W
-  </p>
+
+<p>
+
+<a href="https://www.instagram.com/the_fruit_that_ate_itself" target="_blank">
+@the_fruit_that_ate_itself
+</a>
+
+<br>
+
+53.4808° N, -2.2426° W
+
+</p>
+
 </footer>
 
+
 <script>
+
 /* ELEMENTS */
+
 const btn = document.getElementById("galleryBtn");
 const gallery = document.getElementById("gallery");
 const hero = document.getElementById("hero");
 
 btn.addEventListener("click", () => {
-  gallery.classList.toggle("show");
-  hero.style.display = gallery.classList.contains("show") ? "none" : "flex";
+
+gallery.classList.toggle("show");
+
+if(gallery.classList.contains("show")){
+hero.style.display = "none";
+}else{
+hero.style.display = "flex";
+}
+
 });
 
+
 /* IMAGE LIST */
+
 let images = [
-  "images/thumbring.png",
-  "images/knotthumb.png",
-  "images/thumbnailegg.jpg",
-  "images/mercurythumbnail.png",
-  "images/dreamthumb.jpg",
-  "images/t1.jpg",
-  "images/t2.jpg",
-  "images/t3.jpg",
-  "images/t4.jpg",
-  "images/t5.jpg",
-  "images/thumbnut.jpg",
-  "images/midtripthumb.jpg",
-  "images/mantisthumb.png"
+
+"images/thumbring.png",
+"images/knotthumb.png",
+"images/thumbnailegg.jpg",
+"images/mercurythumbnail.png",
+"images/dreamthumb.jpg",
+"images/t1.jpg",
+"images/t2.jpg",
+"images/thumbnut.jpg",
+"images/midtripthumb.jpg",
+"images/mantisthumb.png"
+
 ];
 
-/* SHUFFLE FUNCTION */
+
+/* SHUFFLE IMAGES */
+
 function shuffle(array){
-  for(let i=array.length-1;i>0;i--){
-    let j=Math.floor(Math.random()*(i+1));
-    [array[i],array[j]]=[array[j],array[i]];
-  }
+
+for(let i=array.length-1;i>0;i--){
+
+let j=Math.floor(Math.random()*(i+1));
+[array[i],array[j]]=[array[j],array[i]];
+
 }
+
+}
+
 shuffle(images);
 
-/* SLIDESHOW */
-const imgA = document.getElementById("imgA");
-const imgB = document.getElementById("imgB");
 
-let index = 0;
-let showingA = true;
-imgA.src = images[0];
+/* RANDOM TIMINGS */
+
+function randomChangeTime(){
+return Math.floor(Math.random()*120000)+30000;
+}
+
+function randomFadeTime(){
+return Math.floor(Math.random()*130000)+20000;
+}
+
+
+/* SLIDESHOW */
+
+const imgA=document.getElementById("imgA");
+const imgB=document.getElementById("imgB");
+
+let index=0;
+let showingA=true;
+
+imgA.src=images[0];
+
 
 /* BREATHING BLUR */
-let blurValue = 18;
-let blurDirection = 1;
+
+let blurValue=18;
+let blurDirection=1;
 
 function animateBlur(){
-  blurValue += blurDirection*0.02;
-  if(blurValue>40) blurDirection=-1;
-  if(blurValue<18) blurDirection=1;
-  imgA.style.filter = "blur("+blurValue+"px)";
-  imgB.style.filter = "blur("+blurValue+"px)";
-  requestAnimationFrame(animateBlur);
+
+blurValue+=blurDirection*0.02;
+
+if(blurValue>40){
+blurDirection=-1;
 }
+
+if(blurValue<18){
+blurDirection=1;
+}
+
+imgA.style.filter="blur("+blurValue+"px)";
+imgB.style.filter="blur("+blurValue+"px)";
+
+requestAnimationFrame(animateBlur);
+
+}
+
 animateBlur();
 
+
 /* DRIFT MOTION */
+
 function drift(){
-  let dx = (Math.random()*200)-100;
-  let dy = (Math.random()*200)-100;
-  let duration = Math.floor(Math.random()*80000)+40000;
 
-  imgA.style.transition = "transform "+duration+"ms linear";
-  imgB.style.transition = "transform "+duration+"ms linear";
+let dx=(Math.random()*200)-100;
+let dy=(Math.random()*200)-100;
 
-  imgA.style.transform = "translate(-50%,-50%) translate("+dx+"px,"+dy+"px)";
-  imgB.style.transform = "translate(-50%,-50%) translate("+dx+"px,"+dy+"px)";
+let duration=Math.floor(Math.random()*80000)+40000;
 
-  setTimeout(drift, duration);
+imgA.style.transition="transform "+duration+"ms linear";
+imgB.style.transition="transform "+duration+"ms linear";
+
+imgA.style.transform="translate(-50%,-50%) translate("+dx+"px,"+dy+"px)";
+imgB.style.transform="translate(-50%,-50%) translate("+dx+"px,"+dy+"px)";
+
+setTimeout(drift,duration);
+
 }
+
 drift();
 
-/* IMAGE CHANGE WITH SYNCHRONIZED FADE */
+
+/* IMAGE CHANGE */
+
 function changeImage(){
-  index++;
-  if(index >= images.length){
-    shuffle(images);
-    index = 0;
-  }
 
-  let fadeTime = Math.floor(Math.random()*130000)+20000; // 20s–150s
+index++;
 
-  imgA.style.transition = "opacity "+fadeTime+"ms linear";
-  imgB.style.transition = "opacity "+fadeTime+"ms linear";
-
-  if(showingA){
-    imgB.src = images[index];
-    imgB.classList.add("active");
-    imgA.classList.remove("active");
-  } else {
-    imgA.src = images[index];
-    imgA.classList.add("active");
-    imgB.classList.remove("active");
-  }
-
-  showingA = !showingA;
-
-  setTimeout(changeImage, fadeTime); // wait for fade to finish before next change
+if(index>=images.length){
+shuffle(images);
+index=0;
 }
 
-// start slideshow with small delay
-setTimeout(changeImage, 2000);
+let fadeTime=randomFadeTime();
+
+imgA.style.transition="opacity "+fadeTime+"ms linear";
+imgB.style.transition="opacity "+fadeTime+"ms linear";
+
+if(showingA){
+
+imgB.src=images[index];
+imgB.classList.add("active");
+imgA.classList.remove("active");
+
+}else{
+
+imgA.src=images[index];
+imgA.classList.add("active");
+imgB.classList.remove("active");
+
+}
+
+showingA=!showingA;
+
+setTimeout(changeImage,randomChangeTime());
+
+}
+
+setTimeout(changeImage,randomChangeTime());
+
 </script>
 
 </body>
