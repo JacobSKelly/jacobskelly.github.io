@@ -274,7 +274,6 @@ const btn = document.getElementById("galleryBtn");
 const gallery = document.getElementById("gallery");
 const hero = document.getElementById("hero");
 
-
 /* GALLERY TOGGLE */
 
 btn.addEventListener("click", () => {
@@ -313,35 +312,53 @@ const imgB = document.getElementById("imgB");
 let index = 0;
 let showingA = true;
 
-function randomBlur(){
+imgA.src = images[0];
 
-return Math.floor(Math.random() * (40 - 18 + 1)) + 18;
+
+/* BREATHING BLUR */
+
+let blurValue = 18;
+let blurDirection = 1;
+
+function animateBlur(){
+
+blurValue += blurDirection * 0.02;
+
+if(blurValue > 40){
+blurValue = 40;
+blurDirection = -1;
+}
+
+if(blurValue < 18){
+blurValue = 18;
+blurDirection = 1;
+}
+
+imgA.style.filter = "blur(" + blurValue + "px)";
+imgB.style.filter = "blur(" + blurValue + "px)";
+
+requestAnimationFrame(animateBlur);
 
 }
 
-/* initial image */
+animateBlur();
 
-imgA.src = images[0];
-imgA.style.filter = "blur(" + randomBlur() + "px)";
 
+/* IMAGE CHANGE */
 
 function changeImage(){
 
 index = (index + 1) % images.length;
 
-let blurAmount = randomBlur();
-
 if(showingA){
 
 imgB.src = images[index];
-imgB.style.filter = "blur(" + blurAmount + "px)";
 imgB.classList.add("active");
 imgA.classList.remove("active");
 
 }else{
 
 imgA.src = images[index];
-imgA.style.filter = "blur(" + blurAmount + "px)";
 imgA.classList.add("active");
 imgB.classList.remove("active");
 
