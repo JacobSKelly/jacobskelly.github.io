@@ -162,7 +162,7 @@ height:260px;
 
 }
 
-/* DESKTOP LAYOUT */
+/* DESKTOP */
 
 @media(min-width:769px){
 
@@ -207,7 +207,9 @@ text-decoration:none;
 </header>
 
 
-<section class="hero">
+<!-- BLURRED COLOUR SQUARE -->
+
+<section class="hero" id="hero">
 
 <div class="blur-box">
 
@@ -222,31 +224,31 @@ text-decoration:none;
 <section class="gallery" id="gallery">
 
 <a href="layer1.html">
-<img src="images/mantisthumb.png" alt="Artwork 1">
+<img src="images/mantisthumb.png">
 </a>
 
 <a href="layer2.html">
-<img src="images/thumbring.png" alt="Artwork 2">
+<img src="images/thumbring.png">
 </a>
 
 <a href="layer3.html">
-<img src="images/knotthumb.png" alt="Artwork 3">
+<img src="images/knotthumb.png">
 </a>
 
 <a href="layer4.html">
-<img src="images/thumbnailegg.jpg" alt="Nearly Six Eggs">
+<img src="images/thumbnailegg.jpg">
 </a>
 
 <a href="layer5.html">
-<img src="images/mercurythumbnail.png" alt="Mercury">
+<img src="images/mercurythumbnail.png">
 </a>
 
 <a href="layer6.html">
-<img src="images/dreamthumb.jpg" alt="Dreamscape">
+<img src="images/dreamthumb.jpg">
 </a>
 
 <a href="layer7.html">
-<img src="images/midtripthumb.jpg" alt="Nearly Four Eggs">
+<img src="images/midtripthumb.jpg">
 </a>
 
 </section>
@@ -255,9 +257,15 @@ text-decoration:none;
 <footer>
 
 <p>
-<a href="https://www.instagram.com/the_fruit_that_ate_itself" target="_blank">@the_fruit_that_ate_itself</a>
+
+<a href="https://www.instagram.com/the_fruit_that_ate_itself" target="_blank">
+@the_fruit_that_ate_itself
+</a>
+
 <br>
+
 53.4808° N, -2.2426° W
+
 </p>
 
 </footer>
@@ -265,13 +273,25 @@ text-decoration:none;
 
 <script>
 
-/* GALLERY TOGGLE */
+/* ELEMENTS */
 
 const btn = document.getElementById("galleryBtn");
 const gallery = document.getElementById("gallery");
+const hero = document.getElementById("hero");
+
+
+/* GALLERY TOGGLE */
 
 btn.addEventListener("click", () => {
+
 gallery.classList.toggle("show");
+
+if(gallery.classList.contains("show")){
+hero.style.display = "none";
+}else{
+hero.style.display = "flex";
+}
+
 });
 
 
