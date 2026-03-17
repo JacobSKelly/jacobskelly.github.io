@@ -85,8 +85,8 @@ overflow:hidden;
 .blur-box img{
 
 position:absolute;
-width:140%;
-height:140%;
+width:160%;
+height:160%;
 
 left:50%;
 top:50%;
@@ -218,37 +218,14 @@ text-decoration:none;
 
 <section class="gallery" id="gallery">
 
-<a href="layer1.html">
-<img src="images/mantisthumb.png">
-</a>
-
-<a href="layer2.html">
-<img src="images/thumbring.png">
-</a>
-
-<a href="layer3.html">
-<img src="images/knotthumb.png">
-</a>
-
-<a href="layer4.html">
-<img src="images/thumbnailegg.jpg">
-</a>
-
-<a href="layer5.html">
-<img src="images/mercurythumbnail.png">
-</a>
-
-<a href="layer6.html">
-<img src="images/dreamthumb.jpg">
-</a>
-
-<a href="layer7.html">
-<img src="images/midtripthumb.jpg">
-</a>
-
-<a href="layer8.html">
-<img src="images/thumbnut.jpg">
-</a>
+<a href="layer1.html"><img src="images/mantisthumb.png"></a>
+<a href="layer2.html"><img src="images/thumbring.png"></a>
+<a href="layer3.html"><img src="images/knotthumb.png"></a>
+<a href="layer4.html"><img src="images/thumbnailegg.jpg"></a>
+<a href="layer5.html"><img src="images/mercurythumbnail.png"></a>
+<a href="layer6.html"><img src="images/dreamthumb.jpg"></a>
+<a href="layer7.html"><img src="images/midtripthumb.jpg"></a>
+<a href="layer8.html"><img src="images/thumbnut.jpg"></a>
 
 </section>
 
@@ -278,8 +255,6 @@ const btn = document.getElementById("galleryBtn");
 const gallery = document.getElementById("gallery");
 const hero = document.getElementById("hero");
 
-/* GALLERY TOGGLE */
-
 btn.addEventListener("click", () => {
 
 gallery.classList.toggle("show");
@@ -295,7 +270,7 @@ hero.style.display = "flex";
 
 /* IMAGE LIST */
 
-const images = [
+let images = [
 
 "images/thumbring.png",
 "images/knotthumb.png",
@@ -311,38 +286,63 @@ const images = [
 ];
 
 
+/* SHUFFLE IMAGES */
+
+function shuffle(array){
+
+for(let i=array.length-1;i>0;i--){
+
+let j=Math.floor(Math.random()*(i+1));
+[array[i],array[j]]=[array[j],array[i]];
+
+}
+
+}
+
+shuffle(images);
+
+
+/* RANDOM TIMINGS */
+
+function randomChangeTime(){
+return Math.floor(Math.random()*120000)+30000;
+}
+
+function randomFadeTime(){
+return Math.floor(Math.random()*130000)+20000;
+}
+
+
 /* SLIDESHOW */
 
-const imgA = document.getElementById("imgA");
-const imgB = document.getElementById("imgB");
+const imgA=document.getElementById("imgA");
+const imgB=document.getElementById("imgB");
 
-let index = 0;
-let showingA = true;
+let index=0;
+let showingA=true;
 
-imgA.src = images[0];
+imgA.src=images[0];
 
 
 /* BREATHING BLUR */
 
-let blurValue = 18;
-let blurDirection = 1;
+let blurValue=18;
+let blurDirection=1;
 
 function animateBlur(){
 
-blurValue += blurDirection * 0.02;
+blurValue+=blurDirection*0.02;
 
-if(blurValue > 40){
-blurValue = 40;
-blurDirection = -1;
+if(blurValue>40){
+blurDirection=-1;
 }
 
-if(blurValue < 18){
-blurValue = 18;
-blurDirection = 1;
+if(blurValue<18){
+blurDirection=1;
 }
 
-imgA.style.filter = "blur(" + blurValue + "px)";
-imgB.style.filter = "blur(" + blurValue + "px)";
+imgA.style.filter="blur("+blurValue+"px)";
+imgB.style.filter="blur("+blurValue+"px)";
 
 requestAnimationFrame(animateBlur);
 
@@ -351,31 +351,65 @@ requestAnimationFrame(animateBlur);
 animateBlur();
 
 
+/* DRIFT MOTION */
+
+function drift(){
+
+let dx=(Math.random()*200)-100;
+let dy=(Math.random()*200)-100;
+
+let duration=Math.floor(Math.random()*80000)+40000;
+
+imgA.style.transition="transform "+duration+"ms linear";
+imgB.style.transition="transform "+duration+"ms linear";
+
+imgA.style.transform="translate(-50%,-50%) translate("+dx+"px,"+dy+"px)";
+imgB.style.transform="translate(-50%,-50%) translate("+dx+"px,"+dy+"px)";
+
+setTimeout(drift,duration);
+
+}
+
+drift();
+
+
 /* IMAGE CHANGE */
 
 function changeImage(){
 
-index = (index + 1) % images.length;
+index++;
+
+if(index>=images.length){
+shuffle(images);
+index=0;
+}
+
+let fadeTime=randomFadeTime();
+
+imgA.style.transition="opacity "+fadeTime+"ms linear";
+imgB.style.transition="opacity "+fadeTime+"ms linear";
 
 if(showingA){
 
-imgB.src = images[index];
+imgB.src=images[index];
 imgB.classList.add("active");
 imgA.classList.remove("active");
 
 }else{
 
-imgA.src = images[index];
+imgA.src=images[index];
 imgA.classList.add("active");
 imgB.classList.remove("active");
 
 }
 
-showingA = !showingA;
+showingA=!showingA;
+
+setTimeout(changeImage,randomChangeTime());
 
 }
 
-setInterval(changeImage,30000);
+setTimeout(changeImage,randomChangeTime());
 
 </script>
 
