@@ -95,6 +95,59 @@ will-change:opacity,transform,filter;
 pointer-events:none;
 }
 
+/* BIO */
+
+.bio{
+display:none;
+max-width:900px;
+margin:40px auto;
+padding:0 20px;
+text-align:left;
+line-height:1.5;
+}
+
+.bio.show{
+display:block;
+}
+
+.bio h2{
+font-size:1.2rem;
+margin-bottom:18px;
+text-align:center;
+}
+
+.bio p{
+margin-bottom:18px;
+font-size:0.98rem;
+color:#111;
+}
+
+.bio h3{
+font-size:1rem;
+margin:28px 0 14px 0;
+text-align:center;
+}
+
+.bio-year{
+margin-bottom:18px;
+}
+
+.bio-year strong{
+display:block;
+margin-bottom:8px;
+font-size:0.98rem;
+}
+
+.bio-year ul{
+list-style:none;
+padding-left:0;
+}
+
+.bio-year li{
+margin-bottom:6px;
+font-size:0.95rem;
+}
+
 /* GALLERY */
 
 .gallery{
@@ -147,6 +200,17 @@ width:260px;
 height:260px;
 }
 
+.bio{
+max-width:92vw;
+margin:28px auto;
+padding:0 16px;
+}
+
+.bio p,
+.bio-year li{
+font-size:0.95rem;
+}
+
 }
 
 /* DESKTOP */
@@ -187,6 +251,7 @@ text-decoration:none;
 <p>contact for order requests.</p>
 
 <div class="controls">
+<a id="bioBtn">bio</a>
 <a id="galleryBtn">gallery</a>
 <a href="https://gofund.me/5230ddea1" target="_blank">support me</a>
 </div>
@@ -199,6 +264,86 @@ text-decoration:none;
 <div class="blur-box">
 <img id="imgA" alt="">
 <img id="imgB" alt="">
+</div>
+
+</section>
+
+
+<section class="bio" id="bio">
+
+<h2>Jacob Kelly — Artist Bio</h2>
+
+<p>Jacob Kelly is a Manchester-based artist working across digital print, text, and sound. His practice explores irrepressible trauma through dreamlike imagery, drawing from memory, the unconscious, and lived experience. Writing and poetry sit at the centre of his work, often forming the structure images emerge from—texts that fragment, loop, or break down as a way of reaching something beyond straightforward language.</p>
+
+<p>His work is driven by a need to communicate something that resists clear explanation—something felt in the body before it can be named. He works with the idea that art is an extension of the body, and the body an extension of the land. Influenced by dark ecology, folklore, childhood imagery, and literature, his work moves between states—human and animal, conscious and unconscious, surface and depth. Transformation is a recurring structure: amphibious, nocturnal, shifting between worlds, resisting fixed or binary ways of thinking.</p>
+
+<p>Much of Kelly’s practice is shaped by mental health, including experiences of depression, ADHD, autism, and PTSD, which have at times made it difficult to sustain a physical studio practice or engage with traditional production methods. In response, he has developed a way of working that is largely self-contained and resourceful—building and maintaining his own computers from low-cost or salvaged parts, and working independently to produce large-scale digital images.</p>
+
+<p>These images are often made at extreme resolutions—sometimes several metres in scale—in order to recreate effects associated with analogue photography and animation, such as grain, blur, and degradation. This process allows him to move between high and low definition, and between high and low cultural references, using digital tools in ways that feel unstable, physical, and imperfect.</p>
+
+<p>His images often appear fragmented or collapsing. Narratives break apart, forms dissolve, and meaning slips. These works attempt to reconstruct images from dreams, holding onto something fleeting before it disappears. The instability within the work reflects both personal experience and a wider sense of social and ecological breakdown, where inherited trauma sits alongside cycles of decay and return.</p>
+
+<p>Kelly works entirely by hand within digital systems, rejecting AI-driven production. The process is slow, repetitive, and often involves pushing unreliable or limited hardware to its limits. This tension—between control and failure, clarity and distortion—is central to the work.</p>
+
+<p>Alongside his visual practice, he produces ambient and experimental sound. His sound work treats landscape as something you move through rather than observe—layered environments where moments of melody or clarity emerge from dense, uneasy atmospheres. Across all mediums, his work returns to the same problem: how to form an image from a dream, and how to communicate it before it disappears.</p>
+
+<h3>Exhibitions &amp; Projects (Selected)</h3>
+
+<div class="bio-year">
+<strong>2025</strong>
+<ul>
+<li>* Nice One, Public — Manchester</li>
+<li>* Nice One, Green Arches — Cheetham Hill, Manchester</li>
+<li>* Rat Dance Festival, Aatma — Manchester</li>
+<li>* Exhibition at The Peer Hat — Manchester</li>
+<li>* The Poetry Clinic, Saan1 Gallery — Northern Quarter, Manchester</li>
+<li>* Art For Our Sake, See Saw Space — Manchester</li>
+</ul>
+</div>
+
+<div class="bio-year">
+<strong>2023</strong>
+<ul>
+<li>* Green Walk Open House Arts &amp; Craft Weekend — Manchester</li>
+</ul>
+</div>
+
+<div class="bio-year">
+<strong>2021</strong>
+<ul>
+<li>* What’s Left Behind (digital archive), Williamson Art Gallery — Wirral</li>
+</ul>
+</div>
+
+<div class="bio-year">
+<strong>2020</strong>
+<ul>
+<li>* Walled, Hulme Garden Centre — Manchester</li>
+<li>* Link Gallery, Manchester School of Art — Manchester</li>
+</ul>
+</div>
+
+<div class="bio-year">
+<strong>2019</strong>
+<ul>
+<li>* Mayfield Depot — Manchester</li>
+</ul>
+</div>
+
+<div class="bio-year">
+<strong>2017</strong>
+<ul>
+<li>* Hover Squid — Manchester</li>
+</ul>
+</div>
+
+<div class="bio-year">
+<strong>2016</strong>
+<ul>
+<li>* Gallery at Bank Quay — Warrington</li>
+<li>* U.Dance, The Lowry — Salford</li>
+<li>* Nexus Art Café — Manchester</li>
+</ul>
 </div>
 
 </section>
@@ -262,21 +407,51 @@ text-decoration:none;
 
 /* ELEMENTS */
 
-const btn = document.getElementById("galleryBtn");
+const bioBtn = document.getElementById("bioBtn");
+const galleryBtn = document.getElementById("galleryBtn");
+const bio = document.getElementById("bio");
 const gallery = document.getElementById("gallery");
 const hero = document.getElementById("hero");
 const imgA = document.getElementById("imgA");
 const imgB = document.getElementById("imgB");
 
+/* VIEW HELPERS */
+
+function showHero(){
+hero.style.display = "flex";
+bio.classList.remove("show");
+gallery.classList.remove("show");
+}
+
+function showBio(){
+hero.style.display = "none";
+bio.classList.add("show");
+gallery.classList.remove("show");
+}
+
+function showGallery(){
+hero.style.display = "none";
+bio.classList.remove("show");
+gallery.classList.add("show");
+}
+
+/* BIO TOGGLE */
+
+bioBtn.addEventListener("click", () => {
+if(bio.classList.contains("show")){
+showHero();
+}else{
+showBio();
+}
+});
+
 /* GALLERY TOGGLE */
 
-btn.addEventListener("click", () => {
-gallery.classList.toggle("show");
-
+galleryBtn.addEventListener("click", () => {
 if(gallery.classList.contains("show")){
-hero.style.display = "none";
+showHero();
 }else{
-hero.style.display = "flex";
+showGallery();
 }
 });
 
