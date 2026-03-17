@@ -3,23 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nut W/ Bennu Bird 2025</title>
+<title>No Smoking 2025</title>
 
 <style>
 
-/* PAGE SETUP */
 body{
   display:flex;
   margin:0;
   font-family: Helvetica, Arial, sans-serif;
   height:100vh;
+  overflow:hidden;
   background:#000;
   color:#fff;
-  overflow:hidden;
 }
 
-/* LEFT TEXT PANEL */
-.text-area{
+/* LEFT PANEL */
+
+.info-container{
   width:30%;
   padding:40px;
   box-sizing:border-box;
@@ -29,13 +29,13 @@ body{
   margin-top:20px;
 }
 
-.text-area h1{
+.info-container h1{
   margin:0 0 5px 0;
   font-size:clamp(1.8rem,5vw,2.2em);
   font-weight:900;
 }
 
-.text-area p{
+.info-container p{
   margin:2px 0;
   font-size:clamp(1rem,2.5vw,1.2em);
   line-height:1.2;
@@ -43,7 +43,8 @@ body{
 }
 
 /* BACK BUTTON */
-a.back{
+
+.back{
   display:inline-block;
   margin-bottom:20px;
   text-decoration:none;
@@ -53,55 +54,45 @@ a.back{
   font-size:0.9rem;
 }
 
-/* IMAGE PANEL */
+/* IMAGE AREA */
+
 .image-area{
   width:70%;
-  height:100vh;
-  overflow-y:auto;
-  background:#000;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-
-/* IMAGE LINKS */
-.image-link{
-  width:100%;
   display:flex;
   justify-content:center;
-  margin-bottom:40px;
-}
-
-/* IMAGES */
-.image-link img{
-  max-width:95%;
-  height:auto;
-  display:block;
+  align-items:center;
   cursor:pointer;
-  transition:opacity 0.25s ease;
+  overflow:hidden;
 }
 
-.image-link img:hover{
-  opacity:0.85;
+.image-area img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  transition:transform 0.3s ease;
+}
+
+.image-area img:hover{
+  transform:scale(1.05);
 }
 
 /* MOBILE */
-@media(max-width:900px){
+
+@media (max-width:768px){
 
   body{
     flex-direction:column;
     height:auto;
-    overflow:auto;
   }
 
-  .text-area{
+  .info-container,
+  .image-area{
     width:100%;
     padding:20px;
   }
 
   .image-area{
-    width:100%;
-    height:auto;
+    height:50vh;
   }
 
 }
@@ -111,25 +102,32 @@ a.back{
 
 <body>
 
-<div class="text-area">
+<div class="info-container">
 
-  <a href="index.html" class="back">← Back to Portfolio</a>
+<a href="index.html" class="back">← Back to Portfolio</a>
 
-  <h1>Nearly Four Eggs</h1>
-  <p><strong>Digital Painting</strong></p>
-  <p>dA Cosmography of the Unknown</p>
+<h1>No Smoking <span style="font-size:0.8em;">2025</span></h1>
+
+<p><strong>Digital Painting</strong></p>
+<p>Praying hands.</p>
 
 </div>
-
 
 <div class="image-area">
-
-  <!-- IMAGE 1 -->
-  <a class="image-link" href="zoom92.html">
-    <img src="https://phfinal.s3.eu-west-2.amazonaws.com/smallnut.jpg">
-  </a>
-
+<img src="https://phfinal.s3.eu-west-2.amazonaws.com/praying+hands+2.jpg" 
+alt="No Smoking 2025" 
+id="mainImage">
 </div>
+
+<script>
+
+const img = document.getElementById('mainImage');
+
+img.addEventListener('click', () => {
+  window.location.href = 'zoom1.html';
+});
+
+</script>
 
 </body>
 </html>
