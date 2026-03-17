@@ -95,10 +95,6 @@ will-change:opacity,transform,filter;
 pointer-events:none;
 }
 
-.blur-box img.active{
-opacity:1;
-}
-
 /* GALLERY */
 
 .gallery{
@@ -201,10 +197,8 @@ text-decoration:none;
 <section class="hero" id="hero">
 
 <div class="blur-box">
-
-<img id="imgA" class="active" alt="">
+<img id="imgA" alt="">
 <img id="imgB" alt="">
-
 </div>
 
 </section>
@@ -306,14 +300,10 @@ const images = [
 ];
 
 
-/* RANDOM HELPERS */
+/* HELPERS */
 
 function rand(min,max){
-return Math.random()*(max-min)+min;
-}
-
-function randInt(max){
-return Math.floor(Math.random()*max);
+return Math.random() * (max - min) + min;
 }
 
 function chance(n){
@@ -325,9 +315,7 @@ return 0.5 - Math.cos(Math.PI * t) / 2;
 }
 
 
-/* SHUFFLE BAG
-   random order before repeats
-*/
+/* SHUFFLE BAG */
 
 let bag = [];
 let lastImage = "";
@@ -340,7 +328,7 @@ const j = Math.floor(Math.random() * (i + 1));
 [bag[i], bag[j]] = [bag[j], bag[i]];
 }
 
-if(bag[0] === lastImage && bag.length > 1){
+if(bag.length > 1 && bag[0] === lastImage){
 [bag[0], bag[1]] = [bag[1], bag[0]];
 }
 }
@@ -355,77 +343,49 @@ return src;
 }
 
 
-/* LAYER STATE */
+/* LAYER MOTION */
 
-const layerState = new Map();
+const stateMap = new Map();
 
-function newMotionState(){
-const startBlur = rand(12,40);
-const targetBlur = rand(12,40);
-
-const startX = rand(-8,8);
-const startY = rand(-8,8);
-const targetX = rand(-8,8);
-const targetY = rand(-8,8);
-
-const startScale = rand(1.10,1.20);
-const targetScale = rand(1.10,1.20);
-
+function newState(){
 const now = performance.now();
 
 return {
-blurFrom:startBlur,
-blurTo:targetBlur,
-blurStart:now,
-blurDuration:rand(18000,70000),
+blurFrom: rand(12,24),
+blurTo: rand(12,40),
+blurStart: now,
+blurDuration: rand(12000,42000),
 
-xFrom:startX,
-yFrom:startY,
-xTo:targetX,
-yTo:targetY,
-moveStart:now,
-moveDuration:rand(25000,90000),
+xFrom: rand(-6,6),
+yFrom: rand(-6,6),
+xTo: rand(-6,6),
+yTo: rand(-6,6),
+moveStart: now,
+moveDuration: rand(18000,50000),
 
-scaleFrom:startScale,
-scaleTo:targetScale
+scaleFrom: rand(1.12,1.18),
+scaleTo: rand(1.12,1.18)
 };
 }
 
-function applyImmediateState(img,state){
-img.style.filter = "blur(" + state.blurFrom + "px)";
-img.style.transform =
-"translate(calc(-50% + " + state.xFrom + "%), calc(-50% + " + state.yFrom + "%)) scale(" + state.scaleFrom + ")";
-}
-
 function resetMotion(img){
-const state = newMotionState();
-layerState.set(img,state);
-applyImmediateState(img,state);
+stateMap.set(img,newState());
 }
-
-resetMotion(imgA);
-resetMotion(imgB);
-
-
-/* CONTINUOUS BLUR + DRIFT */
 
 function animateLayer(img,now){
-const s = layerState.get(img);
+const s = stateMap.get(img);
 if(!s){ return; }
-
-/* blur */
 
 let blurT = (now - s.blurStart) / s.blurDuration;
 if(blurT >= 1){
 s.blurFrom = s.blurTo;
 s.blurTo = rand(12,40);
 s.blurStart = now;
-s.blurDuration = rand(18000,70000);
+s.blurDuration = rand(12000,42000);
 blurT = 0;
 }
-const blurValue = s.blurFrom + (s.blurTo - s.blurFrom) * easeInOut(Math.max(0,Math.min(1,blurT)));
-
-/* movement */
+const blurEase = easeInOut(Math.max(0,Math.min(1,blurT)));
+const blurValue = s.blurFrom + (s.blurTo - s.blurFrom) * blurEase;
 
 let moveT = (now - s.moveStart) / s.moveDuration;
 if(moveT >= 1){
@@ -433,15 +393,14 @@ s.xFrom = s.xTo;
 s.yFrom = s.yTo;
 s.scaleFrom = s.scaleTo;
 
-s.xTo = rand(-8,8);
-s.yTo = rand(-8,8);
-s.scaleTo = rand(1.10,1.20);
+s.xTo = rand(-6,6);
+s.yTo = rand(-6,6);
+s.scaleTo = rand(1.12,1.18);
 
 s.moveStart = now;
-s.moveDuration = rand(25000,90000);
+s.moveDuration = rand(18000,50000);
 moveT = 0;
 }
-
 const moveEase = easeInOut(Math.max(0,Math.min(1,moveT)));
 const x = s.xFrom + (s.xTo - s.xFrom) * moveEase;
 const y = s.yFrom + (s.yTo - s.yFrom) * moveEase;
@@ -458,104 +417,78 @@ animateLayer(imgB,now);
 requestAnimationFrame(animate);
 }
 
-requestAnimationFrame(animate);
 
-
-/* SLIDESHOW CONTROL */
+/* SLIDESHOW */
 
 let active = imgA;
 let hidden = imgB;
-let startTimes = [];
-
-
-/* TIMING
-   at least 20s apart
-   mostly 20–60s
-   sometimes longer
-   no more than 4 starts in rolling 2-minute window
-*/
+let switchTimer = null;
 
 function nextDelayMs(){
-
-const now = Date.now();
-startTimes = startTimes.filter(t => now - t < 120000);
-
-let minDelay = 20000;
-let maxDelay = 120000;
-
-if(startTimes.length >= 4){
-const waitUntil = 120000 - (now - startTimes[0]) + 1000;
-minDelay = Math.max(minDelay, waitUntil);
-}
-
-if(startTimes.length === 1){
-const remaining = 120000 - (now - startTimes[0]) - 20000;
-if(remaining > 20000){
-maxDelay = Math.min(maxDelay, remaining);
-}
-}
-
-if(maxDelay < minDelay){
-maxDelay = minDelay;
-}
-
-if(chance(0.78)){
-return rand(minDelay, Math.min(maxDelay, 60000));
+if(chance(0.8)){
+return rand(20000,40000);
 }else{
-return rand(Math.max(minDelay, 60000), maxDelay);
+return rand(40000,70000);
 }
 }
 
-
-/* APPEARANCE */
+function nextFadeSeconds(){
+if(chance(0.8)){
+return rand(18,36);
+}else{
+return rand(36,55);
+}
+}
 
 function showNextImage(){
 
-const now = Date.now();
-startTimes.push(now);
-startTimes = startTimes.filter(t => now - t < 120000);
+const nextSrc = nextImage();
+const preload = new Image();
 
-const fadeIn = chance(0.78) ? rand(20,60) : rand(60,120);
-const fadeOut = chance(0.78) ? rand(20,60) : rand(60,120);
+preload.onload = function(){
 
-hidden.src = nextImage();
+const fade = nextFadeSeconds();
+
+hidden.src = nextSrc;
 resetMotion(hidden);
 
-/* ensure hidden layer starts invisible */
+hidden.style.transition = "none";
 hidden.style.opacity = 0;
-hidden.classList.remove("active");
 
-/* force style flush so transition always starts cleanly */
 hidden.offsetHeight;
 
-/* fade settings */
-hidden.style.transition = "opacity " + fadeIn + "s linear";
-active.style.transition = "opacity " + fadeOut + "s linear";
+hidden.style.transition = "opacity " + fade + "s linear";
+active.style.transition = "opacity " + fade + "s linear";
 
-/* crossfade */
-hidden.classList.add("active");
-active.classList.remove("active");
+hidden.style.opacity = 1;
+active.style.opacity = 0;
 
-/* swap layers */
 const temp = active;
 active = hidden;
 hidden = temp;
 
-/* schedule next start */
-setTimeout(showNextImage, nextDelayMs());
+switchTimer = setTimeout(showNextImage, nextDelayMs());
+};
+
+preload.onerror = function(){
+switchTimer = setTimeout(showNextImage, 8000);
+};
+
+preload.src = nextSrc;
 }
 
 
 /* START */
 
 imgA.src = nextImage();
-resetMotion(imgA);
-imgA.classList.add("active");
 imgA.style.opacity = 1;
-
 imgB.style.opacity = 0;
 
-setTimeout(showNextImage, nextDelayMs());
+resetMotion(imgA);
+resetMotion(imgB);
+
+requestAnimationFrame(animate);
+switchTimer = setTimeout(showNextImage, nextDelayMs());
 
 </script>
 
