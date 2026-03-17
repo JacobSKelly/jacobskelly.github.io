@@ -83,22 +83,16 @@ overflow:hidden;
 }
 
 .blur-box img{
-
 position:absolute;
 width:140%;
 height:140%;
-
 left:50%;
 top:50%;
-
-transform:translate(-50%,-50%);
-
+transform:translate(-50%,-50%) scale(1.14);
 object-fit:cover;
-
 opacity:0;
-
-transition:opacity 25s linear;
-
+will-change:opacity,transform,filter;
+pointer-events:none;
 }
 
 .blur-box img.active{
@@ -208,8 +202,8 @@ text-decoration:none;
 
 <div class="blur-box">
 
-<img id="imgA" class="active">
-<img id="imgB">
+<img id="imgA" class="active" alt="">
+<img id="imgB" alt="">
 
 </div>
 
@@ -219,35 +213,35 @@ text-decoration:none;
 <section class="gallery" id="gallery">
 
 <a href="layer1.html">
-<img src="images/mantisthumb.png">
+<img src="images/mantisthumb.png" alt="">
 </a>
 
 <a href="layer2.html">
-<img src="images/thumbring.png">
+<img src="images/thumbring.png" alt="">
 </a>
 
 <a href="layer3.html">
-<img src="images/knotthumb.png">
+<img src="images/knotthumb.png" alt="">
 </a>
 
 <a href="layer4.html">
-<img src="images/thumbnailegg.jpg">
+<img src="images/thumbnailegg.jpg" alt="">
 </a>
 
 <a href="layer5.html">
-<img src="images/mercurythumbnail.png">
+<img src="images/mercurythumbnail.png" alt="">
 </a>
 
 <a href="layer6.html">
-<img src="images/dreamthumb.jpg">
+<img src="images/dreamthumb.jpg" alt="">
 </a>
 
 <a href="layer7.html">
-<img src="images/midtripthumb.jpg">
+<img src="images/midtripthumb.jpg" alt="">
 </a>
 
 <a href="layer8.html">
-<img src="images/thumbnut.jpg">
+<img src="images/thumbnut.jpg" alt="">
 </a>
 
 </section>
@@ -277,11 +271,12 @@ text-decoration:none;
 const btn = document.getElementById("galleryBtn");
 const gallery = document.getElementById("gallery");
 const hero = document.getElementById("hero");
+const imgA = document.getElementById("imgA");
+const imgB = document.getElementById("imgB");
 
 /* GALLERY TOGGLE */
 
 btn.addEventListener("click", () => {
-
 gallery.classList.toggle("show");
 
 if(gallery.classList.contains("show")){
@@ -289,14 +284,12 @@ hero.style.display = "none";
 }else{
 hero.style.display = "flex";
 }
-
 });
 
 
 /* IMAGE LIST */
 
 const images = [
-
 "images/thumbring.png",
 "images/knotthumb.png",
 "images/thumbnailegg.jpg",
@@ -310,75 +303,259 @@ const images = [
 "images/thumbnut.jpg",
 "images/midtripthumb.jpg",
 "images/mantisthumb.png"
-
 ];
 
 
-/* SLIDESHOW */
+/* RANDOM HELPERS */
 
-const imgA = document.getElementById("imgA");
-const imgB = document.getElementById("imgB");
-
-let index = 0;
-let showingA = true;
-
-imgA.src = images[0];
-
-
-/* BREATHING BLUR */
-
-let blurValue = 18;
-let blurDirection = 1;
-
-function animateBlur(){
-
-blurValue += blurDirection * 0.02;
-
-if(blurValue > 40){
-blurValue = 40;
-blurDirection = -1;
+function rand(min,max){
+return Math.random()*(max-min)+min;
 }
 
-if(blurValue < 18){
-blurValue = 18;
-blurDirection = 1;
+function randInt(max){
+return Math.floor(Math.random()*max);
 }
 
-imgA.style.filter = "blur(" + blurValue + "px)";
-imgB.style.filter = "blur(" + blurValue + "px)";
-
-requestAnimationFrame(animateBlur);
-
+function chance(n){
+return Math.random() < n;
 }
 
-animateBlur();
+function easeInOut(t){
+return 0.5 - Math.cos(Math.PI * t) / 2;
+}
 
 
-/* IMAGE CHANGE */
+/* SHUFFLE BAG
+   random order before repeats
+*/
 
-function changeImage(){
+let bag = [];
+let lastImage = "";
 
-index = (index + 1) % images.length;
+function refillBag(){
+bag = images.slice();
 
-if(showingA){
+for(let i = bag.length - 1; i > 0; i--){
+const j = Math.floor(Math.random() * (i + 1));
+[bag[i], bag[j]] = [bag[j], bag[i]];
+}
 
-imgB.src = images[index];
-imgB.classList.add("active");
-imgA.classList.remove("active");
+if(bag[0] === lastImage && bag.length > 1){
+[bag[0], bag[1]] = [bag[1], bag[0]];
+}
+}
 
+function nextImage(){
+if(bag.length === 0){
+refillBag();
+}
+const src = bag.shift();
+lastImage = src;
+return src;
+}
+
+
+/* LAYER STATE */
+
+const layerState = new Map();
+
+function newMotionState(){
+const startBlur = rand(12,40);
+const targetBlur = rand(12,40);
+
+const startX = rand(-8,8);
+const startY = rand(-8,8);
+const targetX = rand(-8,8);
+const targetY = rand(-8,8);
+
+const startScale = rand(1.10,1.20);
+const targetScale = rand(1.10,1.20);
+
+const now = performance.now();
+
+return {
+blurFrom:startBlur,
+blurTo:targetBlur,
+blurStart:now,
+blurDuration:rand(18000,70000),
+
+xFrom:startX,
+yFrom:startY,
+xTo:targetX,
+yTo:targetY,
+moveStart:now,
+moveDuration:rand(25000,90000),
+
+scaleFrom:startScale,
+scaleTo:targetScale
+};
+}
+
+function applyImmediateState(img,state){
+img.style.filter = "blur(" + state.blurFrom + "px)";
+img.style.transform =
+"translate(calc(-50% + " + state.xFrom + "%), calc(-50% + " + state.yFrom + "%)) scale(" + state.scaleFrom + ")";
+}
+
+function resetMotion(img){
+const state = newMotionState();
+layerState.set(img,state);
+applyImmediateState(img,state);
+}
+
+resetMotion(imgA);
+resetMotion(imgB);
+
+
+/* CONTINUOUS BLUR + DRIFT */
+
+function animateLayer(img,now){
+const s = layerState.get(img);
+if(!s){ return; }
+
+/* blur */
+
+let blurT = (now - s.blurStart) / s.blurDuration;
+if(blurT >= 1){
+s.blurFrom = s.blurTo;
+s.blurTo = rand(12,40);
+s.blurStart = now;
+s.blurDuration = rand(18000,70000);
+blurT = 0;
+}
+const blurValue = s.blurFrom + (s.blurTo - s.blurFrom) * easeInOut(Math.max(0,Math.min(1,blurT)));
+
+/* movement */
+
+let moveT = (now - s.moveStart) / s.moveDuration;
+if(moveT >= 1){
+s.xFrom = s.xTo;
+s.yFrom = s.yTo;
+s.scaleFrom = s.scaleTo;
+
+s.xTo = rand(-8,8);
+s.yTo = rand(-8,8);
+s.scaleTo = rand(1.10,1.20);
+
+s.moveStart = now;
+s.moveDuration = rand(25000,90000);
+moveT = 0;
+}
+
+const moveEase = easeInOut(Math.max(0,Math.min(1,moveT)));
+const x = s.xFrom + (s.xTo - s.xFrom) * moveEase;
+const y = s.yFrom + (s.yTo - s.yFrom) * moveEase;
+const scale = s.scaleFrom + (s.scaleTo - s.scaleFrom) * moveEase;
+
+img.style.filter = "blur(" + blurValue + "px)";
+img.style.transform =
+"translate(calc(-50% + " + x + "%), calc(-50% + " + y + "%)) scale(" + scale + ")";
+}
+
+function animate(now){
+animateLayer(imgA,now);
+animateLayer(imgB,now);
+requestAnimationFrame(animate);
+}
+
+requestAnimationFrame(animate);
+
+
+/* SLIDESHOW CONTROL */
+
+let active = imgA;
+let hidden = imgB;
+let startTimes = [];
+
+
+/* TIMING
+   at least 20s apart
+   mostly 20–60s
+   sometimes longer
+   no more than 4 starts in rolling 2-minute window
+*/
+
+function nextDelayMs(){
+
+const now = Date.now();
+startTimes = startTimes.filter(t => now - t < 120000);
+
+let minDelay = 20000;
+let maxDelay = 120000;
+
+if(startTimes.length >= 4){
+const waitUntil = 120000 - (now - startTimes[0]) + 1000;
+minDelay = Math.max(minDelay, waitUntil);
+}
+
+if(startTimes.length === 1){
+const remaining = 120000 - (now - startTimes[0]) - 20000;
+if(remaining > 20000){
+maxDelay = Math.min(maxDelay, remaining);
+}
+}
+
+if(maxDelay < minDelay){
+maxDelay = minDelay;
+}
+
+if(chance(0.78)){
+return rand(minDelay, Math.min(maxDelay, 60000));
 }else{
+return rand(Math.max(minDelay, 60000), maxDelay);
+}
+}
 
-imgA.src = images[index];
+
+/* APPEARANCE */
+
+function showNextImage(){
+
+const now = Date.now();
+startTimes.push(now);
+startTimes = startTimes.filter(t => now - t < 120000);
+
+const fadeIn = chance(0.78) ? rand(20,60) : rand(60,120);
+const fadeOut = chance(0.78) ? rand(20,60) : rand(60,120);
+
+hidden.src = nextImage();
+resetMotion(hidden);
+
+/* ensure hidden layer starts invisible */
+hidden.style.opacity = 0;
+hidden.classList.remove("active");
+
+/* force style flush so transition always starts cleanly */
+hidden.offsetHeight;
+
+/* fade settings */
+hidden.style.transition = "opacity " + fadeIn + "s linear";
+active.style.transition = "opacity " + fadeOut + "s linear";
+
+/* crossfade */
+hidden.classList.add("active");
+active.classList.remove("active");
+
+/* swap layers */
+const temp = active;
+active = hidden;
+hidden = temp;
+
+/* schedule next start */
+setTimeout(showNextImage, nextDelayMs());
+}
+
+
+/* START */
+
+imgA.src = nextImage();
+resetMotion(imgA);
 imgA.classList.add("active");
-imgB.classList.remove("active");
+imgA.style.opacity = 1;
 
-}
+imgB.style.opacity = 0;
 
-showingA = !showingA;
-
-}
-
-setInterval(changeImage,30000);
+setTimeout(showNextImage, nextDelayMs());
 
 </script>
 
