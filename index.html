@@ -97,6 +97,8 @@ object-fit:cover;
 
 opacity:0;
 
+transition:opacity 25s linear;
+
 }
 
 .blur-box img.active{
@@ -312,131 +314,71 @@ const images = [
 ];
 
 
-/* RANDOMISED SLIDESHOW */
+/* SLIDESHOW */
 
 const imgA = document.getElementById("imgA");
 const imgB = document.getElementById("imgB");
 
-let active = imgA;
-let hidden = imgB;
+let index = 0;
+let showingA = true;
 
-let lastIndex = -1;
+imgA.src = images[0];
 
 
-/* RANDOM HELPERS */
+/* BREATHING BLUR */
 
-function rand(min,max){
-return Math.random()*(max-min)+min;
+let blurValue = 18;
+let blurDirection = 1;
+
+function animateBlur(){
+
+blurValue += blurDirection * 0.02;
+
+if(blurValue > 40){
+blurValue = 40;
+blurDirection = -1;
 }
 
-function randInt(max){
-return Math.floor(Math.random()*max);
+if(blurValue < 18){
+blurValue = 18;
+blurDirection = 1;
 }
 
+imgA.style.filter = "blur(" + blurValue + "px)";
+imgB.style.filter = "blur(" + blurValue + "px)";
 
-/* RANDOM IMAGE */
-
-function randomImage(){
-
-let i;
-
-do{
-i = randInt(images.length);
-}
-while(i === lastIndex);
-
-lastIndex = i;
-
-return images[i];
+requestAnimationFrame(animateBlur);
 
 }
 
-
-/* RANDOM BLUR */
-
-function randomBlur(){
-return rand(12,40);
-}
+animateBlur();
 
 
-/* RANDOM FADE TIME */
+/* IMAGE CHANGE */
 
-function randomFade(){
+function changeImage(){
 
-if(Math.random() < 0.7){
-return rand(20,60);
+index = (index + 1) % images.length;
+
+if(showingA){
+
+imgB.src = images[index];
+imgB.classList.add("active");
+imgA.classList.remove("active");
+
 }else{
-return rand(60,120);
-}
 
-}
-
-
-/* RANDOM DRIFT */
-
-function randomDrift(){
-
-return {
-x: rand(-8,8),
-y: rand(-8,8),
-scale: rand(1.1,1.2)
-};
-
-}
-
-
-/* SHOW IMAGE */
-
-function showImage(){
-
-const fade = randomFade();
-const blur = randomBlur();
-const drift = randomDrift();
-
-hidden.src = randomImage();
-
-hidden.style.filter = "blur("+blur+"px)";
-hidden.style.transform =
-"translate(calc(-50% + "+drift.x+"%), calc(-50% + "+drift.y+"%)) scale("+drift.scale+")";
-
-hidden.style.transition = "opacity "+fade+"s linear";
-active.style.transition = "opacity "+fade+"s linear";
-
-hidden.classList.add("active");
-active.classList.remove("active");
-
-let temp = active;
-active = hidden;
-hidden = temp;
-
-scheduleNext();
-
-}
-
-
-/* SCHEDULER */
-
-function scheduleNext(){
-
-let delay;
-
-if(Math.random() < 0.7){
-delay = rand(20,60);
-}else{
-delay = rand(60,120);
-}
-
-setTimeout(showImage, delay * 1000);
-
-}
-
-
-/* START */
-
-imgA.src = randomImage();
+imgA.src = images[index];
 imgA.classList.add("active");
+imgB.classList.remove("active");
 
-scheduleNext();
+}
+
+showingA = !showingA;
+
+}
+
+setInterval(changeImage,30000);
 
 </script>
 
