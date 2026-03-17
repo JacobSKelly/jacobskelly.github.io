@@ -6,18 +6,19 @@
 <title>Nearly Four Eggs 2025</title>
 
 <style>
-/* General page setup */
+
+/* PAGE SETUP */
 body{
   display:flex;
   margin:0;
   font-family: Helvetica, Arial, sans-serif;
   height:100vh;
+  background:#000;
+  color:#fff;
   overflow:hidden;
-  background:#000; /* black background */
-  color:#fff;      /* white text */
 }
 
-/* LEFT PANEL */
+/* LEFT TEXT PANEL */
 .text-area{
   width:30%;
   padding:40px;
@@ -28,135 +29,122 @@ body{
   margin-top:20px;
 }
 
-/* Titles and text */
 .text-area h1{
   margin:0 0 5px 0;
   font-size:clamp(1.8rem,5vw,2.2em);
   font-weight:900;
-  color:#fff;
 }
+
 .text-area p{
   margin:2px 0;
   font-size:clamp(1rem,2.5vw,1.2em);
   line-height:1.2;
   font-weight:600;
-  color:#fff;
 }
 
 /* BACK BUTTON */
 a.back{
   display:inline-block;
-  margin-bottom:20px; /* button at top */
+  margin-bottom:20px;
   text-decoration:none;
-  color:#fff; /* white */
+  color:#fff;
   font-weight:bold;
   letter-spacing:1px;
   font-size:0.9rem;
 }
 
-/* IMAGE AREA */
+/* IMAGE PANEL */
 .image-area{
   width:70%;
+  height:100vh;
+  overflow-y:auto;
+  background:#000;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+/* IMAGE LINKS */
+.image-link{
+  width:100%;
   display:flex;
   justify-content:center;
-  align-items:center;
-  cursor:pointer;
-  overflow:hidden;
-  background:#000;
+  margin-bottom:40px;
 }
 
-.image-area img{
+/* IMAGES */
+.image-link img{
+  max-width:95%;
+  height:auto;
   display:block;
-  max-width:100%;
-  max-height:100%;
-  cursor:zoom-in;
-  transition:transform 0.5s ease;
-  transform-origin:top left;
+  cursor:pointer;
+  transition:opacity 0.25s ease;
 }
 
-.image-area img:hover{
-  transform:scale(1.05);
+.image-link img:hover{
+  opacity:0.85;
 }
 
-/* MOBILE LAYOUT */
+/* MOBILE */
 @media(max-width:900px){
-  body{ flex-direction:column; height:auto; }
-  .text-area, .image-area{ width:100%; padding:20px; }
-  .image-area{ height:50vh; margin-top:20px; }
+
+  body{
+    flex-direction:column;
+    height:auto;
+    overflow:auto;
+  }
+
+  .text-area{
+    width:100%;
+    padding:20px;
+  }
+
+  .image-area{
+    width:100%;
+    height:auto;
+  }
+
 }
+
 </style>
 </head>
 
 <body>
 
 <div class="text-area">
+
   <a href="index.html" class="back">← Back to Portfolio</a>
+
   <h1>Nearly Four Eggs</h1>
   <p><strong>Digital Painting</strong></p>
   <p>One minute to midnight..</p>
+
 </div>
+
 
 <div class="image-area">
-  <img src="https://phfinal.s3.eu-west-2.amazonaws.com/midtrip.jpg" id="mainImage">
+
+  <!-- IMAGE 1 -->
+  <a class="image-link" href="zoom7.html">
+    <img src="https://phfinal.s3.eu-west-2.amazonaws.com/midtrip.jpg">
+  </a>
+
+  <!-- IMAGE 2 -->
+  <a class="image-link" href="zoom8.html">
+    <img src="https://phfinal.s3.eu-west-2.amazonaws.com/plainmid.jpg">
+  </a>
+
+  <!-- IMAGE 3 -->
+  <a class="image-link" href="zoom9.html">
+    <img src="https://phfinal.s3.eu-west-2.amazonaws.com/smallbeaut.jpg">
+  </a>
+
+  <!-- IMAGE 4 -->
+  <a class="image-link" href="zoom91.html">
+    <img src="https://phfinal.s3.eu-west-2.amazonaws.com/smallweird.jpg">
+  </a>
+
 </div>
-
-<script>
-const img = document.getElementById('mainImage');
-const container = img.parentElement;
-let zoomed = false;
-const scale = 4;
-
-img.addEventListener('click', (e) => {
-  if(!zoomed){
-    // Zoom in at cursor
-    const rect = img.getBoundingClientRect();
-    const offsetX = (e.clientX - rect.left) / rect.width;
-    const offsetY = (e.clientY - rect.top) / rect.height;
-
-    container.style.overflow = 'auto';
-    img.style.transformOrigin = `${offsetX*100}% ${offsetY*100}%`;
-    img.style.transform = `scale(${scale})`;
-    container.scrollLeft = img.offsetWidth*scale*offsetX - (e.clientX - container.getBoundingClientRect().left);
-    container.scrollTop = img.offsetHeight*scale*offsetY - (e.clientY - container.getBoundingClientRect().top);
-    img.style.cursor = 'zoom-out';
-    zoomed = true;
-  } else {
-    // Second click goes to zoom7.html
-    window.location.href = 'zoom7.html';
-  }
-});
-
-// Drag-to-pan when zoomed
-let isDragging = false, startX, startY, scrollLeft, scrollTop;
-
-container.addEventListener('mousedown', (e)=>{
-  if(!zoomed) return;
-  isDragging = true;
-  startX = e.pageX - container.offsetLeft;
-  startY = e.pageY - container.offsetTop;
-  scrollLeft = container.scrollLeft;
-  scrollTop = container.scrollTop;
-  container.style.cursor = 'grabbing';
-});
-
-container.addEventListener('mouseup', ()=>{ 
-  isDragging=false; 
-  container.style.cursor = zoomed ? 'zoom-out':'zoom-in';
-});
-container.addEventListener('mouseleave', ()=>{ 
-  isDragging=false; 
-  container.style.cursor = zoomed ? 'zoom-out':'zoom-in';
-});
-
-container.addEventListener('mousemove',(e)=>{
-  if(!isDragging) return;
-  e.preventDefault();
-  const x = e.pageX - container.offsetLeft;
-  const y = e.pageY - container.offsetTop;
-  container.scrollLeft = scrollLeft - (x - startX);
-  container.scrollTop = scrollTop - (y - startY);
-});
-</script>
 
 </body>
 </html>
