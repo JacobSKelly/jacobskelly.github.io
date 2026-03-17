@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Jacob Samuel Kelly - Portfolio</title>
 
@@ -45,7 +45,7 @@ font-size:1.8vh;
 color:#555;
 }
 
-/* Minimal buttons */
+/* Buttons */
 .controls{
 margin-top:6px;
 }
@@ -62,7 +62,53 @@ cursor:pointer;
 text-decoration:underline;
 }
 
-/* Gallery (hidden initially) */
+/* =========================
+BLUR CENTREPIECE
+========================= */
+
+.hero{
+width:100%;
+display:flex;
+justify-content:center;
+align-items:center;
+margin:40px 0;
+}
+
+.blur-box{
+
+width:500px;
+height:500px;
+position:relative;
+overflow:hidden;
+
+}
+
+/* blurred layers */
+
+.blur-box img{
+
+position:absolute;
+width:100%;
+height:100%;
+object-fit:cover;
+
+filter:blur(18px);
+transform:scale(1.15); /* prevents blur edges showing */
+
+opacity:0;
+transition:opacity 60s linear;
+
+}
+
+.blur-box img.active{
+opacity:1;
+}
+
+
+/* =========================
+Gallery
+========================= */
+
 .gallery{
 display:none;
 grid-template-columns:repeat(3,1fr);
@@ -91,6 +137,7 @@ object-position:bottom center;
 }
 
 /* Mobile */
+
 @media(max-width:768px){
 
 .gallery{
@@ -107,9 +154,15 @@ header p{
 font-size:14px;
 }
 
+.blur-box{
+width:90vw;
+height:90vw;
 }
 
-/* Desktop layout tweak */
+}
+
+/* Desktop tweak */
+
 @media(min-width:769px){
 
 .gallery a:nth-child(4){
@@ -119,6 +172,7 @@ grid-column:1;
 }
 
 /* Footer */
+
 footer{
 font-size:0.8rem;
 color:#777;
@@ -150,6 +204,21 @@ text-decoration:none;
 </div>
 
 </header>
+
+
+<!-- BLURRED COLOUR CENTREPIECE -->
+
+<section class="hero">
+
+<div class="blur-box">
+
+<img id="imgA" class="active">
+<img id="imgB">
+
+</div>
+
+</section>
+
 
 <section class="gallery" id="gallery">
 
@@ -183,6 +252,7 @@ text-decoration:none;
 
 </section>
 
+
 <footer>
 <p>
 <a href="https://www.instagram.com/the_fruit_that_ate_itself" target="_blank">@the_fruit_that_ate_itself</a><br>
@@ -190,16 +260,70 @@ text-decoration:none;
 </p>
 </footer>
 
+
 <script>
+
+/* ======================
+Gallery Toggle
+====================== */
 
 const btn = document.getElementById("galleryBtn");
 const gallery = document.getElementById("gallery");
 
 btn.addEventListener("click", () => {
-
 gallery.classList.toggle("show");
-
 });
+
+
+/* ======================
+Blur Slideshow
+====================== */
+
+const images = [
+
+"images/mantisthumb.png",
+"images/thumbring.png",
+"images/knotthumb.png",
+"images/thumbnailegg.jpg",
+"images/mercurythumbnail.png",
+"images/dreamthumb.jpg",
+"images/midtripthumb.jpg"
+
+];
+
+const imgA = document.getElementById("imgA");
+const imgB = document.getElementById("imgB");
+
+let index = 0;
+let showingA = true;
+
+imgA.src = images[0];
+
+function changeImage(){
+
+index = (index + 1) % images.length;
+
+if(showingA){
+
+imgB.src = images[index];
+imgB.classList.add("active");
+imgA.classList.remove("active");
+
+}else{
+
+imgA.src = images[index];
+imgA.classList.add("active");
+imgB.classList.remove("active");
+
+}
+
+showingA = !showingA;
+
+}
+
+/* change every minute */
+
+setInterval(changeImage,60000);
 
 </script>
 
