@@ -296,16 +296,12 @@ text-decoration:none;
 
 </header>
 
-
 <section class="hero" id="hero">
-
 <div class="blur-box">
 <img id="imgA" alt="">
 <img id="imgB" alt="">
 </div>
-
 </section>
-
 
 <section class="bio" id="bio">
 
@@ -388,7 +384,6 @@ text-decoration:none;
 
 </section>
 
-
 <section class="gallery" id="gallery">
 
 <a href="layer1.html">
@@ -422,30 +417,22 @@ text-decoration:none;
 <a href="layer8.html">
 <img src="images/thumbnut.jpg" alt="">
 </a>
-  
+
 <a href="layer9.html">
 <img src="images/etrthumb.jpg" alt="">
 </a>
 
 </section>
 
-
 <footer>
-
 <p>
-
 <a href="https://www.instagram.com/the_fruit_that_ate_itself" target="_blank">
 @the_fruit_that_ate_itself
 </a>
-
 <br>
-
 53.4808° N, -2.2426° W
-
 </p>
-
 </footer>
-
 
 <script>
 
@@ -462,78 +449,75 @@ const imgB = document.getElementById("imgB");
 /* VIEW HELPERS */
 
 function showHero(){
-hero.style.display = "flex";
-bio.classList.remove("show");
-gallery.classList.remove("show");
+  hero.style.display = "flex";
+  bio.classList.remove("show");
+  gallery.classList.remove("show");
 }
 
 function showBio(){
-hero.style.display = "none";
-bio.classList.add("show");
-gallery.classList.remove("show");
+  hero.style.display = "none";
+  bio.classList.add("show");
+  gallery.classList.remove("show");
 }
 
 function showGallery(){
-hero.style.display = "none";
-bio.classList.remove("show");
-gallery.classList.add("show");
+  hero.style.display = "none";
+  bio.classList.remove("show");
+  gallery.classList.add("show");
 }
 
 /* BIO TOGGLE */
 
 bioBtn.addEventListener("click", () => {
-if(bio.classList.contains("show")){
-showHero();
-}else{
-showBio();
-}
+  if(bio.classList.contains("show")){
+    showHero();
+  }else{
+    showBio();
+  }
 });
 
 /* GALLERY TOGGLE */
 
 galleryBtn.addEventListener("click", () => {
-if(gallery.classList.contains("show")){
-showHero();
-}else{
-showGallery();
-}
+  if(gallery.classList.contains("show")){
+    showHero();
+  }else{
+    showGallery();
+  }
 });
-
 
 /* IMAGE LIST */
 
 const images = [
-"images/thumbring.png",
-"images/knotthumb.png",
-"images/thumbnailegg.jpg",
-"images/mercurythumbnail.png",
-"images/dreamthumb.jpg",
-"images/t1.jpg",
-"images/t2.jpg",
-"images/t3.jpg",
-"images/t4.jpg",
-"images/t5.jpg",
-"images/thumbnut.jpg",
-"images/midtripthumb.jpg",
-"images/mantisthumb.png"
-"images/etrthumb.jpg"
+  "images/thumbring.png",
+  "images/knotthumb.png",
+  "images/thumbnailegg.jpg",
+  "images/mercurythumbnail.png",
+  "images/dreamthumb.jpg",
+  "images/t1.jpg",
+  "images/t2.jpg",
+  "images/t3.jpg",
+  "images/t4.jpg",
+  "images/t5.jpg",
+  "images/thumbnut.jpg",
+  "images/midtripthumb.jpg",
+  "images/mantisthumb.png",
+  "images/etrthumb.jpg"
 ];
-
 
 /* HELPERS */
 
 function rand(min,max){
-return Math.random() * (max - min) + min;
+  return Math.random() * (max - min) + min;
 }
 
 function chance(n){
-return Math.random() < n;
+  return Math.random() < n;
 }
 
 function easeInOut(t){
-return 0.5 - Math.cos(Math.PI * t) / 2;
+  return 0.5 - Math.cos(Math.PI * t) / 2;
 }
-
 
 /* SHUFFLE BAG */
 
@@ -541,102 +525,100 @@ let bag = [];
 let lastImage = "";
 
 function refillBag(){
-bag = images.slice();
+  bag = images.slice();
 
-for(let i = bag.length - 1; i > 0; i--){
-const j = Math.floor(Math.random() * (i + 1));
-[bag[i], bag[j]] = [bag[j], bag[i]];
-}
+  for(let i = bag.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [bag[i], bag[j]] = [bag[j], bag[i]];
+  }
 
-if(bag.length > 1 && bag[0] === lastImage){
-[bag[0], bag[1]] = [bag[1], bag[0]];
-}
+  if(bag.length > 1 && bag[0] === lastImage){
+    [bag[0], bag[1]] = [bag[1], bag[0]];
+  }
 }
 
 function nextImage(){
-if(bag.length === 0){
-refillBag();
+  if(bag.length === 0){
+    refillBag();
+  }
+  const src = bag.shift();
+  lastImage = src;
+  return src;
 }
-const src = bag.shift();
-lastImage = src;
-return src;
-}
-
 
 /* LAYER MOTION */
 
 const stateMap = new Map();
 
 function newState(){
-const now = performance.now();
+  const now = performance.now();
 
-return {
-blurFrom: rand(12,24),
-blurTo: rand(12,40),
-blurStart: now,
-blurDuration: rand(12000,42000),
+  return {
+    blurFrom: rand(12,24),
+    blurTo: rand(12,40),
+    blurStart: now,
+    blurDuration: rand(12000,42000),
 
-xFrom: rand(-6,6),
-yFrom: rand(-6,6),
-xTo: rand(-6,6),
-yTo: rand(-6,6),
-moveStart: now,
-moveDuration: rand(18000,50000),
+    xFrom: rand(-6,6),
+    yFrom: rand(-6,6),
+    xTo: rand(-6,6),
+    yTo: rand(-6,6),
+    moveStart: now,
+    moveDuration: rand(18000,50000),
 
-scaleFrom: rand(1.12,1.18),
-scaleTo: rand(1.12,1.18)
-};
+    scaleFrom: rand(1.12,1.18),
+    scaleTo: rand(1.12,1.18)
+  };
 }
 
 function resetMotion(img){
-stateMap.set(img,newState());
+  stateMap.set(img,newState());
 }
 
 function animateLayer(img,now){
-const s = stateMap.get(img);
-if(!s){ return; }
+  const s = stateMap.get(img);
+  if(!s){ return; }
 
-let blurT = (now - s.blurStart) / s.blurDuration;
-if(blurT >= 1){
-s.blurFrom = s.blurTo;
-s.blurTo = rand(12,40);
-s.blurStart = now;
-s.blurDuration = rand(12000,42000);
-blurT = 0;
-}
-const blurEase = easeInOut(Math.max(0,Math.min(1,blurT)));
-const blurValue = s.blurFrom + (s.blurTo - s.blurFrom) * blurEase;
+  let blurT = (now - s.blurStart) / s.blurDuration;
+  if(blurT >= 1){
+    s.blurFrom = s.blurTo;
+    s.blurTo = rand(12,40);
+    s.blurStart = now;
+    s.blurDuration = rand(12000,42000);
+    blurT = 0;
+  }
+  const blurEase = easeInOut(Math.max(0,Math.min(1,blurT)));
+  const blurValue = s.blurFrom + (s.blurTo - s.blurFrom) * blurEase;
 
-let moveT = (now - s.moveStart) / s.moveDuration;
-if(moveT >= 1){
-s.xFrom = s.xTo;
-s.yFrom = s.yTo;
-s.scaleFrom = s.scaleTo;
+  let moveT = (now - s.moveStart) / s.moveDuration;
+  if(moveT >= 1){
+    s.xFrom = s.xTo;
+    s.yFrom = s.yTo;
+    s.scaleFrom = s.scaleTo;
 
-s.xTo = rand(-6,6);
-s.yTo = rand(-6,6);
-s.scaleTo = rand(1.12,1.18);
+    s.xTo = rand(-6,6);
+    s.yTo = rand(-6,6);
+    s.scaleTo = rand(1.12,1.18);
 
-s.moveStart = now;
-s.moveDuration = rand(18000,50000);
-moveT = 0;
-}
-const moveEase = easeInOut(Math.max(0,Math.min(1,moveT)));
-const x = s.xFrom + (s.xTo - s.xFrom) * moveEase;
-const y = s.yFrom + (s.yTo - s.yFrom) * moveEase;
-const scale = s.scaleFrom + (s.scaleTo - s.scaleFrom) * moveEase;
+    s.moveStart = now;
+    s.moveDuration = rand(18000,50000);
+    moveT = 0;
+  }
+  const moveEase = easeInOut(Math.max(0,Math.min(1,moveT)));
+  const x = s.xFrom + (s.xTo - s.xFrom) * moveEase;
+  const y = s.yFrom + (s.yTo - s.yFrom) * moveEase;
+  const scale = s.scaleFrom + (s.scaleTo - s.scaleFrom) * moveEase;
 
-img.style.filter = "blur(" + blurValue + "px)";
-img.style.transform =
-"translate(calc(-50% + " + x + "%), calc(-50% + " + y + "%)) scale(" + scale + ")";
+  img.style.filter = "blur(" + blurValue + "px)";
+  img.style.transform =
+    "translate(calc(-50% + " + x + "%), calc(-50% + " + y + "%)) scale(" + scale + ")";
 }
 
 function animate(now){
-animateLayer(imgA,now);
-animateLayer(imgB,now);
-requestAnimationFrame(animate);
+  animateLayer(imgA,now);
+  animateLayer(imgB,now);
+  requestAnimationFrame(animate);
 }
-
 
 /* SLIDESHOW */
 
@@ -645,58 +627,57 @@ let hidden = imgB;
 let switchTimer = null;
 
 function nextDelayMs(){
-if(chance(0.8)){
-return rand(20000,40000);
-}else{
-return rand(40000,70000);
-}
+  if(chance(0.8)){
+    return rand(20000,40000);
+  }else{
+    return rand(40000,70000);
+  }
 }
 
 function nextFadeSeconds(){
-if(chance(0.8)){
-return rand(18,36);
-}else{
-return rand(36,55);
-}
+  if(chance(0.8)){
+    return rand(18,36);
+  }else{
+    return rand(36,55);
+  }
 }
 
 function showNextImage(){
 
-const nextSrc = nextImage();
-const preload = new Image();
+  const nextSrc = nextImage();
+  const preload = new Image();
 
-preload.onload = function(){
+  preload.onload = function(){
 
-const fade = nextFadeSeconds();
+    const fade = nextFadeSeconds();
 
-hidden.src = nextSrc;
-resetMotion(hidden);
+    hidden.src = nextSrc;
+    resetMotion(hidden);
 
-hidden.style.transition = "none";
-hidden.style.opacity = 0;
+    hidden.style.transition = "none";
+    hidden.style.opacity = 0;
 
-hidden.offsetHeight;
+    hidden.offsetHeight;
 
-hidden.style.transition = "opacity " + fade + "s linear";
-active.style.transition = "opacity " + fade + "s linear";
+    hidden.style.transition = "opacity " + fade + "s linear";
+    active.style.transition = "opacity " + fade + "s linear";
 
-hidden.style.opacity = 1;
-active.style.opacity = 0;
+    hidden.style.opacity = 1;
+    active.style.opacity = 0;
 
-const temp = active;
-active = hidden;
-hidden = temp;
+    const temp = active;
+    active = hidden;
+    hidden = temp;
 
-switchTimer = setTimeout(showNextImage, nextDelayMs());
-};
+    switchTimer = setTimeout(showNextImage, nextDelayMs());
+  };
 
-preload.onerror = function(){
-switchTimer = setTimeout(showNextImage, 8000);
-};
+  preload.onerror = function(){
+    switchTimer = setTimeout(showNextImage, 8000);
+  };
 
-preload.src = nextSrc;
+  preload.src = nextSrc;
 }
-
 
 /* START */
 
