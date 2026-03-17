@@ -66,7 +66,7 @@ cursor:pointer;
 text-decoration:underline;
 }
 
-/* CENTER BLUR SQUARE */
+/* BLUR CENTREPIECE */
 
 .hero{
 display:flex;
@@ -85,7 +85,6 @@ overflow:hidden;
 .blur-box img{
 
 position:absolute;
-
 width:140%;
 height:140%;
 
@@ -95,8 +94,6 @@ top:50%;
 transform:translate(-50%,-50%);
 
 object-fit:cover;
-
-filter:blur(18px);
 
 opacity:0;
 
@@ -207,8 +204,6 @@ text-decoration:none;
 </header>
 
 
-<!-- BLURRED COLOUR SQUARE -->
-
 <section class="hero" id="hero">
 
 <div class="blur-box">
@@ -295,7 +290,7 @@ hero.style.display = "flex";
 });
 
 
-/* BLUR SLIDESHOW */
+/* IMAGE LIST */
 
 const images = [
 
@@ -309,27 +304,44 @@ const images = [
 
 ];
 
+
+/* SLIDESHOW */
+
 const imgA = document.getElementById("imgA");
 const imgB = document.getElementById("imgB");
 
 let index = 0;
 let showingA = true;
 
+function randomBlur(){
+
+return Math.floor(Math.random() * (40 - 18 + 1)) + 18;
+
+}
+
+/* initial image */
+
 imgA.src = images[0];
+imgA.style.filter = "blur(" + randomBlur() + "px)";
+
 
 function changeImage(){
 
 index = (index + 1) % images.length;
 
+let blurAmount = randomBlur();
+
 if(showingA){
 
 imgB.src = images[index];
+imgB.style.filter = "blur(" + blurAmount + "px)";
 imgB.classList.add("active");
 imgA.classList.remove("active");
 
 }else{
 
 imgA.src = images[index];
+imgA.style.filter = "blur(" + blurAmount + "px)";
 imgA.classList.add("active");
 imgB.classList.remove("active");
 
