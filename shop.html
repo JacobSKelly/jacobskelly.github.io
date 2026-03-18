@@ -155,24 +155,97 @@ header p{
   margin:14px auto 0 auto;
 }
 
+/* base button reset */
 .square-button{
-  display:inline-block;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+  font-family:Helvetica, Arial, sans-serif;
+  transition:all 0.25s ease;
+}
+
+/* minimal black BUY button */
+.square-button.minimal-buy{
+  background:#000;
+  color:#fff;
+  border:none;
+  border-radius:0;
+  box-shadow:none;
+  min-width:auto;
+  height:auto;
+  padding:7px 14px 6px 14px;
   font-size:11px;
-  line-height:18px;
-  height:18px;
-  color:#ffffff;
-  min-width:70px;
-  padding:0 10px;
-  background-color:#006aff;
-  text-align:center;
-  box-shadow:0 0 0 1px rgba(0,0,0,.1) inset;
-  border-radius:4px;
-  text-decoration:shimmer;
+  line-height:1;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+}
+
+.square-button.minimal-buy:hover{
+  opacity:0.82;
+}
+
+/* neon "buy me" text button */
+.square-button.neon-buy{
+  background:none;
+  border:none;
+  box-shadow:none;
+  min-width:auto;
+  height:auto;
+  padding:0;
+  color:#7fd6ff;
+  font-size:17px;
+  font-style:italic;
+  font-weight:normal;
+  letter-spacing:0.01em;
+  text-transform:lowercase;
+  position:relative;
+  text-decoration:none;
+  animation:neonBreath 4.8s ease-in-out infinite;
+}
+
+.square-button.neon-buy::before,
+.square-button.neon-buy::after{
+  content:attr(data-text);
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  color:#7fd6ff;
+}
+
+.square-button.neon-buy::before{
+  opacity:0.65;
+  filter:blur(4px);
+}
+
+.square-button.neon-buy::after{
+  opacity:0.38;
+  filter:blur(10px);
+}
+
+.square-button.neon-buy:hover{
+  color:#a9e8ff;
+}
+
+@keyframes neonBreath{
+  0%, 100%{
+    opacity:0.9;
+    text-shadow:
+      0 0 2px rgba(127,214,255,0.70),
+      0 0 6px rgba(127,214,255,0.55),
+      0 0 14px rgba(0,106,255,0.30);
+  }
+  50%{
+    opacity:1;
+    text-shadow:
+      0 0 3px rgba(127,214,255,0.95),
+      0 0 10px rgba(127,214,255,0.82),
+      0 0 20px rgba(0,106,255,0.48);
+  }
 }
 
 .square-button.disabled{
-  background:#bbb;
-  color:#fff;
+  opacity:0.35;
   pointer-events:none;
 }
 
@@ -252,7 +325,7 @@ footer a{
     </div>
 
     <div class="square-wrap">
-      <a target="_blank" href="https://square.link/u/4zO8jeLV?src=embed" class="square-button">Buy now</a>
+      <a target="_blank" href="https://square.link/u/4zO8jeLV?src=embed" class="square-button minimal-buy">BUY</a>
     </div>
 
     <p class="product-note">Double click image for full-size artwork.</p>
@@ -265,15 +338,6 @@ footer a{
         <div class="product-slide">
           <img src="images/thumbman.jpg" alt="Le Samouraï">
         </div>
-        <!-- add more slides here later -->
-        <!--
-        <div class="product-slide">
-          <img src="images/samourai2.jpg" alt="Le Samouraï">
-        </div>
-        <div class="product-slide">
-          <img src="images/samourai3.jpg" alt="Le Samouraï">
-        </div>
-        -->
       </div>
     </div>
 
@@ -288,7 +352,10 @@ footer a{
     </div>
 
     <div class="square-wrap">
-      <a target="_blank" href="https://square.link/u/a9w7yysf?src=embed" class="square-button">Buy now</a>
+      <a target="_blank"
+         href="https://square.link/u/a9w7yysf?src=embed"
+         class="square-button neon-buy"
+         data-text="buy me">buy me</a>
     </div>
 
     <p class="product-note">Double click image for full-size artwork.</p>
@@ -301,15 +368,6 @@ footer a{
         <div class="product-slide">
           <img src="images/mercurythumbnail.png" alt="Mercury">
         </div>
-        <!-- add more slides here later -->
-        <!--
-        <div class="product-slide">
-          <img src="images/mercury2.png" alt="Mercury">
-        </div>
-        <div class="product-slide">
-          <img src="images/mercury3.png" alt="Mercury">
-        </div>
-        -->
       </div>
     </div>
 
@@ -324,7 +382,7 @@ footer a{
     </div>
 
     <div class="square-wrap">
-      <a href="#" class="square-button disabled">Buy now</a>
+      <a href="#" class="square-button minimal-buy disabled">BUY</a>
     </div>
 
     <p class="product-note">Double click image for full-size artwork.</p>
@@ -368,7 +426,7 @@ document.querySelectorAll('.product').forEach(product => {
   }
 
   track.querySelectorAll('img').forEach(img => {
-    img.addEventListener('click', (e) => {
+    img.addEventListener('click', () => {
       if (clickTimer) return;
 
       clickTimer = setTimeout(() => {
