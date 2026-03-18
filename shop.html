@@ -6,389 +6,799 @@
 <title>Shop - Jacob Samuel Kelly</title>
 
 <style>
+
+/* RESET */
+
 *{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+margin:0;
+padding:0;
+box-sizing:border-box;
 }
 
-html, body{
-  width:100%;
-  min-height:100%;
-  font-family:Helvetica, Arial, sans-serif;
-  background:#fff;
-  color:#111;
-  text-align:center;
+/* BASE */
+
+html,body{
+width:100%;
+font-family:Helvetica,Arial,sans-serif;
+background:#fff;
+color:#111;
+text-align:center;
 }
 
 body{
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
+display:flex;
+flex-direction:column;
+min-height:100vh;
 }
 
+/* HEADER */
+
 header{
-  padding:2vh 20px 1vh 20px;
-  line-height:1.2;
+padding:2vh 20px 1vh 20px;
+line-height:1.2;
 }
 
 header h1{
-  font-size:4vh;
-  margin-bottom:0.6vh;
-  font-weight:normal;
+font-size:4vh;
+margin-bottom:1vh;
+font-weight:normal;
 }
 
 header p{
-  font-size:1.8vh;
-  color:#555;
+font-size:1.8vh;
+color:#555;
 }
 
-.back-link{
-  display:inline-block;
-  margin-top:10px;
-  font-size:0.85rem;
-  color:#111;
-  text-decoration:none;
+.controls-line{
+margin-top:6px;
 }
 
-.back-link:hover{
-  text-decoration:underline;
+.controls-line a,
+.controls-line button,
+.controls-line span{
+font-size:0.85rem;
+color:#111;
+text-decoration:none;
+margin:0 4px;
 }
 
-.shop{
-  flex:1 1 auto;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:1.5vh;
-  max-width:90vw;
-  margin:2vh auto 4vh auto;
-  align-items:start;
+.controls-line a:hover{
+text-decoration:underline;
+}
+
+/* TOP NAV */
+
+.shop-nav{
+margin-top:10px;
+margin-bottom:8px;
+line-height:1.5;
+}
+
+.shop-toggle{
+appearance:none;
+background:none;
+border:none;
+font-family:Helvetica,Arial,sans-serif;
+font-size:0.85rem;
+color:#111;
+cursor:pointer;
+padding:0;
+}
+
+.shop-toggle:hover{
+text-decoration:underline;
+}
+
+.shop-toggle.active{
+text-decoration:underline;
+}
+
+.shop-separator{
+font-size:0.85rem;
+color:#111;
+margin:0 5px;
+}
+
+/* MAIN AREA */
+
+.shop-shell{
+width:100%;
+}
+
+.shop-intro{
+min-height:150px;
+display:flex;
+justify-content:center;
+align-items:flex-start;
+position:relative;
+margin-top:18px;
+}
+
+.mini-art-anchor{
+width:min(72vw, 920px);
+position:relative;
+margin:0 auto;
+min-height:120px;
+}
+
+.mini-art{
+position:absolute;
+left:0;
+top:8px;
+width:94px;
+height:64px;
+overflow:hidden;
+background:#fff;
+}
+
+.mini-art img{
+position:absolute;
+width:150%;
+height:150%;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%) scale(1.12);
+object-fit:cover;
+filter:blur(16px);
+opacity:0.96;
+}
+
+/* DROPDOWN PANELS */
+
+.shop-panel{
+display:none;
+max-width:90vw;
+margin:0 auto 28px auto;
+}
+
+.shop-panel.show{
+display:block;
+}
+
+/* GALLERY */
+
+.gallery{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:1.5vh;
+max-width:72vw;
+margin:0 auto;
+justify-content:center;
 }
 
 .product{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+display:flex;
+flex-direction:column;
+align-items:center;
+}
+
+.product-card{
+width:80%;
+display:flex;
+flex-direction:column;
+align-items:center;
+text-decoration:none;
+color:inherit;
 }
 
 .product-image-frame{
-  width:100%;
-  aspect-ratio:1/1;
-  background:#f5f5f5;
-  overflow:hidden;
-  position:relative;
+width:100%;
+aspect-ratio:1/1;
+background:#f5f5f5;
+overflow:hidden;
+position:relative;
 }
 
 .product-track{
-  display:flex;
-  width:100%;
-  height:100%;
-  transition:transform 0.3s ease;
+display:flex;
+width:100%;
+height:100%;
+transition:transform 0.3s ease;
 }
 
 .product-slide{
-  flex:0 0 100%;
-  width:100%;
-  height:100%;
+flex:0 0 100%;
+width:100%;
+height:100%;
 }
 
 .product-slide img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  object-position:bottom center;
-  display:block;
-  cursor:pointer;
-  user-select:none;
-  -webkit-user-drag:none;
-}
-
-.product-info{
-  width:100%;
-  padding-top:10px;
-  line-height:1.3;
-}
-
-.product-title{
-  font-size:0.95rem;
-  font-weight:normal;
-}
-
-.product-price{
-  font-size:0.85rem;
-  color:#555;
-  margin-top:4px;
-}
-
-.product-type{
-  font-size:0.8rem;
-  color:#777;
-  margin-top:3px;
+width:100%;
+height:100%;
+object-fit:cover;
+object-position:bottom center;
+display:block;
+cursor:pointer;
+user-select:none;
+-webkit-user-drag:none;
 }
 
 .carousel-controls{
-  margin-top:8px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:6px;
-  min-height:18px;
+margin-top:8px;
+display:flex;
+justify-content:center;
+align-items:center;
+gap:6px;
+min-height:18px;
 }
 
 .carousel-dot{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  border:1px solid #111;
-  background:#fff;
+width:8px;
+height:8px;
+border-radius:50%;
+border:1px solid #111;
+background:#fff;
 }
 
 .carousel-dot.active{
-  background:#111;
+background:#111;
 }
 
 .carousel-controls.hidden{
-  visibility:hidden;
+visibility:hidden;
+}
+
+.product-info{
+width:100%;
+padding-top:10px;
+line-height:1.3;
+min-height:82px;
+}
+
+.product-title{
+font-size:0.95rem;
+font-weight:normal;
+}
+
+.product-price{
+font-size:0.85rem;
+color:#555;
+margin-top:4px;
+}
+
+.product-type{
+font-size:0.8rem;
+color:#777;
+margin-top:3px;
 }
 
 .square-wrap{
-  margin:14px auto 0 auto;
+margin:10px auto 0 auto;
 }
 
-/* base button reset */
 .square-button{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  text-decoration:none;
-  font-family:Helvetica, Arial, sans-serif;
-  transition:all 0.25s ease;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+text-decoration:none;
+font-family:Helvetica,Arial,sans-serif;
+transition:opacity 0.25s ease;
+background:#000;
+color:#fff;
+border:none;
+border-radius:0;
+box-shadow:none;
+min-width:auto;
+height:auto;
+padding:7px 14px 6px 14px;
+font-size:11px;
+line-height:1;
+letter-spacing:0.14em;
+text-transform:uppercase;
 }
 
-/* minimal black BUY button */
-.square-button.minimal-buy{
-  background:#000;
-  color:#fff;
-  border:none;
-  border-radius:0;
-  box-shadow:none;
-  min-width:auto;
-  height:auto;
-  padding:7px 14px 6px 14px;
-  font-size:11px;
-  line-height:1;
-  letter-spacing:0.14em;
-  text-transform:uppercase;
-}
-
-.square-button.minimal-buy:hover{
-  opacity:0.82;
-}
-
-/* neon "buy me" text button */
-.square-button.neon-buy{
-  background:none;
-  border:none;
-  box-shadow:none;
-  min-width:auto;
-  height:auto;
-  padding:0;
-  color:#7fd6ff;
-  font-size:17px;
-  font-style:italic;
-  font-weight:normal;
-  letter-spacing:0.01em;
-  text-transform:lowercase;
-  position:relative;
-  text-decoration:none;
-  animation:neonBreath 4.8s ease-in-out infinite;
-}
-
-.square-button.neon-buy::before,
-.square-button.neon-buy::after{
-  content:attr(data-text);
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  color:#7fd6ff;
-}
-
-.square-button.neon-buy::before{
-  opacity:0.65;
-  filter:blur(4px);
-}
-
-.square-button.neon-buy::after{
-  opacity:0.38;
-  filter:blur(10px);
-}
-
-.square-button.neon-buy:hover{
-  color:#a9e8ff;
-}
-
-@keyframes neonBreath{
-  0%, 100%{
-    opacity:0.9;
-    text-shadow:
-      0 0 2px rgba(127,214,255,0.70),
-      0 0 6px rgba(127,214,255,0.55),
-      0 0 14px rgba(0,106,255,0.30);
-  }
-  50%{
-    opacity:1;
-    text-shadow:
-      0 0 3px rgba(127,214,255,0.95),
-      0 0 10px rgba(127,214,255,0.82),
-      0 0 20px rgba(0,106,255,0.48);
-  }
+.square-button:hover{
+opacity:0.82;
 }
 
 .square-button.disabled{
-  opacity:0.35;
-  pointer-events:none;
+opacity:0.35;
+pointer-events:none;
 }
 
 .product-note{
-  font-size:0.74rem;
-  color:#777;
-  margin-top:8px;
-  line-height:1.3;
+font-size:0.74rem;
+color:#777;
+margin-top:8px;
+line-height:1.3;
+opacity:0;
+transition:opacity 0.2s ease;
+min-height:1.1em;
+pointer-events:none;
 }
 
+.product-card:hover .product-note,
+.product-card:focus .product-note,
+.product:hover .product-note{
+opacity:1;
+}
+
+/* PLACEHOLDERS */
+
+.placeholder .product-image-frame{
+background:#f2f2f2;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.placeholder-thumb{
+width:100%;
+height:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:0.78rem;
+color:#777;
+letter-spacing:0.02em;
+}
+
+.placeholder .product-info{
+min-height:62px;
+}
+
+.placeholder .product-title{
+font-size:0.9rem;
+color:#444;
+}
+
+.placeholder .product-price,
+.placeholder .product-type{
+color:#888;
+}
+
+/* FOOTER */
+
 footer{
-  flex:0 0 auto;
-  font-size:0.8rem;
-  color:#777;
-  padding:1vh 0 2vh 0;
-  line-height:1.4;
+font-size:0.8rem;
+color:#777;
+padding:1vh 0 2vh 0;
+margin-top:auto;
+line-height:1.4;
 }
 
 footer a{
-  color:#777;
-  text-decoration:none;
+color:#777;
+text-decoration:none;
+display:inline-block;
+margin-bottom:2px;
 }
+
+/* MOBILE */
 
 @media(max-width:768px){
-  .shop{
-    grid-template-columns:1fr;
-    gap:2vh;
-    max-width:92vw;
-  }
 
-  header h1{
-    font-size:28px;
-  }
-
-  header p{
-    font-size:14px;
-  }
+header h1{
+font-size:28px;
 }
+
+header p{
+font-size:14px;
+}
+
+.shop-nav{
+padding:0 14px;
+line-height:1.8;
+}
+
+.shop-panel{
+max-width:92vw;
+}
+
+.gallery{
+grid-template-columns:1fr;
+gap:2vh;
+max-width:92vw;
+}
+
+.product-card{
+width:86%;
+}
+
+.mini-art-anchor{
+width:92vw;
+min-height:82px;
+}
+
+.mini-art{
+position:relative;
+left:auto;
+top:auto;
+margin:0 auto;
+width:86px;
+height:58px;
+}
+
+.shop-intro{
+min-height:96px;
+margin-top:10px;
+}
+
+}
+
+/* DESKTOP */
+
+@media(min-width:769px){
+
+.gallery .product:nth-child(4){
+grid-column:1;
+}
+
+}
+
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Shop</h1>
-  <p>The Fruit That Ate Itself</p>
-  <a href="index.html" class="back-link">← Back to Portfolio</a>
+
+<h1>Shop</h1>
+
+<p>The Fruit That Ate Itself</p>
+
+<div class="controls-line">
+  <a href="index.html">← back to portfolio</a>
+</div>
+
+<div class="shop-nav">
+  <button class="shop-toggle" data-target="printsPanel">Prints</button>
+  <span class="shop-separator">-</span>
+  <button class="shop-toggle" data-target="apparelPanel">Apparel</button>
+  <span class="shop-separator">-</span>
+  <button class="shop-toggle" data-target="booksPanel">Books</button>
+  <span class="shop-separator">-</span>
+  <button class="shop-toggle" data-target="originalPanel">Original Works</button>
+</div>
+
 </header>
 
-<section class="shop">
+<main class="shop-shell">
 
-  <!-- PRODUCT 1 -->
-  <div class="product">
-    <div class="product-image-frame">
-      <div class="product-track" data-full-link="layer4.html">
-        <div class="product-slide">
-          <img src="images/thumbnailegg.jpg" alt="Black T, Nearly Six Eggs">
-        </div>
-        <div class="product-slide">
-          <img src="images/eggsblack.png" alt="Black T, Nearly Six Eggs">
-        </div>
-        <div class="product-slide">
-          <img src="images/eggsblack2.png" alt="Black T, Nearly Six Eggs">
-        </div>
+  <section class="shop-intro">
+    <div class="mini-art-anchor">
+      <div class="mini-art" aria-hidden="true">
+        <img src="images/thumbring.png" alt="">
       </div>
     </div>
+  </section>
 
-    <div class="carousel-controls">
-      <span class="carousel-dot active"></span>
-      <span class="carousel-dot"></span>
-      <span class="carousel-dot"></span>
-    </div>
+  <!-- PRINTS -->
+  <section class="shop-panel" id="printsPanel">
+    <div class="gallery">
 
-    <div class="product-info">
-      <p class="product-title">Black T, ‘Nearly Six Eggs’</p>
-      <p class="product-price">£30</p>
-      <p class="product-type">T-shirt</p>
-    </div>
-
-    <div class="square-wrap">
-      <a target="_blank" href="https://square.link/u/4zO8jeLV?src=embed" class="square-button minimal-buy">BUY</a>
-    </div>
-
-    <p class="product-note">Double click image for full-size artwork.</p>
-  </div>
-
-  <!-- PRODUCT 2 -->
-  <div class="product">
-    <div class="product-image-frame">
-      <div class="product-track" data-full-link="layer11.html">
-        <div class="product-slide">
-          <img src="images/thumbman.jpg" alt="Le Samouraï">
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Print 01</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
         </div>
       </div>
-    </div>
 
-    <div class="carousel-controls hidden">
-      <span class="carousel-dot active"></span>
-    </div>
-
-    <div class="product-info">
-      <p class="product-title">Le Samouraï</p>
-      <p class="product-price">£30</p>
-      <p class="product-type">T-shirt</p>
-    </div>
-
-    <div class="square-wrap">
-      <a target="_blank"
-         href="https://square.link/u/a9w7yysf?src=embed"
-         class="square-button neon-buy"
-         data-text="buy me">buy me</a>
-    </div>
-
-    <p class="product-note">Double click image for full-size artwork.</p>
-  </div>
-
-  <!-- PRODUCT 3 -->
-  <div class="product">
-    <div class="product-image-frame">
-      <div class="product-track" data-full-link="layer5.html">
-        <div class="product-slide">
-          <img src="images/mercurythumbnail.png" alt="Mercury">
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Print 02</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
         </div>
       </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Print 03</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Print 04</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Print 05</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Print 06</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Print 07</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Print 08</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Print 09</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
     </div>
+  </section>
 
-    <div class="carousel-controls hidden">
-      <span class="carousel-dot active"></span>
+  <!-- APPAREL -->
+  <section class="shop-panel" id="apparelPanel">
+    <div class="gallery">
+
+      <!-- PRODUCT 1 -->
+      <div class="product">
+        <div class="product-card">
+          <div class="product-image-frame">
+            <div class="product-track" data-full-link="layer4.html">
+              <div class="product-slide">
+                <img src="images/thumbnailegg.jpg" alt="Black T, Nearly Six Eggs">
+              </div>
+              <div class="product-slide">
+                <img src="images/eggsblack.png" alt="Black T, Nearly Six Eggs">
+              </div>
+              <div class="product-slide">
+                <img src="images/eggsblack2.png" alt="Black T, Nearly Six Eggs">
+              </div>
+            </div>
+          </div>
+
+          <div class="carousel-controls">
+            <span class="carousel-dot active"></span>
+            <span class="carousel-dot"></span>
+            <span class="carousel-dot"></span>
+          </div>
+
+          <div class="product-info">
+            <p class="product-title">Black T, ‘Nearly Six Eggs’</p>
+            <p class="product-price">£30</p>
+            <p class="product-type">T-shirt</p>
+            <div class="square-wrap">
+              <a target="_blank" href="https://square.link/u/4zO8jeLV?src=embed" class="square-button">BUY</a>
+            </div>
+          </div>
+
+          <p class="product-note">Double click for full-size artwork.</p>
+        </div>
+      </div>
+
+      <!-- PRODUCT 2 -->
+      <div class="product">
+        <div class="product-card">
+          <div class="product-image-frame">
+            <div class="product-track" data-full-link="layer11.html">
+              <div class="product-slide">
+                <img src="images/thumbman.jpg" alt="Le Samouraï">
+              </div>
+            </div>
+          </div>
+
+          <div class="carousel-controls hidden">
+            <span class="carousel-dot active"></span>
+          </div>
+
+          <div class="product-info">
+            <p class="product-title">Le Samouraï</p>
+            <p class="product-price">£30</p>
+            <p class="product-type">T-shirt</p>
+            <div class="square-wrap">
+              <a target="_blank" href="https://square.link/u/a9w7yysf?src=embed" class="square-button">BUY</a>
+            </div>
+          </div>
+
+          <p class="product-note">Double click for full-size artwork.</p>
+        </div>
+      </div>
+
+      <!-- PRODUCT 3 -->
+      <div class="product">
+        <div class="product-card">
+          <div class="product-image-frame">
+            <div class="product-track" data-full-link="layer5.html">
+              <div class="product-slide">
+                <img src="images/mercurythumbnail.png" alt="Mercury">
+              </div>
+            </div>
+          </div>
+
+          <div class="carousel-controls hidden">
+            <span class="carousel-dot active"></span>
+          </div>
+
+          <div class="product-info">
+            <p class="product-title">Mercury</p>
+            <p class="product-price">£30</p>
+            <p class="product-type">T-shirt</p>
+            <div class="square-wrap">
+              <a href="#" class="square-button disabled">BUY</a>
+            </div>
+          </div>
+
+          <p class="product-note">Double click for full-size artwork.</p>
+        </div>
+      </div>
+
     </div>
+  </section>
 
-    <div class="product-info">
-      <p class="product-title">Mercury</p>
-      <p class="product-price">£30</p>
-      <p class="product-type">T-shirt</p>
+  <!-- BOOKS -->
+  <section class="shop-panel" id="booksPanel">
+    <div class="gallery">
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Book 01</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Book 02</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Book 03</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Book 04</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Book 05</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Book 06</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Book 07</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Book 08</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Book 09</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
     </div>
+  </section>
 
-    <div class="square-wrap">
-      <a href="#" class="square-button minimal-buy disabled">BUY</a>
+  <!-- ORIGINAL WORKS -->
+  <section class="shop-panel" id="originalPanel">
+    <div class="gallery">
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Original 01</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Original 02</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Original 03</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Original 04</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Original 05</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Original 06</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Original 07</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Original 08</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
+      <div class="product placeholder">
+        <div class="product-card">
+          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
+          <div class="product-info"><p class="product-title">Original 09</p><p class="product-type">Coming Soon</p></div>
+          <p class="product-note">More works will appear here.</p>
+        </div>
+      </div>
+
     </div>
+  </section>
 
-    <p class="product-note">Double click image for full-size artwork.</p>
-  </div>
-
-</section>
+</main>
 
 <footer>
   <p>
@@ -398,8 +808,38 @@ footer a{
 </footer>
 
 <script>
-document.querySelectorAll('.product').forEach(product => {
+
+/* DROPDOWN PANELS */
+
+const toggleButtons = document.querySelectorAll(".shop-toggle");
+const panels = document.querySelectorAll(".shop-panel");
+
+function closeAllPanels(){
+  panels.forEach(panel => panel.classList.remove("show"));
+  toggleButtons.forEach(button => button.classList.remove("active"));
+}
+
+toggleButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    const targetId = button.getAttribute("data-target");
+    const targetPanel = document.getElementById(targetId);
+    const isOpen = targetPanel.classList.contains("show");
+
+    closeAllPanels();
+
+    if(!isOpen){
+      targetPanel.classList.add("show");
+      button.classList.add("active");
+    }
+  });
+});
+
+/* APPAREL CAROUSELS */
+
+document.querySelectorAll('#apparelPanel .product').forEach(product => {
   const track = product.querySelector('.product-track');
+  if(!track){ return; }
+
   const slides = product.querySelectorAll('.product-slide');
   const dotsWrap = product.querySelector('.carousel-controls');
   const dots = product.querySelectorAll('.carousel-dot');
@@ -443,6 +883,7 @@ document.querySelectorAll('.product').forEach(product => {
     });
   });
 });
+
 </script>
 
 </body>
