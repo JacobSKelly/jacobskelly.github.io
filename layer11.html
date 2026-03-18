@@ -1,1 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>football - Jacob Samuel Kelly</title>
 
+<style>
+/* General page setup */
+body{
+  display:flex;
+  margin:0;
+  font-family: Helvetica, Arial, sans-serif;
+  height:100vh;
+  overflow:hidden;
+  background:#000;
+  color:#fff;
+}
+
+/* LEFT PANEL */
+.text-area{
+  width:30%;
+  padding:40px;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  margin-top:20px;
+}
+
+/* Titles and text */
+.text-area h1{
+  margin:0 0 5px 0;
+  font-size:clamp(1.8rem,5vw,2.2em);
+  font-weight:900;
+  color:#fff;
+}
+
+.text-area p{
+  margin:2px 0;
+  font-size:clamp(1rem,2.5vw,1.2em);
+  line-height:1.2;
+  font-weight:600;
+  color:#fff;
+}
+
+/* BACK BUTTON */
+a.back{
+  display:inline-block;
+  margin-bottom:20px;
+  text-decoration:none;
+  color:#fff;
+  font-weight:bold;
+  letter-spacing:1px;
+  font-size:0.9rem;
+}
+
+/* IMAGE AREA */
+.image-area{
+  width:70%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  overflow:hidden;
+  background:#000;
+}
+
+.image-area img{
+  display:block;
+  max-width:100%;
+  max-height:100%;
+  cursor:zoom-in;
+  transition:transform 0.3s ease;
+  transform-origin:center center;
+}
+
+.image-area img:hover{
+  transform:scale(1.05);
+}
+
+/* MOBILE LAYOUT */
+@media(max-width:900px){
+  body{
+    flex-direction:column;
+    height:auto;
+  }
+
+  .text-area,
+  .image-area{
+    width:100%;
+    padding:20px;
+  }
+
+  .image-area{
+    height:50vh;
+    margin-top:20px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="text-area">
+  <a href="index.html" class="back">← Back to Portfolio</a>
+  <h1>Football 2026</h1>
+  <p><strong>Digital Painting</strong></p>
+  <p>Mixed Media.</p>
+</div>
+
+<div class="image-area" id="imageContainer">
+  <img src="https://phfinal.s3.eu-west-2.amazonaws.com/smallman.jpg" alt="Football" id="mainImage">
+</div>
+
+<script>
+const img = document.getElementById('mainImage');
+const container = document.getElementById('imageContainer');
+
+let zoomed = false;
+let clickTimeout = null;
+const scale = 4;
+
+/* Single click = zoom in/out, double click = go to zoom page */
+img.addEventListener('click', (e) => {
+  if (clickTimeout) return;
+
+  clickTimeout = setTimeout(() => {
+    if(!zoomed){
+      const rect = img.getBoundingClientRect();
+      const offsetX = (e.clientX - rect.left) / rect.width;
+      const offsetY = (e.clientY - rect.top) / rect.height;
+
+      container.style.overflow = 'auto';
+      img.style.transformOrigin = `${offsetX * 100}% ${offsetY * 100}%`;
+      img.style.transform = `scale(${scale})`;
+      img.style.cursor = 'zoom-out';
+
+      zoomed = true;
+    } else {
+      img.style.transform = 'scale(1)';
+      container.style.overflow = 'hidden';
+      img.style.cursor = 'zoom-in';
+      zoomed = false;
+    }
+
+    clickTimeout = null;
+  }, 250);
+});
+
+img.addEventListener('dblclick', (e) => {
+  e.preventDefault();
+  clearTimeout(clickTimeout);
+  clickTimeout = null;
+  window.location.href = 'zoom94.html';
+});
+
+/* Drag-to-pan when zoomed */
+let isDragging = false;
+let startX, startY, scrollLeft, scrollTop;
+
+container.addEventListener('mousedown', (e) => {
+  if(!zoomed) return;
+  isDragging = true;
+  startX = e.pageX - container.offsetLeft;
+  startY = e.pageY - container.offsetTop;
+  scrollLeft = container.scrollLeft;
+  scrollTop = container.scrollTop;
+  container.style.cursor = 'grabbing';
+});
+
+container.addEventListener('mouseup', () => {
+  isDragging = false;
+  container.style.cursor = zoomed ? 'grab' : 'default';
+});
+
+container.addEventListener('mouseleave', () => {
+  isDragging = false;
+  container.style.cursor = zoomed ? 'grab' : 'default';
+});
+
+container.addEventListener('mousemove', (e) => {
+  if(!isDragging) return;
+  e.preventDefault();
+  const x = e.pageX - container.offsetLeft;
+  const y = e.pageY - container.offsetTop;
+  container.scrollLeft = scrollLeft - (x - startX);
+  container.scrollTop = scrollTop - (y - startY);
+});
+</script>
+
+</body>
+</html>
