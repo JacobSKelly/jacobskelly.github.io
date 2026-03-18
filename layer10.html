@@ -1,82 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clouds 2025</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clouds 2025</title>
 
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      min-height: 100%;
-      background: #000;
-      color: #fff;
-      font-family: Arial, sans-serif;
-    }
+<style>
 
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+body{
+  display:flex;
+  margin:0;
+  font-family:Helvetica, Arial, sans-serif;
+  min-height:100vh;
+  overflow:hidden;
+  background:#000;
+  color:#fff;
+}
 
-    .page {
-      width: 100%;
-      max-width: 1400px;
-      padding: 24px;
-      box-sizing: border-box;
-      text-align: center;
-    }
+/* LEFT PANEL */
 
-    h1 {
-      margin: 0 0 8px 0;
-      font-size: 1.8rem;
-      font-weight: 400;
-      letter-spacing: 0.02em;
-    }
+.info-container{
+  width:34%;
+  padding:40px;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  margin-top:20px;
+}
 
-    h2 {
-      margin: 0 0 24px 0;
-      font-size: 1rem;
-      font-weight: 400;
-      color: #ccc;
-      text-transform: lowercase;
-      letter-spacing: 0.04em;
-    }
+.info-container h1{
+  margin:0 0 5px 0;
+  font-size:clamp(1.8rem,5vw,2.2em);
+  font-weight:900;
+}
 
-    .video-wrap {
-      position: relative;
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      aspect-ratio: 16 / 9;
-      background: #000;
-    }
+.info-container p{
+  margin:0 0 14px 0;
+  font-size:clamp(0.95rem,1.3vw,1.05rem);
+  line-height:1.45;
+  font-weight:400;
+  color:#f2f2f2;
+}
 
-    .video-wrap iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      display: block;
-    }
-  </style>
+.info-container .subheading{
+  margin:2px 0 20px 0;
+  font-size:clamp(1rem,2vw,1.15rem);
+  line-height:1.2;
+  font-weight:600;
+}
+
+/* BACK BUTTON */
+
+.back{
+  display:inline-block;
+  margin-bottom:20px;
+  text-decoration:none;
+  color:#fff;
+  font-weight:bold;
+  letter-spacing:1px;
+  font-size:0.9rem;
+}
+
+/* VIDEO AREA */
+
+.video-area{
+  width:66%;
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  padding:40px 50px 40px 20px;
+  box-sizing:border-box;
+  overflow:hidden;
+}
+
+.video-wrap{
+  width:min(820px, 100%);
+  aspect-ratio:16 / 9;
+  background:#000;
+}
+
+.video-wrap iframe{
+  width:100%;
+  height:100%;
+  border:0;
+  display:block;
+}
+
+/* MOBILE */
+
+@media (max-width:768px){
+
+  body{
+    flex-direction:column;
+    min-height:auto;
+    overflow:auto;
+  }
+
+  .info-container,
+  .video-area{
+    width:100%;
+    padding:20px;
+    margin-top:0;
+  }
+
+  .video-area{
+    justify-content:center;
+    align-items:flex-start;
+  }
+
+  .video-wrap{
+    width:100%;
+    max-width:100%;
+  }
+
+}
+
+</style>
 </head>
 
 <body>
-  <div class="page">
-    <h1>Clouds 2025</h1>
-    <h2>matte background</h2>
 
-    <div class="video-wrap">
-      <iframe
-        src="https://www.youtube-nocookie.com/embed/-yywDae5He0?controls=1&rel=0&fs=1"
-        title="Clouds 2025"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-        allowfullscreen>
-      </iframe>
-    </div>
+<div class="info-container">
+
+<a href="index.html" class="back">← Back to Portfolio</a>
+
+<h1>Clouds <span style="font-size:0.8em;">2025</span></h1>
+
+<p class="subheading"><strong>Matte Painting</strong></p>
+
+<p>Often marking the boundary between where the sound stage ends and the escapism of cinema begins, matte paintings in film have always entranced me. They sit at the threshold between title sequences and fantasy space, where hand-painted lettering and painted backgrounds come to life through movement, grain, and texture.</p>
+
+<p>I have long been drawn to the interplay between film grain and the image, and to the way post-production inserts in older films often appear shakier, grainier, and more unstable than the footage itself. Title cards, special effects, and painted elements were frequently exposed more heavily in order to merge them into one continuous whole. Paradoxically, these imperfections often made something artificial or hand-painted appear more convincing, in a way that feels largely absent from much contemporary filmmaking.</p>
+
+<p>Inspired in part by the Columbia Pictures logo, this short animated film was made as part of that ongoing investigation. Working without photo reference, I built the image through layers of opacity, Gaussian blur, and blending modes, gradually accumulating thin, almost invisible veils of paint-like information.</p>
+
+<p>Clouds seem an ideal subject for this process. They are almost an illusion in themselves: temporary structures formed by the density of water particles suspended in air. From one angle a cloud can appear thick and solid, from another thin and transparent. They occlude the sun and cast shadows into themselves, creating doubles, false depths, and shifting optical effects.</p>
+
+<p>What interests me is the way clouds produce illusions of depth, shimmer, and refraction through repeating self-similar forms, as though fractal structures found throughout nature become momentarily opalescent in the shifting interplay of shadow and light. This work explores those effects as they feel fundamentally connected to the techniques I use in Photoshop, where simple transformations can generate surprisingly complex and naturalistic results.</p>
+
+</div>
+
+<div class="video-area">
+  <div class="video-wrap">
+    <iframe
+      src="https://www.youtube-nocookie.com/embed/-yywDae5He0?controls=1&rel=0&fs=1"
+      title="Clouds 2025"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+      allowfullscreen>
+    </iframe>
   </div>
+</div>
+
 </body>
 </html>
