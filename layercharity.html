@@ -1,1 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Charity - Jacob Samuel Kelly</title>
 
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html, body{
+  width:100%;
+  min-height:100%;
+  font-family:Helvetica, Arial, sans-serif;
+  background:#fff;
+  color:#111;
+}
+
+body{
+  display:flex;
+  flex-direction:column;
+}
+
+header{
+  padding:2vh 20px 1vh 20px;
+  text-align:center;
+  line-height:1.2;
+}
+
+header h1{
+  font-size:4vh;
+  margin-bottom:1vh;
+  font-weight:normal;
+}
+
+header p{
+  font-size:1.8vh;
+  color:#555;
+}
+
+main{
+  width:100%;
+  max-width:860px;
+  margin:0 auto;
+  padding:30px 20px 60px 20px;
+}
+
+section{
+  margin-bottom:34px;
+}
+
+h2{
+  font-size:1rem;
+  font-weight:normal;
+  margin-bottom:12px;
+  text-transform:lowercase;
+}
+
+p{
+  font-size:0.92rem;
+  line-height:1.45;
+  margin-bottom:12px;
+}
+
+a{
+  color:#111;
+  text-decoration:none;
+}
+
+a:hover{
+  text-decoration:underline;
+}
+
+.back{
+  display:inline-block;
+  margin-bottom:24px;
+  font-size:0.9rem;
+}
+
+.summary{
+  border-top:1px solid #111;
+  border-bottom:1px solid #111;
+  padding:14px 0;
+}
+
+.summary-grid{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:14px;
+  margin-top:10px;
+}
+
+.summary-item{
+  text-align:left;
+}
+
+.summary-item span{
+  display:block;
+  font-size:0.75rem;
+  color:#666;
+  margin-bottom:4px;
+}
+
+.summary-item strong{
+  font-size:1rem;
+  font-weight:normal;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+  font-size:0.88rem;
+}
+
+th, td{
+  text-align:left;
+  padding:10px 8px;
+  border-bottom:1px solid #ddd;
+  vertical-align:top;
+}
+
+th{
+  font-weight:normal;
+  color:#555;
+}
+
+.note{
+  font-size:0.82rem;
+  color:#666;
+}
+
+ul{
+  list-style:none;
+  padding-left:0;
+}
+
+li{
+  font-size:0.88rem;
+  line-height:1.4;
+  margin-bottom:6px;
+}
+
+footer{
+  text-align:center;
+  font-size:0.8rem;
+  color:#777;
+  padding:1vh 0 3vh 0;
+  line-height:1.4;
+  margin-top:auto;
+}
+
+footer a{
+  color:#777;
+}
+
+@media(max-width:768px){
+  header h1{
+    font-size:28px;
+  }
+
+  header p{
+    font-size:14px;
+  }
+
+  main{
+    padding:24px 16px 50px 16px;
+  }
+
+  .summary-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  table{
+    font-size:0.8rem;
+  }
+
+  th, td{
+    padding:8px 6px;
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Charity</h1>
+  <p>Jacob Samuel Kelly</p>
+</header>
+
+<main>
+
+  <a href="index.html" class="back">← Back to Portfolio</a>
+
+  <section>
+    <h2>goal</h2>
+    <p>
+      We have pledged to donate half the profits from t-shirt sales to help protect UK waterways.
+      This page exists as a public record of what comes in, what is spent, what remains as profit,
+      and what is given away.
+    </p>
+    <p>
+      It also exists to make visible the economics around small-scale art production:
+      what things cost, what artists are left with, and where money actually goes.
+    </p>
+  </section>
+
+  <section>
+    <h2>how it works</h2>
+    <p>
+      A t-shirt selling for <strong>£30</strong> usually returns around <strong>£10 profit</strong>
+      after production and platform costs. Of that <strong>£10</strong>, we pledge to donate
+      <strong>£5</strong> towards protecting UK waterways.
+    </p>
+    <p class="note">
+      Figures may change slightly depending on print costs, payment processing fees, discounts,
+      and shipping structures. This page will be updated to reflect the real numbers.
+    </p>
+  </section>
+
+  <section class="summary">
+    <h2>current totals</h2>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <span>t-shirts sold</span>
+        <strong>0</strong>
+      </div>
+      <div class="summary-item">
+        <span>gross sales</span>
+        <strong>£0.00</strong>
+      </div>
+      <div class="summary-item">
+        <span>total profit</span>
+        <strong>£0.00</strong>
+      </div>
+      <div class="summary-item">
+        <span>donated / set aside</span>
+        <strong>£0.00</strong>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>sales and donations log</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Product</th>
+          <th>Sold for</th>
+          <th>Profit</th>
+          <th>50% pledged</th>
+          <th>Status</th>
+          <th>Evidence</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>—</td>
+          <td>No sales yet</td>
+          <td>£0.00</td>
+          <td>£0.00</td>
+          <td>£0.00</td>
+          <td>Waiting</td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>what will be published here</h2>
+    <ul>
+      <li>Sale date</li>
+      <li>Product name</li>
+      <li>Sale price</li>
+      <li>Print / production cost</li>
+      <li>Platform and payment fees</li>
+      <li>Final profit</li>
+      <li>Amount pledged from that sale</li>
+      <li>Donation status</li>
+      <li>Screenshots, receipts, invoices, or confirmation records where possible</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>transparency note</h2>
+    <p>
+      This page is intended as an open ledger rather than a branding exercise.
+      If there are delays, low margins, or no donations yet, that will be shown here plainly.
+      If support is received, that will also be shown plainly.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  <a href="https://www.instagram.com/the_fruit_that_ate_itself" target="_blank">@the_fruit_that_ate_itself</a><br>
+  53.4808° N, -2.2426° W
+</footer>
+
+</body>
+</html>
