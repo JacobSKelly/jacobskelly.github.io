@@ -11,7 +11,7 @@ body{
   display:flex;
   margin:0;
   font-family:Helvetica, Arial, sans-serif;
-  min-height:100vh;
+  height:100vh;
   overflow:hidden;
   background:#000;
   color:#fff;
@@ -21,40 +21,41 @@ body{
 
 .info-container{
   width:34%;
-  padding:40px;
+  padding:32px 34px 32px 34px;
   box-sizing:border-box;
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
-  margin-top:20px;
+  align-self:flex-start;
 }
 
 .info-container h1{
-  margin:0 0 5px 0;
-  font-size:clamp(1.8rem,5vw,2.2em);
+  margin:0 0 4px 0;
+  font-size:clamp(1.6rem,4vw,2.1rem);
   font-weight:900;
 }
 
-.info-container p{
-  margin:0 0 14px 0;
-  font-size:clamp(0.95rem,1.3vw,1.05rem);
-  line-height:1.45;
-  font-weight:400;
-  color:#f2f2f2;
-}
-
 .info-container .subheading{
-  margin:2px 0 20px 0;
-  font-size:clamp(1rem,2vw,1.15rem);
+  margin:0 0 16px 0;
+  font-size:clamp(0.9rem,1.6vw,1rem);
   line-height:1.2;
   font-weight:600;
+}
+
+.info-container p{
+  margin:0 0 10px 0;
+  font-size:11px;
+  line-height:1.3;
+  font-weight:400;
+  color:#f2f2f2;
+  max-width:95%;
 }
 
 /* BACK BUTTON */
 
 .back{
   display:inline-block;
-  margin-bottom:20px;
+  margin-bottom:18px;
   text-decoration:none;
   color:#fff;
   font-weight:bold;
@@ -64,20 +65,46 @@ body{
 
 /* VIDEO AREA */
 
-.video-area{
+.media-area{
   width:66%;
+  height:100vh;
   display:flex;
   justify-content:flex-end;
   align-items:center;
-  padding:40px 50px 40px 20px;
+  padding:20px 48px 20px 20px;
   box-sizing:border-box;
-  overflow:hidden;
+}
+
+.media-wrap{
+  width:min(760px, 100%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.video-placeholder,
+.video-wrap{
+  width:100%;
+  aspect-ratio:16 / 9;
+  background:#000;
+}
+
+.video-placeholder{
+  display:block;
+  cursor:pointer;
+  border:0;
+  padding:0;
+}
+
+.video-placeholder img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:contain;
 }
 
 .video-wrap{
-  width:min(820px, 100%);
-  aspect-ratio:16 / 9;
-  background:#000;
+  display:none;
 }
 
 .video-wrap iframe{
@@ -87,29 +114,42 @@ body{
   display:block;
 }
 
+.watch-text{
+  margin-top:10px;
+  font-size:11px;
+  line-height:1.2;
+  color:#fff;
+  letter-spacing:0.02em;
+  text-align:center;
+}
+
 /* MOBILE */
 
 @media (max-width:768px){
 
   body{
     flex-direction:column;
-    min-height:auto;
+    height:auto;
     overflow:auto;
   }
 
   .info-container,
-  .video-area{
+  .media-area{
     width:100%;
+    height:auto;
     padding:20px;
-    margin-top:0;
   }
 
-  .video-area{
+  .info-container{
+    align-self:auto;
+  }
+
+  .media-area{
     justify-content:center;
     align-items:flex-start;
   }
 
-  .video-wrap{
+  .media-wrap{
     width:100%;
     max-width:100%;
   }
@@ -129,28 +169,51 @@ body{
 
 <p class="subheading"><strong>Matte Painting</strong></p>
 
-<p>Often marking the boundary between where the sound stage ends and the escapism of cinema begins, matte paintings in film have always entranced me. They sit at the threshold between title sequences and fantasy space, where hand-painted lettering and painted backgrounds come to life through movement, grain, and texture.</p>
+<p>Often marking the boundary between where the sound stage ends and the escapism provided by cinema begins, matte paintings in film have always entranced me. They sit at the threshold between title sequences and fantasy space, where hand-painted lettering and painted backgrounds come to life through movement, grain, and texture.</p>
 
-<p>I have long been drawn to the interplay between film grain and the image, and to the way post-production inserts in older films often appear shakier, grainier, and more unstable than the footage itself. Title cards, special effects, and painted elements were frequently exposed more heavily in order to merge them into one continuous whole. Paradoxically, these imperfections often made something artificial or hand-painted appear more convincing, in a way that feels largely absent from much contemporary filmmaking.</p>
+<p>I have long been drawn to the interplay between film grain, lense effects and post-processing. Where the seems show. Often I find im more interested in making, than I am the finsihed work itself. Post-production inserts in older films often appear shakier, grainier, and more unstable than the footage. Title cards, special effects, and painted elements were exposed more frequently in order to merge them into one continuous product. often making something hand-painted appear totaly real, in a way that feels largely absent from much contemporary filmmaking.</p>
 
-<p>Inspired in part by the Columbia Pictures logo, this short animated film was made as part of that ongoing investigation. Working without photo reference, I built the image through layers of opacity, Gaussian blur, and blending modes, gradually accumulating thin, almost invisible veils of paint-like information.</p>
+<p>Inspired in part by the Columbia Pictures logo, this short animated film was made as part of that life long investigation. Working without photo reference, I built the image through layers of opacity, Gaussian blur, and blending modes, gradually accumulating thin, almost invisible layers of paint-like information.</p>
 
-<p>Clouds seem an ideal subject for this process. They are almost an illusion in themselves: temporary structures formed by the density of water particles suspended in air. From one angle a cloud can appear thick and solid, from another thin and transparent. They occlude the sun and cast shadows into themselves, creating doubles, false depths, and shifting optical effects.</p>
+<p>Clouds seem an ideal subject for this process. clouds are almost an illusion, created by the density of water particles suspended in the air. Such that, from one angle a cloud could appear thick and dense, and from another, thin and transparrent. The clouds occlude the sun casting shadows into themselves, creating doubles. creating optical illlusions of depth and holgraphic effects, where the self similar and fractal structures that repeat throughout nature become opalesquent and shimmering, in this interplay of shadow and light that plays out.</p>
 
-<p>What interests me is the way clouds produce illusions of depth, shimmer, and refraction through repeating self-similar forms, as though fractal structures found throughout nature become momentarily opalescent in the shifting interplay of shadow and light. This work explores those effects as they feel fundamentally connected to the techniques I use in Photoshop, where simple transformations can generate surprisingly complex and naturalistic results.</p>
+<p>This work sets out to investigate some of these effects as they seem fundamental to the techniques I use in photoshop. Where simple transformations in my work are able to create complex and naturalistic effects</p>
 
 </div>
 
-<div class="video-area">
-  <div class="video-wrap">
-    <iframe
-      src="https://www.youtube-nocookie.com/embed/-yywDae5He0?controls=1&rel=0&fs=1"
-      title="Clouds 2025"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-      allowfullscreen>
-    </iframe>
+<div class="media-area">
+  <div class="media-wrap">
+    <button class="video-placeholder" id="videoPlaceholder" aria-label="Play Clouds 2025">
+      <img src="https://phfinal.s3.eu-west-2.amazonaws.com/clarge.png" alt="Clouds 2025">
+    </button>
+
+    <div class="video-wrap" id="videoWrap">
+      <iframe
+        src=""
+        data-src="https://www.youtube-nocookie.com/embed/-yywDae5He0?autoplay=1&controls=1&rel=0&fs=1"
+        title="Clouds 2025"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <div class="watch-text" id="watchText">click to watch film</div>
   </div>
 </div>
+
+<script>
+const videoPlaceholder = document.getElementById("videoPlaceholder");
+const videoWrap = document.getElementById("videoWrap");
+const watchText = document.getElementById("watchText");
+const iframe = videoWrap.querySelector("iframe");
+
+videoPlaceholder.addEventListener("click", () => {
+  iframe.src = iframe.dataset.src;
+  videoPlaceholder.style.display = "none";
+  videoWrap.style.display = "block";
+  watchText.style.display = "none";
+});
+</script>
 
 </body>
 </html>
