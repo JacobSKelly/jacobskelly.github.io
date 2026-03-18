@@ -90,6 +90,7 @@ width:300px;
 height:300px;
 position:relative;
 overflow:hidden;
+background:#fff;
 }
 
 .blur-box img{
@@ -103,6 +104,25 @@ object-fit:cover;
 opacity:0;
 will-change:opacity,transform,filter;
 pointer-events:none;
+}
+
+.loading-message{
+position:absolute;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+font-size:0.78rem;
+color:#555;
+letter-spacing:0.02em;
+opacity:0;
+transition:opacity 0.25s ease;
+pointer-events:none;
+z-index:3;
+white-space:nowrap;
+}
+
+.loading-message.show{
+opacity:1;
 }
 
 /* BIO / EXHIBITIONS */
@@ -219,6 +239,10 @@ width:260px;
 height:260px;
 }
 
+.loading-message{
+font-size:0.74rem;
+}
+
 .bio,
 .exhibitions{
 max-width:92vw;
@@ -309,6 +333,7 @@ text-decoration:none;
 
 <section class="hero" id="hero">
 <div class="blur-box">
+<div class="loading-message" id="loadingMessage">one moment...</div>
 <img id="imgA" alt="">
 <img id="imgB" alt="">
 </div>
@@ -468,6 +493,7 @@ const hero = document.getElementById("hero");
 
 const imgA = document.getElementById("imgA");
 const imgB = document.getElementById("imgB");
+const loadingMessage = document.getElementById("loadingMessage");
 
 /* VIEW HELPERS */
 
@@ -597,6 +623,22 @@ function chance(n){
 
 function easeInOut(t){
   return 0.5 - Math.cos(Math.PI * t) / 2;
+}
+
+/* LOADING MESSAGE */
+
+let loadingTimer = null;
+
+function scheduleLoadingMessage(){
+  clearTimeout(loadingTimer);
+  loadingTimer = setTimeout(() => {
+    loadingMessage.classList.add("show");
+  }, 350);
+}
+
+function hideLoadingMessage(){
+  clearTimeout(loadingTimer);
+  loadingMessage.classList.remove("show");
 }
 
 /* SHUFFLE BAG */
@@ -781,15 +823,40 @@ function showNextImage(){
 
 shuffleGalleryHourly();
 
-imgA.src = nextImage();
-imgA.style.opacity = 1;
-imgB.style.opacity = 0;
+const firstSrc = nextImage();
+const firstPreload = new Image();
 
-resetMotion(imgA);
-resetMotion(imgB);
+scheduleLoadingMessage();
 
-requestAnimationFrame(animate);
-switchTimer = setTimeout(showNextImage, nextDelayMs());
+firstPreload.onload = function(){
+  imgA.src = firstSrc;
+  imgA.style.opacity = 1;
+  imgB.style.opacity = 0;
+
+  hideLoadingMessage();
+
+  resetMotion(imgA);
+  resetMotion(imgB);
+
+  requestAnimationFrame(animate);
+  switchTimer = setTimeout(showNextImage, nextDelayMs());
+};
+
+firstPreload.onerror = function(){
+  hideLoadingMessage();
+
+  imgA.src = firstSrc;
+  imgA.style.opacity = 1;
+  imgB.style.opacity = 0;
+
+  resetMotion(imgA);
+  resetMotion(imgB);
+
+  requestAnimationFrame(animate);
+  switchTimer = setTimeout(showNextImage, nextDelayMs());
+};
+
+firstPreload.src = firstSrc;
 
 </script>
 
