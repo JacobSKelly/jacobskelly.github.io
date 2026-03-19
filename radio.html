@@ -571,7 +571,7 @@ const CHANNELS = {
 const FX_PROTECTED_TRACKS = new Set([
   'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3',
   'https://peachradio.s3.eu-west-2.amazonaws.com/redhouse.mp3',
-  'https://peachradio.s3.eu-west-2.amazonaws.com/xenopus.mp3'
+  'https://peachradio.s3.eu-west-2.amazonaws.com/xenopus.mp3',
   'https://peachradio.s3.eu-west-2.amazonaws.com/samantha.mp3'
 ]);
 
@@ -639,6 +639,8 @@ let ambientWet = null;
 
 let running = false;
 let muted = false;
+let pausedByKey = false;
+let cleanOverride = false;
 let currentChannel = 1;
 let currentTrack = null;
 let currentTexture = null;
@@ -736,6 +738,10 @@ function ambienceBias(){
   const chDrift = clamp(channelElapsedSec() / 160, 0, 1);
   const tide = (Math.sin(elapsedSec() / 95) + 1) * 0.5;
 
+  if(cleanOverride){
+    return 1;
+  }
+
   if(station.mode === 'all-clean'){
     return clamp(0.45 + tide * 0.25, 0, 1);
   }
@@ -752,10 +758,12 @@ function ambienceBias(){
 }
 
 function syncLiveState(){
-  els.dot.classList.toggle('on', running && !muted);
+  els.dot.classList.toggle('on', running && !muted && !pausedByKey);
 
   if(!running){
     els.liveText.textContent = 'standby';
+  } else if(pausedByKey){
+    els.liveText.textContent = 'paused';
   } else if(muted){
     els.liveText.textContent = 'muted';
   } else {
@@ -829,14 +837,14 @@ function updateClock(){
 function updateTelemetry(){
   const ctxState = audioCtx ? audioCtx.state : 'none';
   const fxText = audioCtx
-    ? `m ${mainGain ? mainGain.gain.value.toFixed(2) : '0.00'} / t ${textureGain ? textureGain.gain.value.toFixed(2) : '0.00'} / n ${noiseGain ? noiseGain.gain.value.toFixed(2) : '0.00'} / a ${ambientGain ? ambientGain.gain.value.toFixed(2) : '0.00'}`
+    ? `m ${mainGain ? mainGain.gain.value.toFixed(2) : '0.00'} / t ${textureGain ? textureGain.gain.value.toFixed(2) : '0.00'} / n ${noiseGain ? noiseGain.gain.value.toFixed(2) : '0.00'} / a ${ambientGain ? ambientGain.gain.value.toFixed(2) : '0.00'}${cleanOverride ? ' / clean' : ''}`
     : '—';
 
   els.telemetryLeft.textContent =
 `ENG: ${ctxState}
 CH: ${currentChannel}
 MODE: ${currentMode}
-AUDIO: ${running ? (muted ? 'muted' : 'live') : 'standby'}
+AUDIO: ${running ? (pausedByKey ? 'paused' : (muted ? 'muted' : 'live')) : 'standby'}
 ELAPSED: ${formatTime(elapsedSec())}
 CHAN ELAPSED: ${formatTime(channelElapsedSec())}`;
 
@@ -864,21 +872,59 @@ function refillBags(){
   }
 }
 
-function nextCentrepiece(){
+function nextCentrepiece(excludeSrc = null){
   if(centrepieceBag.length === 0) refillBags();
-  return centrepieceBag.shift() || null;
+
+  if(!excludeSrc) return centrepieceBag.shift() || null;
+
+  let picked = centrepieceBag.find(track => track.src !== excludeSrc) || null;
+  if(!picked){
+    refillBags();
+    picked = centrepieceBag.find(track => track.src !== excludeSrc) || centrepieceBag[0] || null;
+  }
+  if(!picked) return null;
+
+  const idx = centrepieceBag.findIndex(track => track.src === picked.src);
+  if(idx >= 0) centrepieceBag.splice(idx, 1);
+  return picked;
 }
 
-function nextTexture(){
+function nextTexture(excludeSrc = null){
   if(textureBag.length === 0) refillBags();
-  return textureBag.shift() || null;
+
+  if(!excludeSrc) return textureBag.shift() || null;
+
+  let picked = textureBag.find(track => track.src !== excludeSrc) || null;
+  if(!picked){
+    refillBags();
+    picked = textureBag.find(track => track.src !== excludeSrc) || textureBag[0] || null;
+  }
+  if(!picked) return null;
+
+  const idx = textureBag.findIndex(track => track.src === picked.src);
+  if(idx >= 0) textureBag.splice(idx, 1);
+  return picked;
 }
 
-function nextAnyFromChannel4(){
+function nextAnyFromChannel4(excludeSrc = null){
   const station = activeStation();
-  if(station.mode !== 'all-clean') return nextCentrepiece();
+  if(station.mode !== 'all-clean') return nextCentrepiece(excludeSrc);
   if(centrepieceBag.length === 0) refillBags();
-  return centrepieceBag.shift() || null;
+
+  let picked = !excludeSrc
+    ? centrepieceBag.shift()
+    : centrepieceBag.find(track => track.src !== excludeSrc) || null;
+
+  if(!picked){
+    refillBags();
+    picked = centrepieceBag.find(track => track.src !== excludeSrc) || centrepieceBag[0] || null;
+  }
+
+  if(!picked) return null;
+
+  const idx = centrepieceBag.findIndex(track => track.src === picked.src);
+  if(idx >= 0) centrepieceBag.splice(idx, 1);
+  return picked;
 }
 
 function allTracksForChannel(channel){
@@ -902,6 +948,7 @@ function getJoinerTrack(){
 function pickGapTexture(){
   const station = activeStation();
 
+  if(cleanOverride) return null;
   if(station.mode === 'all-clean' || station.mode === 'dead-air') return null;
   if(station.textures.length === 0) return null;
   if(currentTrackIsFXProtected()) return null;
@@ -932,6 +979,7 @@ function saveCurrentChannelState(){
   if(!running) return;
   if(!currentTrack) return;
   if(currentChannel === 5) return;
+  if(currentChannel === 4) return;
 
   let currentTime = 0;
 
@@ -955,6 +1003,7 @@ function setChannel(channel){
   currentChannel = channel;
   currentTrack = null;
   currentTexture = null;
+  pausedByKey = false;
   channelStart = Date.now();
 
   els.channelButtons.forEach((btn, idx) => {
@@ -1123,6 +1172,10 @@ function stopAllFX(){
   updateTelemetry();
 }
 
+function setStatusTuning(){
+  els.status.textContent = 'Tuning';
+}
+
 function makeFilteredNoise(durationSec, config = {}){
   const now = audioCtx.currentTime;
   const buffer = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * durationSec), audioCtx.sampleRate);
@@ -1256,8 +1309,127 @@ function makeValveSweep(durationSec, peak = 0.02){
   return stop;
 }
 
+function synthesizeTuningSound(durationSec = rand(2.6, 5.4), intensity = 1){
+  if(!audioCtx || cleanOverride) return;
+
+  const now = audioCtx.currentTime;
+
+  const hissBuffer = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * durationSec), audioCtx.sampleRate);
+  const hissData = hissBuffer.getChannelData(0);
+  for(let i = 0; i < hissData.length; i++){
+    hissData[i] = (Math.random() * 2 - 1) * (0.28 * intensity);
+  }
+
+  const hissSrc = audioCtx.createBufferSource();
+  hissSrc.buffer = hissBuffer;
+
+  const hissHP = audioCtx.createBiquadFilter();
+  hissHP.type = 'highpass';
+  hissHP.frequency.setValueAtTime(380, now);
+
+  const hissBP = audioCtx.createBiquadFilter();
+  hissBP.type = 'bandpass';
+  hissBP.frequency.setValueAtTime(1800, now);
+  hissBP.frequency.exponentialRampToValueAtTime(rand(420, 4200), now + durationSec * 0.55);
+  hissBP.frequency.exponentialRampToValueAtTime(rand(700, 2600), now + durationSec);
+  hissBP.Q.value = 0.75;
+
+  const hissGain = audioCtx.createGain();
+  hissGain.gain.value = 0.0001;
+
+  hissSrc.connect(hissHP);
+  hissHP.connect(hissBP);
+  hissBP.connect(hissGain);
+  hissGain.connect(noiseGain);
+
+  hissGain.gain.setValueAtTime(0.0001, now);
+  hissGain.gain.exponentialRampToValueAtTime(0.085 * intensity, now + 0.22);
+  hissGain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+
+  const heteroA = audioCtx.createOscillator();
+  const heteroB = audioCtx.createOscillator();
+  const ringGain = audioCtx.createGain();
+  const ringFilter = audioCtx.createBiquadFilter();
+
+  heteroA.type = 'sine';
+  heteroB.type = 'sine';
+  heteroA.frequency.setValueAtTime(rand(600, 1200), now);
+  heteroB.frequency.setValueAtTime(rand(606, 1208), now);
+  heteroA.frequency.exponentialRampToValueAtTime(rand(120, 430), now + durationSec);
+  heteroB.frequency.exponentialRampToValueAtTime(rand(123, 447), now + durationSec);
+
+  ringFilter.type = 'bandpass';
+  ringFilter.frequency.value = rand(900, 2200);
+  ringFilter.Q.value = 2.2;
+
+  ringGain.gain.value = 0.0001;
+
+  heteroA.connect(ringFilter);
+  heteroB.connect(ringFilter);
+  ringFilter.connect(ringGain);
+  ringGain.connect(noiseGain);
+
+  ringGain.gain.setValueAtTime(0.0001, now);
+  ringGain.gain.exponentialRampToValueAtTime(0.03 * intensity, now + 0.12);
+  ringGain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec * 0.8);
+
+  const clickCount = 5 + Math.floor(rand(0, 6));
+  for(let i = 0; i < clickCount; i++){
+    const t = now + rand(0.08, Math.max(0.12, durationSec - 0.08));
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+
+    osc.type = chance(0.5) ? 'square' : 'sawtooth';
+    osc.frequency.value = rand(400, 2400);
+
+    filter.type = chance(0.5) ? 'bandpass' : 'highpass';
+    filter.frequency.value = rand(700, 3600);
+    filter.Q.value = rand(0.6, 5);
+
+    gain.gain.value = 0.0001;
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(noiseGain);
+
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(rand(0.01, 0.04) * intensity, t + 0.006);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + rand(0.03, 0.09));
+
+    osc.start(t);
+    osc.stop(t + 0.12);
+
+    activeNodeStops.push(() => {
+      try{ osc.stop(); }catch(e){}
+      [osc, gain, filter].forEach(node => {
+        try{ node.disconnect(); }catch(e){}
+      });
+    });
+  }
+
+  hissSrc.start(now);
+  hissSrc.stop(now + durationSec + 0.05);
+  heteroA.start(now);
+  heteroB.start(now);
+  heteroA.stop(now + durationSec + 0.05);
+  heteroB.stop(now + durationSec + 0.05);
+
+  const stop = () => {
+    try{ hissSrc.stop(); }catch(e){}
+    try{ heteroA.stop(); }catch(e){}
+    try{ heteroB.stop(); }catch(e){}
+    [hissSrc, hissHP, hissBP, hissGain, heteroA, heteroB, ringGain, ringFilter].forEach(node => {
+      try{ node.disconnect(); }catch(e){}
+    });
+  };
+
+  activeNodeStops.push(stop);
+  log('Synth tuning burst');
+}
+
 function triggerCrackle(){
-  if(!audioCtx || !running) return;
+  if(!audioCtx || !running || cleanOverride) return;
   if(activeStation().mode === 'all-clean') return;
 
   const now = audioCtx.currentTime;
@@ -1297,6 +1469,11 @@ function triggerCrackle(){
 
 function crackleLoop(){
   if(!running) return;
+  if(cleanOverride){
+    crackleTimer = setTimeout(crackleLoop, rand(1600, 3200));
+    return;
+  }
+
   const station = activeStation();
   if(station.mode === 'all-clean'){
     crackleTimer = setTimeout(crackleLoop, rand(1800, 3400));
@@ -1315,6 +1492,27 @@ function updateProcessing(){
   const station = activeStation();
   const t = instability();
   const ambient = ambienceBias();
+
+  if(cleanOverride){
+    mainDrive.curve = makeDistortionCurve(0);
+    textureDrive.curve = makeDistortionCurve(0);
+    mainFilter.frequency.setTargetAtTime(19000, audioCtx.currentTime, 0.25);
+    textureFilter.frequency.setTargetAtTime(1800, audioCtx.currentTime, 0.25);
+    mainSend.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.3);
+    mainDelay.delayTime.setTargetAtTime(0.12, audioCtx.currentTime, 0.3);
+    mainFeedback.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.3);
+    mainWet.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.3);
+    ambientLP.frequency.setTargetAtTime(6000, audioCtx.currentTime, 0.3);
+    ambientDelay.delayTime.setTargetAtTime(0.2, audioCtx.currentTime, 0.3);
+    ambientFeedback.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.3);
+    ambientWet.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.3);
+    noiseGain.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.15);
+    humGain.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.15);
+    textureGain.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.2);
+    updateTelemetry();
+    return;
+  }
+
   const clean = station.mode === 'all-clean';
   const deadAir = station.mode === 'dead-air';
   const texturesOnly = station.mode === 'textures-only';
@@ -1389,8 +1587,20 @@ function updateProcessing(){
 function startValveRadioStartup(){
   const station = activeStation();
 
-  currentMode = station.mode === 'dead-air' ? 'dead air' : 'startup';
+  currentMode = station.mode === 'dead-air' ? 'dead air' : 'tuning';
+  setStatusTuning();
   updateTelemetry();
+
+  if(cleanOverride){
+    synthesizeTuningSound(rand(1.8, 3.2), 0.45);
+    log('Clean override tuning');
+    return;
+  }
+
+  synthesizeTuningSound(
+    station.mode === 'dead-air' ? rand(4.2, 6.2) : rand(3.2, 5.4),
+    station.mode === 'all-clean' ? 0.55 : station.mode === 'dead-air' ? 1.15 : 1
+  );
 
   if(station.mode === 'all-clean'){
     makeHumCluster(8, 0.012);
@@ -1414,6 +1624,7 @@ function startValveRadioStartup(){
   makeValveSweep(station.mode === 'dead-air' ? 12 : 10, station.mode === 'dead-air' ? 0.018 : 0.028);
 
   overlayTimers.push(setTimeout(() => {
+    if(cleanOverride) return;
     makeFilteredNoise(10 + rand(4,8), {
       preType:'lowpass',
       preFreq:1100,
@@ -1427,6 +1638,7 @@ function startValveRadioStartup(){
   }, 1200));
 
   overlayTimers.push(setTimeout(() => {
+    if(cleanOverride) return;
     for(let i = 0; i < 5; i++){
       overlayTimers.push(setTimeout(triggerCrackle, rand(0, 2400)));
     }
@@ -1435,17 +1647,18 @@ function startValveRadioStartup(){
   log(station.mode === 'dead-air' ? 'Dead-air startup engaged' : 'Valve startup storm engaged');
 }
 
-function chooseTrackForChannel(){
+function chooseTrackForChannel(excludeSrc = null){
   const station = activeStation();
-  if(station.mode === 'textures-only') return nextTexture();
-  if(station.mode === 'centrepieces-only') return nextCentrepiece();
-  if(station.mode === 'all-clean') return nextAnyFromChannel4();
-  if(station.mode === 'main') return nextCentrepiece();
+  if(station.mode === 'textures-only') return nextTexture(excludeSrc);
+  if(station.mode === 'centrepieces-only') return nextCentrepiece(excludeSrc);
+  if(station.mode === 'all-clean') return nextAnyFromChannel4(excludeSrc);
+  if(station.mode === 'main') return nextCentrepiece(excludeSrc);
   return null;
 }
 
 async function playTextureSnippet(style = 'overlay', options = {}){
   const station = activeStation();
+  if(cleanOverride) return;
   if(station.mode === 'all-clean' || station.mode === 'dead-air') return;
   if(station.textures.length === 0) return;
   if(currentTrackIsFXProtected()) return;
@@ -1549,6 +1762,7 @@ async function playTextureSnippet(style = 'overlay', options = {}){
 
 async function reverseGhostLayer(){
   const station = activeStation();
+  if(cleanOverride) return;
   if(station.mode === 'all-clean' || station.mode === 'dead-air') return;
   if(!running || !currentTrack || !Number.isFinite(els.music.duration)) return;
   if(els.music.duration < 12) return;
@@ -1628,7 +1842,7 @@ async function reverseGhostLayer(){
 }
 
 function makeAmbientWash(durationSec = rand(10, 26)){
-  if(!audioCtx || !running) return;
+  if(!audioCtx || !running || cleanOverride) return;
 
   const now = audioCtx.currentTime;
   const oscA = audioCtx.createOscillator();
@@ -1685,7 +1899,7 @@ function makeAmbientWash(durationSec = rand(10, 26)){
 }
 
 function scheduleTrackIncidents(){
-  if(!running) return;
+  if(!running || cleanOverride) return;
 
   const station = activeStation();
   const t = instability();
@@ -1693,7 +1907,7 @@ function scheduleTrackIncidents(){
 
   if(station.mode === 'dead-air'){
     overlayTimers.push(setTimeout(() => {
-      if(running){
+      if(running && !cleanOverride){
         makeFilteredNoise(rand(18, 34), {
           preType:'highpass',
           preFreq:260,
@@ -1709,7 +1923,7 @@ function scheduleTrackIncidents(){
     }, rand(4000, 12000)));
 
     overlayTimers.push(setTimeout(() => {
-      if(running && chance(0.65)) makeAmbientWash(rand(16, 34));
+      if(running && !cleanOverride && chance(0.65)) makeAmbientWash(rand(16, 34));
     }, rand(6000, 14000)));
 
     return;
@@ -1719,7 +1933,7 @@ function scheduleTrackIncidents(){
     const overlayCount = 2 + Math.floor(t * 2);
     for(let i = 0; i < overlayCount; i++){
       overlayTimers.push(setTimeout(() => {
-        if(running) playTextureSnippet('overlay');
+        if(running && !cleanOverride) playTextureSnippet('overlay');
       }, rand(8000, 55000)));
     }
   }
@@ -1728,7 +1942,7 @@ function scheduleTrackIncidents(){
     const extra = 2 + Math.floor(amb * 2);
     for(let i = 0; i < extra; i++){
       overlayTimers.push(setTimeout(() => {
-        if(running && chance(0.75)) makeAmbientWash(rand(8, 20));
+        if(running && !cleanOverride && chance(0.75)) makeAmbientWash(rand(8, 20));
       }, rand(4000, 24000)));
     }
   }
@@ -1736,26 +1950,26 @@ function scheduleTrackIncidents(){
   if(station.mode === 'centrepieces-only'){
     if(chance(0.55 + t * 0.18)){
       overlayTimers.push(setTimeout(() => {
-        if(running) reverseGhostLayer();
+        if(running && !cleanOverride) reverseGhostLayer();
       }, rand(14000, 65000)));
     }
   }
 
   if(station.mode !== 'all-clean' && chance(0.35 + amb * 0.32)){
     overlayTimers.push(setTimeout(() => {
-      if(running) makeAmbientWash(rand(10, 28));
+      if(running && !cleanOverride) makeAmbientWash(rand(10, 28));
     }, rand(7000, 34000)));
   }
 
   if(station.mode !== 'textures-only' && station.mode !== 'all-clean' && chance(0.45 + t * 0.22)){
     overlayTimers.push(setTimeout(() => {
-      if(running) reverseGhostLayer();
+      if(running && !cleanOverride) reverseGhostLayer();
     }, rand(15000, 60000)));
   }
 
   if(station.mode !== 'all-clean' && chance(0.45)){
     overlayTimers.push(setTimeout(() => {
-      if(running){
+      if(running && !cleanOverride){
         makeFilteredNoise(rand(8, 18), {
           preType:'highpass',
           preFreq:900,
@@ -1772,41 +1986,63 @@ function scheduleTrackIncidents(){
   }
 }
 
+function chooseRandomMiddleStart(duration, stationMode){
+  if(!Number.isFinite(duration) || duration <= 6) return 0;
+
+  const endBuffer = stationMode === 'all-clean' ? 18 : 12;
+  const minPct = stationMode === 'all-clean' ? 0.22 : 0.12;
+  const maxPct = stationMode === 'all-clean' ? 0.82 : 0.88;
+
+  const minStart = Math.max(2, duration * minPct);
+  const maxStart = Math.max(minStart + 1, Math.min(duration - endBuffer, duration * maxPct));
+
+  if(maxStart <= minStart) return minStart;
+  return rand(minStart, maxStart);
+}
+
 async function startTrack(track){
   await ensureAudio();
   updateProcessing();
 
   const station = activeStation();
-  const memory = channelMemory[currentChannel];
+  const previousTrackSrc = currentTrack ? currentTrack.src : channelMemory[currentChannel]?.trackSrc || null;
+
+  const memory = (currentChannel === 4 || cleanOverride)
+    ? null
+    : channelMemory[currentChannel];
+
   const rememberedTrack = !track && memory && memory.trackSrc
     ? findTrackBySrc(currentChannel, memory.trackSrc)
     : null;
 
-  currentTrack = track || rememberedTrack || chooseTrackForChannel();
+  currentTrack = track || rememberedTrack || chooseTrackForChannel(currentChannel === 4 ? previousTrackSrc : null);
   updateTelemetry();
 
   if(station.mode === 'dead-air'){
     running = true;
+    pausedByKey = false;
     setMuted(false, true);
     setLive(true);
     currentMode = 'dead air';
-    els.status.textContent = '...';
+    setStatusTuning();
 
     stopAllFX();
     startValveRadioStartup();
 
-    makeFilteredNoise(rand(16, 36), {
-      preType:'highpass',
-      preFreq:280,
-      bandType:'bandpass',
-      bandFreq:610,
-      bandQ:0.42,
-      peak:0.08,
-      attack:2,
-      noiseLevel:0.32
-    });
-    makeHumCluster(rand(12, 26), 0.03);
-    makeAmbientWash(rand(18, 38));
+    if(!cleanOverride){
+      makeFilteredNoise(rand(16, 36), {
+        preType:'highpass',
+        preFreq:280,
+        bandType:'bandpass',
+        bandFreq:610,
+        bandQ:0.42,
+        peak:0.08,
+        attack:2,
+        noiseLevel:0.32
+      });
+      makeHumCluster(rand(12, 26), 0.03);
+      makeAmbientWash(rand(18, 38));
+    }
 
     crackleLoop();
     scheduleTrackIncidents();
@@ -1825,9 +2061,9 @@ async function startTrack(track){
     return;
   }
 
-  currentMode = 'loading';
+  currentMode = 'tuning';
   updateTelemetry();
-  els.status.textContent = `Loading ${currentTrack.title}`;
+  setStatusTuning();
 
   stopAllFX();
   startValveRadioStartup();
@@ -1837,6 +2073,7 @@ async function startTrack(track){
   log(`Loading ${currentTrack.title}`);
 
   const activeMemory =
+    memory &&
     channelMemory[currentChannel] &&
     channelMemory[currentChannel].trackSrc === currentTrack.src
       ? channelMemory[currentChannel]
@@ -1857,22 +2094,19 @@ async function startTrack(track){
         els.music.removeEventListener('error', onError);
 
         try{
-          if(Number.isFinite(els.music.duration) && rememberedTime > 0){
+          if(Number.isFinite(els.music.duration) && rememberedTime > 0 && currentChannel !== 4){
             if(rememberedTime < els.music.duration - 0.25){
               els.music.currentTime = rememberedTime;
               log(`Returned to channel ${currentChannel} at ${formatTime(rememberedTime)}`);
             } else {
-              log(`Saved position passed track end on channel ${currentChannel}; starting fresh`);
+              const middleStart = chooseRandomMiddleStart(els.music.duration, station.mode);
+              els.music.currentTime = middleStart;
+              log(`Saved position passed track end on channel ${currentChannel}; retuned to ${formatTime(middleStart)}`);
             }
           } else if(Number.isFinite(els.music.duration)){
-            const minStart = Math.min(12, els.music.duration * 0.25);
-            const maxStart = Math.max(minStart + 2, els.music.duration - 8);
-
-            if(maxStart > minStart){
-              const startAt = rand(minStart, maxStart);
-              els.music.currentTime = startAt;
-              log(`Started mid-track at ${formatTime(startAt)}`);
-            }
+            const startAt = chooseRandomMiddleStart(els.music.duration, station.mode);
+            els.music.currentTime = startAt;
+            log(`Started mid-track at ${formatTime(startAt)}`);
           }
         }catch(e){}
 
@@ -1902,6 +2136,7 @@ async function startTrack(track){
   }
 
   running = true;
+  pausedByKey = false;
   setMuted(false, true);
   setLive(true);
 
@@ -1929,13 +2164,15 @@ function beginGap(){
   if(!running) return;
 
   const station = activeStation();
-  currentMode = station.mode === 'all-clean' ? 'handover' : 'gap';
-  els.status.textContent = station.mode === 'dead-air' ? 'Audible Dead Air' : 'Tuning';
+  currentMode = station.mode === 'all-clean' ? 'handover' : 'tuning';
+  setStatusTuning();
   updateTelemetry();
 
   fadeGain(mainGain, 0, station.mode === 'all-clean' ? rand(1.2, 2.4) : rand(2, 5));
 
-  if(station.mode !== 'all-clean'){
+  if(!cleanOverride && station.mode !== 'all-clean'){
+    synthesizeTuningSound(rand(2.6, 5.0), 0.95);
+
     makeFilteredNoise(rand(12, 28), {
       preType:'highpass',
       preFreq:420,
@@ -1948,22 +2185,24 @@ function beginGap(){
     });
 
     makeHumCluster(rand(8, 18), 0.022);
+  } else if(station.mode === 'all-clean'){
+    synthesizeTuningSound(rand(1.4, 2.6), 0.35);
   }
 
-  if(station.mode === 'main' || station.mode === 'textures-only'){
+  if(!cleanOverride && (station.mode === 'main' || station.mode === 'textures-only')){
     const gapPick = pickGapTexture();
     if(gapPick){
       playTextureSnippet('gap', gapPick);
     }
   }
 
-  if(station.mode !== 'all-clean' && chance(0.35 + ambienceBias() * 0.3)){
+  if(!cleanOverride && station.mode !== 'all-clean' && chance(0.35 + ambienceBias() * 0.3)){
     overlayTimers.push(setTimeout(() => {
       if(running) makeAmbientWash(rand(10, 24));
     }, rand(1500, 7000)));
   }
 
-  if((station.mode === 'main' || station.mode === 'centrepieces-only') && chance(0.45 + instability() * 0.2)){
+  if(!cleanOverride && (station.mode === 'main' || station.mode === 'centrepieces-only') && chance(0.45 + instability() * 0.2)){
     overlayTimers.push(setTimeout(() => {
       if(running) reverseGhostLayer();
     }, rand(2500, 9000)));
@@ -1986,6 +2225,7 @@ function stopPlayback(keepMemory = false){
   }
 
   running = false;
+  pausedByKey = false;
   currentMode = 'idle';
   clearTimers();
 
@@ -2014,6 +2254,61 @@ function clearVisibleLog(){
   renderVisibleLog();
 }
 
+function toggleSecretPause(){
+  if(!running || !currentTrack) return;
+
+  pausedByKey = !pausedByKey;
+
+  if(pausedByKey){
+    try{ els.music.pause(); }catch(e){}
+    try{ els.texture.pause(); }catch(e){}
+    currentMode = 'paused';
+    log('Secret pause engaged');
+  } else {
+    Promise.resolve(els.music.play()).catch(() => {});
+    if(currentTexture && els.texture.src){
+      Promise.resolve(els.texture.play()).catch(() => {});
+    }
+    currentMode =
+      activeStation().mode === 'textures-only' ? 'texture transmission' :
+      activeStation().mode === 'centrepieces-only' ? 'centrepiece transmission' :
+      activeStation().mode === 'all-clean' ? 'clean transmission' :
+      activeStation().mode === 'dead-air' ? 'dead air' :
+      'main broadcast';
+    log('Secret pause released');
+  }
+
+  syncLiveState();
+  updateTelemetry();
+}
+
+function toggleCleanMode(){
+  cleanOverride = !cleanOverride;
+
+  if(cleanOverride){
+    stopAllFX();
+    if(audioCtx){
+      noiseGain.gain.cancelScheduledValues(audioCtx.currentTime);
+      humGain.gain.cancelScheduledValues(audioCtx.currentTime);
+      textureGain.gain.cancelScheduledValues(audioCtx.currentTime);
+      noiseGain.gain.setValueAtTime(0, audioCtx.currentTime);
+      humGain.gain.setValueAtTime(0, audioCtx.currentTime);
+      textureGain.gain.setValueAtTime(0, audioCtx.currentTime);
+    }
+    log('Clean mode on');
+  } else {
+    log('Clean mode off');
+    if(running && !pausedByKey){
+      synthesizeTuningSound(rand(1.4, 2.2), 0.45);
+      crackleLoop();
+      scheduleTrackIncidents();
+    }
+  }
+
+  updateProcessing();
+  updateTelemetry();
+}
+
 els.music.addEventListener('ended', () => {
   if(currentChannel !== 5){
     channelMemory[currentChannel] = { trackSrc:null, time:0, title:null, leftAt:0 };
@@ -2033,6 +2328,10 @@ els.startBtn.addEventListener('click', async () => {
   await ensureAudio();
 
   if(running){
+    if(pausedByKey){
+      toggleSecretPause();
+      return;
+    }
     if(muted){
       setMuted(false);
       log('Unmuted');
@@ -2081,6 +2380,8 @@ els.channelButtons.forEach((btn, idx) => {
 });
 
 window.addEventListener('keydown', e => {
+  if(e.repeat) return;
+
   if(e.key === '\\' && running && Number.isFinite(els.music.duration)){
     try{
       els.music.currentTime = Math.min((els.music.duration || 0) - 0.5, els.music.currentTime + 15);
@@ -2088,9 +2389,19 @@ window.addEventListener('keydown', e => {
     }catch(err){}
   }
 
-  if(e.key === '}'){
+  if(e.key === '}' || e.key === ']'){
     e.preventDefault();
     downloadLog();
+  }
+
+  if(e.key.toLowerCase() === 'p'){
+    e.preventDefault();
+    toggleSecretPause();
+  }
+
+  if(e.key.toLowerCase() === 'c'){
+    e.preventDefault();
+    toggleCleanMode();
   }
 });
 
@@ -2099,14 +2410,14 @@ setInterval(() => {
   updateClock();
   updateTelemetry();
 
-  if(running){
+  if(running && !pausedByKey){
     updateProcessing();
   }
 
   heartbeatCounter += 1;
   const station = activeStation();
   log(
-    `tick | ch ${currentChannel} ${station.mode} | mode ${currentMode} | audio ${running ? (muted ? 'muted' : 'live') : 'standby'} | main ${currentTrack ? currentTrack.title : '—'} | tex ${currentTexture ? currentTexture.title : '—'} | inst ${instability().toFixed(2)} | amb ${ambienceBias().toFixed(2)}`
+    `tick | ch ${currentChannel} ${station.mode} | mode ${currentMode} | audio ${running ? (pausedByKey ? 'paused' : (muted ? 'muted' : 'live')) : 'standby'} | main ${currentTrack ? currentTrack.title : '—'} | tex ${currentTexture ? currentTexture.title : '—'} | inst ${instability().toFixed(2)} | amb ${ambienceBias().toFixed(2)}${cleanOverride ? ' | clean' : ''}`
   );
 }, 1000);
 
