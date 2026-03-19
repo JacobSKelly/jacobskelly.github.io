@@ -476,6 +476,16 @@ const CHANNELS = {
   }
 };
 
+  const FX_PROTECTED_TRACKS = new Set([
+  'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3',
+  'https://peachradio.s3.eu-west-2.amazonaws.com/redhouse.mp3',
+  'https://peachradio.s3.eu-west-2.amazonaws.com/xenopus.mp3'
+]);
+
+function currentTrackIsFXProtected(){
+  return !!(currentTrack && FX_PROTECTED_TRACKS.has(currentTrack.src));
+}
+
 const DIGIT_MAP = {
   '0': ['a','b','c','d','e','f'],
   '1': ['b','c'],
@@ -1268,6 +1278,7 @@ async function playTextureSnippet(style = 'overlay'){
   const station = activeStation();
   if(station.mode === 'all-clean' || station.mode === 'dead-air') return;
   if(station.textures.length === 0) return;
+  if(currentTrackIsFXProtected()) return;
 
   const track = nextTexture();
   if(!track) return;
