@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>radio debug</title>
+  <style>
+    :root{
+      --bg:#000;
+      --fg:#fff;
+      --muted:rgba(255,255,255,.62);
+      --line:rgba(255,255,255,.14);
+      --green:#86ff8a;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--fg);font-family:Arial,Helvetica,sans-serif}
+    .wrap{min-height:100%;display:grid;place-items:center;padding:32px}
+    .radio{width:min(920px,100%);border:1px solid var(--line);padding:22px;display:grid;gap:18px;background:#000}
+    .top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+    .title{font-size:clamp(28px,6vw,56px);text-transform:lowercase;line-height:.95}
+    .rightCluster{display:grid;gap:10px;justify-items:end}
+    .live{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.15em}
+    .dot{width:10px;height:10px;border-radius:50%;background:#320000;transition:.2s}
+    .dot.on{background:#ff2a2a;box-shadow:0 0 12px rgba(255,0,0,.7)}
+    .clock{font-family:monospace;font-size:28px;letter-spacing:.12em;color:var(--green);text-shadow:0 0 8px rgba(134,255,138,.35),0 0 18px rgba(134,255,138,.18)}
+    .channels{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+    .channels button{min-width:0}
+    .channels button.active{border-color:var(--green);color:var(--green)}
+    .screen{border:1px solid var(--line);padding:16px;display:grid;gap:12px;min-height:150px;align-content:center}
+    .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;margin-bottom:6px}
+    .value{font-size:clamp(18px,3vw,28px);word-break:break-word;line-height:1.2}
+    .tiny{font-size:12px;color:var(--muted);word-break:break-all}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    button{background:transparent;color:var(--fg);border:1px solid var(--line);padding:10px 14px;cursor:pointer;font-size:14px}
+    button:hover{border-color:#fff}
+    .log{border-top:1px solid var(--line);padding-top:12px;font-size:12px;color:var(--muted);min-height:42px;white-space:pre-wrap}
+    @media(max-width:700px){
+      .top{grid-template-columns:1fr;display:grid}
+      .rightCluster{justify-items:start}
+      .channels{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .clock{font-size:24px}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="radio">
+    <div class="top">
+      <div class="title">radio</div>
+      <div class="rightCluster">
+        <div class="clock" id="clock">00:00</div>
+        <div class="live">
+          <div class="dot" id="dot"></div>
+          <div id="liveText">standby</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="channels">
+      <button class="active" id="ch1Btn" type="button">Channel 1</button>
+      <button id="ch2Btn" type="button">Channel 2</button>
+      <button id="ch3Btn" type="button">Channel 3</button>
+      <button id="ch4Btn" type="button">Channel 4</button>
+      <button id="ch5Btn" type="button">Channel 5</button>
+    </div>
+
+    <div class="screen">
+      <div>
+        <div class="label">State</div>
+        <div class="value" id="status">Stopped</div>
+      </div>
+      <div>
+        <div class="label">Track URL</div>
+        <div class="tiny" id="trackUrl">—</div>
+      </div>
+      <div>
+        <div class="label">Channel notes</div>
+        <div class="tiny" id="channelNotes">Edit CHANNELS in the script below to wire in future stations. Channel 1 is live now; Channels 2–5 are placeholders.</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="startBtn" type="button">Start</button>
+      <button id="stopBtn" type="button">Stop</button>
+      <button id="nextBtn" type="button">Next Track</button>
+      <button id="clearBtn" type="button">Clear Log</button>
+    </div>
+
+    <div class="log" id="log"></div>
+  </div>
+</div>
+
+<audio id="music" crossorigin="anonymous" preload="auto"></audio>
+
+<script>
+/*
+  CHANNEL SETUP
+  ------------
+  Replace the urls inside any channel playlist below when you add more stations later.
+  Only channel 1 is active right now.
+*/
+const CHANNELS = {
+  1: {
+    name: 'Channel 1',
+    enabled: true,
+    tracks: [
+      { title:'Joiner', src:'https://peachradio.s3.eu-west-2.amazonaws.com/joiner.mp3' },
+      { title:'Unicorn', src:'https://peachradio.s3.eu-west-2.amazonaws.com/unicorn.mp3' },
+      { title:'Funeral March', src:'https://peachradio.s3.eu-west-2.amazonaws.com/funeral+march.mp3' },
+      { title:'Slimedemo', src:'https://peachradio.s3.eu-west-2.amazonaws.com/slimedemo.mp3' },
+      { title:'Fuckoffalypse', src:'https://peachradio.s3.eu-west-2.amazonaws.com/fuckoffalypse.mp3' },
+      { title:'Tabrettabret', src:'https://peachradio.s3.eu-west-2.amazonaws.com/tabrettabret.mp3' },
+      { title:'Kibo', src:'https://peachradio.s3.eu-west-2.amazonaws.com/kibo.mp3' },
+      { title:'Redhouse', src:'https://peachradio.s3.eu-west-2.amazonaws.com/redhouse.mp3' },
+      { title:'Banhus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3' },
+      { title:'Oumuamua', src:'https://peachradio.s3.eu-west-2.amazonaws.com/oumuamua.mp3' },
+      { title:'Agalma', src:'https://peachradio.s3.eu-west-2.amazonaws.com/agalma.mp3' },
+      { title:'Rusholme', src:'https://peachradio.s3.eu-west-2.amazonaws.com/rusholme.mp3' },
+      { title:'Kilimanjaro', src:'https://peachradio.s3.eu-west-2.amazonaws.com/kilimanjaro.mp3' },
+      { title:'Samantha', src:'https://peachradio.s3.eu-west-2.amazonaws.com/samantha.mp3' },
+      { title:'Ambulance', src:'https://peachradio.s3.eu-west-2.amazonaws.com/ambulance.mp3' },
+      { title:'Xenopus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/xenopus.mp3' },
+      { title:'Hypna', src:'https://peachradio.s3.eu-west-2.amazonaws.com/hypna.mp3' },
+      { title:'Untitled', src:'https://peachradio.s3.eu-west-2.amazonaws.com/untitled.mp3' },
+      { title:'Bigblackpearl', src:'https://peachradio.s3.eu-west-2.amazonaws.com/bigblackpearl.mp3' }
+    ]
+  },
+  2: { name: 'Channel 2', enabled: false, tracks: [] },
+  3: { name: 'Channel 3', enabled: false, tracks: [] },
+  4: { name: 'Channel 4', enabled: false, tracks: [] },
+  5: { name: 'Channel 5', enabled: false, tracks: [] }
+};
+
+const els = {
+  music: document.getElementById('music'),
+  dot: document.getElementById('dot'),
+  liveText: document.getElementById('liveText'),
+  status: document.getElementById('status'),
+  trackUrl: document.getElementById('trackUrl'),
+  channelNotes: document.getElementById('channelNotes'),
+  log: document.getElementById('log'),
+  startBtn: document.getElementById('startBtn'),
+  stopBtn: document.getElementById('stopBtn'),
+  nextBtn: document.getElementById('nextBtn'),
+  clearBtn: document.getElementById('clearBtn'),
+  clock: document.getElementById('clock'),
+  channelButtons: [1,2,3,4,5].map(i => document.getElementById(`ch${i}Btn`))
+};
+
+let audioCtx = null;
+let currentTrackIndex = 0;
+let running = false;
+let currentChannel = 1;
+let currentTrack = null;
+let nextTrackTimer = null;
+let layerTimers = [];
+let currentLayerStops = [];
+
+function log(message){
+  const stamp = new Date().toLocaleTimeString();
+  els.log.textContent += `[${stamp}] ${message}\n`;
+  els.log.scrollTop = els.log.scrollHeight;
+  console.log(message);
+}
+
+function setLive(on){
+  els.dot.classList.toggle('on', on);
+  els.liveText.textContent = on ? 'live' : 'standby';
+}
+
+function updateClock(){
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  els.clock.textContent = `${hh}:${mm}`;
+}
+
+function activePlaylist(){
+  return CHANNELS[currentChannel].tracks;
+}
+
+function setChannel(channel){
+  currentChannel = channel;
+  els.channelButtons.forEach((btn, idx) => btn.classList.toggle('active', idx + 1 === channel));
+  const info = CHANNELS[channel];
+  els.channelNotes.textContent = info.enabled
+    ? `${info.name} live. Channels 2–5 are ready for you to populate in CHANNELS.`
+    : `${info.name} placeholder only. Add tracks in CHANNELS to activate it later.`;
+  currentTrackIndex = 0;
+  log(`Switched to ${info.name}`);
+}
+
+async function ensureAudioContext(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    log(`AudioContext created. state=${audioCtx.state}`);
+  }
+  if(audioCtx.state === 'suspended'){
+    log('Attempting audioCtx.resume()');
+    await audioCtx.resume();
+    log(`audioCtx resumed. state=${audioCtx.state}`);
+  }
+}
+
+function chooseTrack(){
+  const list = activePlaylist();
+  if(!list.length) return null;
+  const track = list[currentTrackIndex % list.length];
+  currentTrackIndex += 1;
+  return track;
+}
+
+function stopLayers(){
+  layerTimers.forEach(id => clearTimeout(id));
+  layerTimers = [];
+  currentLayerStops.forEach(fn => {
+    try{ fn(); }catch(e){}
+  });
+  currentLayerStops = [];
+}
+
+function makeFilteredNoise(durationSec, config = {}){
+  const now = audioCtx.currentTime;
+  const buffer = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * durationSec), audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for(let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (config.noiseLevel || 0.22);
+
+  const src = audioCtx.createBufferSource();
+  src.buffer = buffer;
+
+  const pre = audioCtx.createBiquadFilter();
+  pre.type = config.preType || 'lowpass';
+  pre.frequency.value = config.preFreq || 1200;
+
+  const band = audioCtx.createBiquadFilter();
+  band.type = config.bandType || 'bandpass';
+  band.frequency.value = config.bandFreq || 900;
+  band.Q.value = config.bandQ || 0.8;
+
+  const gain = audioCtx.createGain();
+  gain.gain.value = 0.0001;
+
+  src.connect(pre);
+  pre.connect(band);
+  band.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(config.peak || 0.03, now + (config.attack || 2));
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+
+  src.start(now);
+  src.stop(now + durationSec + 0.05);
+
+  return () => {
+    try{ src.stop(); }catch(e){}
+    try{ src.disconnect(); }catch(e){}
+    try{ pre.disconnect(); }catch(e){}
+    try{ band.disconnect(); }catch(e){}
+    try{ gain.disconnect(); }catch(e){}
+  };
+}
+
+function reverseGhostLayer(){
+  if(!running || !currentTrack) return;
+  if(!Number.isFinite(els.music.duration) || els.music.duration < 12) return;
+
+  const startTime = Math.max(0, els.music.currentTime - 4);
+  const endTime = Math.min(els.music.duration, startTime + 6 + Math.random() * 8);
+  const segmentDur = Math.max(4, endTime - startTime);
+  const offline = new OfflineAudioContext(1, Math.ceil(audioCtx.sampleRate * segmentDur), audioCtx.sampleRate);
+  const temp = new Audio();
+  temp.crossOrigin = 'anonymous';
+  temp.src = currentTrack.src;
+
+  temp.addEventListener('loadedmetadata', async () => {
+    try{
+      const response = await fetch(currentTrack.src);
+      const arr = await response.arrayBuffer();
+      const decoded = await offline.decodeAudioData(arr.slice(0));
+      const channel = decoded.getChannelData(0);
+      const sliceStart = Math.floor(startTime * decoded.sampleRate);
+      const sliceEnd = Math.min(channel.length, Math.floor(endTime * decoded.sampleRate));
+      const slice = channel.slice(sliceStart, sliceEnd).reverse();
+      const buffer = offline.createBuffer(1, slice.length, decoded.sampleRate);
+      buffer.copyToChannel(slice, 0);
+
+      const src = audioCtx.createBufferSource();
+      src.buffer = buffer;
+      src.playbackRate.value = 0.35 + Math.random() * 0.3;
+
+      const low = audioCtx.createBiquadFilter();
+      low.type = 'lowpass';
+      low.frequency.value = 700 + Math.random() * 1200;
+
+      const wave = audioCtx.createWaveShaper();
+      wave.curve = new Float32Array(4096).map((_,i)=>{
+        const x = i * 2 / 4095 - 1;
+        return Math.tanh(x * (1.8 + Math.random() * 0.8));
+      });
+
+      const gain = audioCtx.createGain();
+      gain.gain.value = 0.0001;
+
+      const delay = audioCtx.createDelay(1.2);
+      delay.delayTime.value = 0.24 + Math.random() * 0.35;
+      const wet = audioCtx.createGain();
+      wet.gain.value = 0.18 + Math.random() * 0.16;
+      const feedback = audioCtx.createGain();
+      feedback.gain.value = 0.22 + Math.random() * 0.18;
+
+      src.connect(low);
+      low.connect(wave);
+      wave.connect(gain);
+      gain.connect(audioCtx.destination);
+      gain.connect(delay);
+      delay.connect(wet);
+      wet.connect(audioCtx.destination);
+      delay.connect(feedback);
+      feedback.connect(delay);
+
+      const now = audioCtx.currentTime;
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.035 + Math.random() * 0.04, now + 3);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + segmentDur * 0.9 + 6);
+
+      src.start(now);
+      src.stop(now + segmentDur * 0.9 + 6);
+
+      currentLayerStops.push(() => {
+        try{ src.stop(); }catch(e){}
+        [src, low, wave, gain, delay, wet, feedback].forEach(node => {
+          try{ node.disconnect(); }catch(e){}
+        });
+      });
+
+      log('Reverse ghost layer added');
+    } catch(err){
+      log(`Ghost layer skipped: ${err.message || err}`);
+    }
+  }, { once:true });
+
+  temp.load();
+}
+
+function rainStaticLayer(){
+  const stop = makeFilteredNoise(18 + Math.random() * 22, {
+    preType:'highpass',
+    preFreq:500 + Math.random() * 900,
+    bandType:'bandpass',
+    bandFreq:1100 + Math.random() * 1700,
+    bandQ:0.6,
+    peak:0.012 + Math.random() * 0.018,
+    attack:3,
+    noiseLevel:0.18
+  });
+  currentLayerStops.push(stop);
+  log('Rain static layer added');
+}
+
+function transitionStaticGap(){
+  if(!running) return;
+  const stop = makeFilteredNoise(8 + Math.random() * 18, {
+    preType:'lowpass',
+    preFreq:900,
+    bandType:'bandpass',
+    bandFreq:650,
+    bandQ:0.45,
+    peak:0.03,
+    attack:1.6,
+    noiseLevel:0.24
+  });
+  currentLayerStops.push(stop);
+  log('Static gap layer added');
+}
+
+async function startPlayback(track = null){
+  try{
+    await ensureAudioContext();
+
+    currentTrack = track || chooseTrack();
+    if(!currentTrack){
+      els.status.textContent = 'No tracks in this channel';
+      return;
+    }
+
+    els.status.textContent = `Loading ${currentTrack.title}`;
+    els.trackUrl.textContent = currentTrack.src;
+    log(`Setting src to: ${currentTrack.src}`);
+
+    stopLayers();
+    els.music.src = currentTrack.src;
+    els.music.load();
+    log('Called music.load()');
+
+    const playPromise = els.music.play();
+    log('Called music.play()');
+    if(playPromise && typeof playPromise.then === 'function'){
+      await playPromise;
+      log('music.play() resolved');
+    }
+
+    running = true;
+    setLive(true);
+    els.status.textContent = currentTrack.title;
+
+    rainStaticLayer();
+    if(Math.random() < 0.35){
+      layerTimers.push(setTimeout(reverseGhostLayer, 12000 + Math.random() * 18000));
+    }
+  } catch (err) {
+    running = false;
+    setLive(false);
+    els.status.textContent = 'Stopped';
+    const message = err && err.message ? err.message : String(err);
+    log(`ERROR: ${message}`);
+  }
+}
+
+function stopPlayback(){
+  running = false;
+  try{
+    els.music.pause();
+    log('Called music.pause()');
+  }catch(err){
+    log(`pause failed: ${err.message || err}`);
+  }
+  stopLayers();
+  setLive(false);
+  els.status.textContent = 'Stopped';
+}
+
+els.music.addEventListener('ended', () => {
+  if(!running) return;
+  transitionStaticGap();
+  nextTrackTimer = setTimeout(() => {
+    startPlayback();
+  }, 2000 + Math.random() * 12000);
+});
+
+els.startBtn.addEventListener('click', async () => {
+  log('Start button clicked');
+  if(running) return;
+  await startPlayback();
+});
+
+els.stopBtn.addEventListener('click', () => {
+  log('Stop button clicked');
+  stopPlayback();
+});
+
+els.nextBtn.addEventListener('click', async () => {
+  log('Next Track button clicked');
+  stopPlayback();
+  await startPlayback();
+});
+
+els.clearBtn.addEventListener('click', () => {
+  els.log.textContent = '';
+});
+
+els.channelButtons.forEach((btn, idx) => {
+  btn.addEventListener('click', async () => {
+    const channel = idx + 1;
+    if(!CHANNELS[channel].enabled){
+      log(`${CHANNELS[channel].name} not wired yet`);
+      return;
+    }
+    const wasRunning = running;
+    stopPlayback();
+    setChannel(channel);
+    if(wasRunning){
+      await startPlayback();
+    }
+  });
+});
+
+window.addEventListener('keydown', e => {
+  if(e.key === '\\' && running && Number.isFinite(els.music.duration)){
+    try{
+      els.music.currentTime = Math.min((els.music.duration || 0) - 0.5, els.music.currentTime + 15);
+      log('skip');
+    }catch(err){}
+  }
+});
+
+updateClock();
+setInterval(updateClock, 1000);
+setChannel(1);
+setLive(false);
+els.status.textContent = 'Stopped';
+els.trackUrl.textContent = '—';
+log('radio debug ready');
+</script>
+</body>
+</html>
