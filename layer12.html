@@ -3,22 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ambuland Land 2025 - Jacob Kelly</title>
+  <title>Ambuland Land 2025 — Jacob Kelly</title>
 
   <style>
     * { box-sizing: border-box; }
 
-    body{
-      display:flex;
-      margin:0;
-      font-family: Helvetica, Arial, sans-serif;
-      min-height:100vh;
-      overflow:hidden;
-      background:#000;
-      color:#fff;
+    :root{
+      --bg:#000;
+      --fg:#fff;
+      --panel:#0b0b0b;
+      --line:rgba(255,255,255,0.12);
+      --shadow:0 24px 60px rgba(0,0,0,0.45);
     }
 
-    /* LEFT PANEL */
+    html, body {
+      margin:0;
+      min-height:100%;
+      background:var(--bg);
+      color:var(--fg);
+      font-family: Helvetica, Arial, sans-serif;
+    }
+
+    body{
+      min-height:100vh;
+      display:flex;
+      overflow:hidden;
+    }
+
     .text-area{
       width:30%;
       padding:40px;
@@ -30,38 +41,45 @@
     }
 
     .text-area h1{
-      margin:0 0 5px 0;
-      font-size:clamp(1.8rem,5vw,2.2rem);
+      margin:0 0 6px 0;
+      font-size:clamp(1.8rem, 5vw, 2.2rem);
       font-weight:900;
-      color:#fff;
+      line-height:1;
     }
 
     .text-area p{
       margin:2px 0;
-      font-size:clamp(1rem,2.5vw,1.2rem);
+      font-size:clamp(1rem, 2.5vw, 1.15rem);
       line-height:1.2;
       font-weight:600;
-      color:#fff;
+    }
+
+    .meta{
+      margin-top:18px;
+      color:rgba(255,255,255,0.72);
+      font-size:0.92rem;
+      line-height:1.4;
+      max-width:28ch;
     }
 
     a.back{
       display:inline-block;
       margin-bottom:20px;
-      text-decoration:none;
       color:#fff;
+      text-decoration:none;
       font-weight:bold;
       letter-spacing:1px;
       font-size:0.9rem;
     }
 
-    /* RIGHT AREA */
     .viewer-shell{
       width:70%;
+      min-height:100vh;
+      position:relative;
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:30px;
-      position:relative;
+      padding:28px;
       overflow:hidden;
     }
 
@@ -73,37 +91,48 @@
       justify-content:center;
     }
 
-    .spread,
-    .cover-view{
+    .cover-view,
+    .spread-view,
+    .back-view{
+      width:100%;
       display:flex;
       align-items:center;
       justify-content:center;
       gap:18px;
-      max-width:100%;
-      max-height:100%;
     }
 
     .page-wrap{
+      position:relative;
       display:flex;
       align-items:center;
       justify-content:center;
       background:#111;
-      border:1px solid rgba(255,255,255,0.08);
-      box-shadow:0 20px 50px rgba(0,0,0,0.45);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
       overflow:hidden;
       user-select:none;
+      flex:0 0 auto;
     }
 
-    .cover-view .page-wrap{
+    .page-wrap.cover,
+    .page-wrap.backcover{
       cursor:pointer;
     }
 
-    .spread .page-wrap.left{
+    .page-wrap.left{
       cursor:w-resize;
     }
 
-    .spread .page-wrap.right{
+    .page-wrap.right{
       cursor:e-resize;
+    }
+
+    .page-wrap::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,0.04);
     }
 
     canvas{
@@ -111,27 +140,39 @@
       width:100%;
       height:100%;
       background:#fff;
-    }
-
-    .hint{
-      position:absolute;
-      bottom:20px;
-      left:50%;
-      transform:translateX(-50%);
-      font-size:0.9rem;
-      letter-spacing:0.4px;
-      color:rgba(255,255,255,0.75);
-      text-align:center;
-      pointer-events:none;
+      image-rendering:auto;
     }
 
     .loading,
     .error{
-      font-size:1rem;
       color:#fff;
       text-align:center;
-      max-width:540px;
       line-height:1.5;
+      max-width:520px;
+    }
+
+    .hint{
+      position:absolute;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      color:rgba(255,255,255,0.75);
+      font-size:0.88rem;
+      letter-spacing:0.2px;
+      text-align:center;
+      pointer-events:none;
+      white-space:nowrap;
+    }
+
+    .stats{
+      position:absolute;
+      top:18px;
+      right:22px;
+      text-align:right;
+      color:rgba(255,255,255,0.7);
+      font-size:0.82rem;
+      line-height:1.35;
+      pointer-events:none;
     }
 
     @media (max-width: 900px){
@@ -151,18 +192,24 @@
       }
 
       .viewer-shell{
-        min-height:70vh;
-        padding:20px;
+        min-height:72vh;
+        padding:18px;
       }
 
-      .spread{
+      .spread-view{
         gap:10px;
       }
 
       .hint{
+        white-space:normal;
+        width:calc(100% - 24px);
         bottom:10px;
-        font-size:0.8rem;
-        padding:0 16px;
+      }
+
+      .stats{
+        top:10px;
+        right:12px;
+        font-size:0.74rem;
       }
     }
   </style>
@@ -172,15 +219,19 @@
   <div class="text-area">
     <a href="index.html" class="back">← Back</a>
     <h1>Ambuland Land 2025</h1>
-    <p><strong>PDF Publication</strong></p>
-    <p>Jacob Kelly.</p>
+    <p><strong>Jacob Kelly</strong></p>
+    <p>PDF publication.</p>
+    <div class="meta">
+      A deterministic ten-year deterioration. The same pixels darken for everyone at the same hour.
+    </div>
   </div>
 
   <div class="viewer-shell">
+    <div class="stats" id="stats"></div>
     <div class="book-stage" id="bookStage">
-      <div class="loading" id="status">Loading PDF…</div>
+      <div class="loading">Loading PDF…</div>
     </div>
-    <div class="hint" id="hint" style="display:none;"></div>
+    <div class="hint" id="hint"></div>
   </div>
 
   <script type="module">
@@ -189,214 +240,302 @@
     pdfjsLib.GlobalWorkerOptions.workerSrc =
       "https://cdn.jsdelivr.net/npm/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs";
 
-    // CHANGE THIS TO YOUR S3 PDF URL
-    const PDF_URL = "https://your-bucket.s3.eu-west-2.amazonaws.com/ambuland-land-2025.pdf";
+    const PDF_URL = "https://phfinal.s3.eu-west-2.amazonaws.com/AmbulanceWeb.pdf";
+
+    // ===== Project constants =====
+    const BOOK_TITLE = "Ambuland Land 2025";
+    const TOTAL_LOGICAL_PAGES = 16;
+
+    // Exact page raster size you want to base the decay on
+    const PAGE_PIXEL_WIDTH = 1746;
+    const PAGE_PIXEL_HEIGHT = 2478;
+    const PIXELS_PER_PAGE = PAGE_PIXEL_WIDTH * PAGE_PIXEL_HEIGHT; // 4,326,588
+    const TOTAL_PIXELS = TOTAL_LOGICAL_PAGES * PIXELS_PER_PAGE;   // 69,225,408
+
+    // Ten-year artwork timeline
+    const START_DATE = new Date("2025-01-01T00:00:00Z");
+    const END_DATE   = new Date("2035-01-01T00:00:00Z");
+
+    // Fixed seed so everyone sees the same loss
+    const SEED = 2097152;
+
+    // Secret demo mode
+    const DEMO_DURATION_MS = 60000; // one minute
+    let demoMode = false;
+    let demoStartTime = 0;
+    let demoRAF = null;
+    let aKeyDown = false;
 
     const stage = document.getElementById("bookStage");
-    const statusEl = document.getElementById("status");
-    const hintEl = document.getElementById("hint");
+    const hint = document.getElementById("hint");
+    const stats = document.getElementById("stats");
 
     let pdfDoc = null;
-    let totalPages = 0;
 
-    // Mode:
-    // "cover" = page 1 only
-    // "spread" = show two inner pages
+    // modes: cover | spread | backcover
     let mode = "cover";
-
-    // Left page of current spread.
-    // First open spread should be pages 2 and 3.
-    let currentLeftPage = 2;
+    let currentLeftPage = 2; // logical pages 2+3 are first spread
 
     function setHint(text){
-      hintEl.textContent = text;
-      hintEl.style.display = text ? "block" : "none";
+      hint.textContent = text || "";
     }
 
-    function clampSpreadStart(pageNum){
-      if (totalPages <= 1) return 2;
-      if (pageNum < 2) return 2;
+    function clamp(n, min, max){
+      return Math.max(min, Math.min(max, n));
+    }
 
-      // Keep left page even: 2,4,6...
-      if (pageNum % 2 !== 0) pageNum -= 1;
+    function totalHours(){
+      return Math.floor((END_DATE - START_DATE) / 3600000);
+    }
 
-      if (pageNum > totalPages) {
-        pageNum = totalPages % 2 === 0 ? totalPages : totalPages - 1;
+    function elapsedHours(){
+      const now = Date.now();
+      if (now <= START_DATE.getTime()) return 0;
+      if (now >= END_DATE.getTime()) return totalHours();
+      return Math.floor((now - START_DATE.getTime()) / 3600000);
+    }
+
+    function artworkPixelsToBlackNow(){
+      const hours = elapsedHours();
+      const total = totalHours();
+      if (hours <= 0) return 0;
+      if (hours >= total) return TOTAL_PIXELS;
+      return Math.floor((hours / total) * TOTAL_PIXELS);
+    }
+
+    function demoPixelsToBlackNow(){
+      if (!demoMode) return 0;
+      const elapsed = performance.now() - demoStartTime;
+      const progress = clamp(elapsed / DEMO_DURATION_MS, 0, 1);
+      return Math.floor(progress * TOTAL_PIXELS);
+    }
+
+    function activePixelsToBlackNow(){
+      if (demoMode) {
+        return Math.max(artworkPixelsToBlackNow(), demoPixelsToBlackNow());
       }
-
-      if (pageNum < 2) pageNum = 2;
-      return pageNum;
+      return artworkPixelsToBlackNow();
     }
 
-    function getMaxCanvasSize(single = false){
+    function activeThresholdNow(){
+      return activePixelsToBlackNow() / TOTAL_PIXELS;
+    }
+
+    function updateStats(){
+      const blacked = artworkPixelsToBlackNow();
+      const pct = (100 * blacked / TOTAL_PIXELS).toFixed(4);
+      stats.innerHTML = `
+        ${BOOK_TITLE}<br>
+        ${blacked.toLocaleString()} / ${TOTAL_PIXELS.toLocaleString()} darkened<br>
+        ${pct}% complete
+      `;
+    }
+
+    // PDF is backwards:
+    // logical 1 -> pdf 16, logical 2 -> pdf 15 ... logical 16 -> pdf 1
+    function logicalToPdfPage(logicalPage){
+      return (TOTAL_LOGICAL_PAGES - logicalPage) + 1;
+    }
+
+    function getPageDisplaySize(singlePage){
       const shell = document.querySelector(".viewer-shell");
-      const shellStyles = getComputedStyle(shell);
-      const padX = parseFloat(shellStyles.paddingLeft) + parseFloat(shellStyles.paddingRight);
-      const padY = parseFloat(shellStyles.paddingTop) + parseFloat(shellStyles.paddingBottom);
+      const availW = shell.clientWidth - 40;
+      const availH = shell.clientHeight - 90;
+      const aspect = PAGE_PIXEL_WIDTH / PAGE_PIXEL_HEIGHT;
 
-      const maxWidth = shell.clientWidth - padX - 20;
-      const maxHeight = shell.clientHeight - padY - 50;
-
-      if (single) {
-        return { width: maxWidth, height: maxHeight };
+      if (singlePage){
+        const maxW = availW * 0.72;
+        const maxH = availH * 0.92;
+        let w = maxW;
+        let h = w / aspect;
+        if (h > maxH) {
+          h = maxH;
+          w = h * aspect;
+        }
+        return { w, h };
       }
 
-      return {
-        width: maxWidth,
-        height: maxHeight
-      };
+      const gap = window.innerWidth <= 900 ? 10 : 18;
+      const maxWPerPage = (availW - gap) / 2;
+      const maxHPerPage = availH * 0.92;
+
+      let w = maxWPerPage;
+      let h = w / aspect;
+
+      if (h > maxHPerPage){
+        h = maxHPerPage;
+        w = h * aspect;
+      }
+
+      return { w, h };
     }
 
-    async function renderPageToCanvas(pageNum, targetCanvas, maxWidth, maxHeight){
-      const page = await pdfDoc.getPage(pageNum);
+    function hash01(globalIndex){
+      let x = (globalIndex ^ SEED) >>> 0;
+      x ^= x >>> 16;
+      x = Math.imul(x, 0x7feb352d);
+      x ^= x >>> 15;
+      x = Math.imul(x, 0x846ca68b);
+      x ^= x >>> 16;
+      return x / 4294967296;
+    }
+
+    async function renderLogicalPage(logicalPage, visibleCanvas){
+      const pdfPageNumber = logicalToPdfPage(logicalPage);
+      const page = await pdfDoc.getPage(pdfPageNumber);
+
+      // Render to temp canvas from the PDF, then resample to exact working grid
       const viewport = page.getViewport({ scale: 1 });
+      const tempScale = PAGE_PIXEL_WIDTH / viewport.width;
+      const tempViewport = page.getViewport({ scale: tempScale });
 
-      const scale = Math.min(
-        maxWidth / viewport.width,
-        maxHeight / viewport.height
-      );
+      const tempCanvas = document.createElement("canvas");
+      tempCanvas.width = Math.round(tempViewport.width);
+      tempCanvas.height = Math.round(tempViewport.height);
 
-      const scaledViewport = page.getViewport({ scale });
-
-      const context = targetCanvas.getContext("2d");
-      targetCanvas.width = scaledViewport.width;
-      targetCanvas.height = scaledViewport.height;
+      const tempCtx = tempCanvas.getContext("2d", { willReadFrequently: true });
 
       await page.render({
-        canvasContext: context,
-        viewport: scaledViewport
+        canvasContext: tempCtx,
+        viewport: tempViewport
       }).promise;
 
-      return {
-        width: scaledViewport.width,
-        height: scaledViewport.height
-      };
+      visibleCanvas.width = PAGE_PIXEL_WIDTH;
+      visibleCanvas.height = PAGE_PIXEL_HEIGHT;
+
+      const ctx = visibleCanvas.getContext("2d", { willReadFrequently: true });
+      ctx.drawImage(tempCanvas, 0, 0, PAGE_PIXEL_WIDTH, PAGE_PIXEL_HEIGHT);
+
+      const img = ctx.getImageData(0, 0, PAGE_PIXEL_WIDTH, PAGE_PIXEL_HEIGHT);
+      const data = img.data;
+      const threshold = activeThresholdNow();
+      const pageOffset = (logicalPage - 1) * PIXELS_PER_PAGE;
+
+      for (let y = 0; y < PAGE_PIXEL_HEIGHT; y++) {
+        const rowBase = y * PAGE_PIXEL_WIDTH;
+
+        for (let x = 0; x < PAGE_PIXEL_WIDTH; x++) {
+          const pagePixelIndex = rowBase + x;
+          const globalIndex = pageOffset + pagePixelIndex;
+          const score = hash01(globalIndex);
+
+          if (score < threshold) {
+            const i = pagePixelIndex * 4;
+            data[i] = 0;
+            data[i + 1] = 0;
+            data[i + 2] = 0;
+            data[i + 3] = 255;
+          }
+        }
+      }
+
+      ctx.putImageData(img, 0, 0);
+    }
+
+    async function makePageWrap(logicalPage, className, displayW, displayH){
+      const wrap = document.createElement("div");
+      wrap.className = `page-wrap ${className}`;
+      wrap.style.width = `${Math.round(displayW)}px`;
+      wrap.style.height = `${Math.round(displayH)}px`;
+
+      const canvas = document.createElement("canvas");
+      wrap.appendChild(canvas);
+
+      await renderLogicalPage(logicalPage, canvas);
+      return wrap;
     }
 
     async function renderCover(){
       stage.innerHTML = "";
+      const view = document.createElement("div");
+      view.className = "cover-view";
 
-      const wrap = document.createElement("div");
-      wrap.className = "cover-view";
-
-      const pageWrap = document.createElement("div");
-      pageWrap.className = "page-wrap";
-
-      const canvas = document.createElement("canvas");
-      pageWrap.appendChild(canvas);
-      wrap.appendChild(pageWrap);
-      stage.appendChild(wrap);
-
-      const max = getMaxCanvasSize(true);
-
-      const result = await renderPageToCanvas(1, canvas, max.width * 0.7, max.height * 0.92);
-
-      pageWrap.style.width = result.width + "px";
-      pageWrap.style.height = result.height + "px";
+      const size = getPageDisplaySize(true);
+      const pageWrap = await makePageWrap(1, "cover", size.w, size.h);
 
       pageWrap.addEventListener("click", () => {
-        if (totalPages > 1) {
-          mode = "spread";
-          currentLeftPage = 2;
-          renderBook();
-        }
+        mode = "spread";
+        currentLeftPage = 2;
+        renderBook();
       });
 
-      setHint(totalPages > 1 ? "Click the cover to open" : "");
+      view.appendChild(pageWrap);
+      stage.appendChild(view);
+      setHint("Click the cover to open");
+    }
+
+    async function renderBackCover(){
+      stage.innerHTML = "";
+      const view = document.createElement("div");
+      view.className = "back-view";
+
+      const size = getPageDisplaySize(true);
+      const pageWrap = await makePageWrap(16, "backcover", size.w, size.h);
+
+      pageWrap.addEventListener("click", () => {
+        mode = "spread";
+        currentLeftPage = 14;
+        renderBook();
+      });
+
+      view.appendChild(pageWrap);
+      stage.appendChild(view);
+      setHint("Click to return inside");
     }
 
     async function renderSpread(){
       stage.innerHTML = "";
+      const view = document.createElement("div");
+      view.className = "spread-view";
 
-      const rightPageNum = currentLeftPage + 1;
+      const size = getPageDisplaySize(false);
 
-      const spread = document.createElement("div");
-      spread.className = "spread";
-
-      const leftWrap = document.createElement("div");
-      leftWrap.className = "page-wrap left";
-
-      const rightWrap = document.createElement("div");
-      rightWrap.className = "page-wrap right";
-
-      const leftCanvas = document.createElement("canvas");
-      const rightCanvas = document.createElement("canvas");
-
-      leftWrap.appendChild(leftCanvas);
-      spread.appendChild(leftWrap);
-
-      const max = getMaxCanvasSize(false);
-
-      // Rough split for two pages + gap
-      const perPageWidth = Math.min((max.width - 18) / 2, max.height * 0.75);
-      const perPageHeight = max.height * 0.92;
-
-      const leftResult = await renderPageToCanvas(
-        currentLeftPage,
-        leftCanvas,
-        perPageWidth,
-        perPageHeight
-      );
-
-      leftWrap.style.width = leftResult.width + "px";
-      leftWrap.style.height = leftResult.height + "px";
-
-      if (rightPageNum <= totalPages) {
-        spread.appendChild(rightWrap);
-
-        const rightResult = await renderPageToCanvas(
-          rightPageNum,
-          rightCanvas,
-          perPageWidth,
-          perPageHeight
-        );
-
-        rightWrap.appendChild(rightCanvas);
-        rightWrap.style.width = rightResult.width + "px";
-        rightWrap.style.height = rightResult.height + "px";
-      }
-
-      stage.appendChild(spread);
+      const leftWrap = await makePageWrap(currentLeftPage, "left", size.w, size.h);
+      const rightPage = currentLeftPage + 1;
+      const rightWrap = await makePageWrap(rightPage, "right", size.w, size.h);
 
       leftWrap.addEventListener("click", () => {
-        // If on first spread, clicking left goes back to cover
         if (currentLeftPage <= 2) {
           mode = "cover";
-          renderBook();
-          return;
+        } else {
+          currentLeftPage -= 2;
         }
-
-        currentLeftPage = clampSpreadStart(currentLeftPage - 2);
         renderBook();
       });
 
       rightWrap.addEventListener("click", () => {
-        if (currentLeftPage + 2 <= totalPages) {
-          currentLeftPage = clampSpreadStart(currentLeftPage + 2);
-          renderBook();
+        if (currentLeftPage >= 14) {
+          mode = "backcover";
+        } else {
+          currentLeftPage += 2;
         }
+        renderBook();
       });
 
-      const hasNext = currentLeftPage + 2 <= totalPages;
-      const hasPrev = currentLeftPage > 2;
+      view.appendChild(leftWrap);
+      view.appendChild(rightWrap);
+      stage.appendChild(view);
 
-      if (hasPrev && hasNext) {
-        setHint("Click left page to go back • Click right page to go forward");
-      } else if (hasPrev) {
-        setHint("Click left page to go back");
-      } else if (hasNext) {
+      if (currentLeftPage <= 2) {
         setHint("Click left page for cover • Click right page to go forward");
+      } else if (currentLeftPage >= 14) {
+        setHint("Click left page to go back • Click right page for back cover");
       } else {
-        setHint("Click left page to go back");
+        setHint("Click left page to go back • Click right page to go forward");
       }
     }
 
     async function renderBook(){
-      try {
-        stage.innerHTML = '<div class="loading">Rendering…</div>';
+      if (!pdfDoc) return;
 
+      stage.innerHTML = '<div class="loading">Rendering…</div>';
+      updateStats();
+
+      try {
         if (mode === "cover") {
           await renderCover();
+        } else if (mode === "backcover") {
+          await renderBackCover();
         } else {
           await renderSpread();
         }
@@ -405,29 +544,57 @@
         stage.innerHTML = `
           <div class="error">
             Could not render the PDF.<br><br>
-            Make sure the file URL is correct and your S3 bucket allows CORS.
+            Check the URL and S3 CORS settings.
           </div>
         `;
-        setHint("");
       }
     }
 
     async function loadPDF(){
       try {
-        const loadingTask = pdfjsLib.getDocument(PDF_URL);
-        pdfDoc = await loadingTask.promise;
-        totalPages = pdfDoc.numPages;
-
+        const task = pdfjsLib.getDocument(PDF_URL);
+        pdfDoc = await task.promise;
         await renderBook();
       } catch (err) {
         console.error(err);
         stage.innerHTML = `
           <div class="error">
             Failed to load the PDF.<br><br>
-            Check the PDF URL and CORS settings on your S3 bucket.
+            Check the file URL and CORS configuration on S3.
           </div>
         `;
       }
+    }
+
+    function startDemoMode(){
+      if (demoMode) return;
+      demoMode = true;
+      demoStartTime = performance.now();
+      tickDemo();
+    }
+
+    function stopDemoMode(){
+      demoMode = false;
+      if (demoRAF) {
+        cancelAnimationFrame(demoRAF);
+        demoRAF = null;
+      }
+      renderBook();
+    }
+
+    function tickDemo(){
+      if (!demoMode) return;
+
+      renderBook().finally(() => {
+        const elapsed = performance.now() - demoStartTime;
+        if (elapsed >= DEMO_DURATION_MS) {
+          demoMode = false;
+          demoRAF = null;
+          renderBook();
+          return;
+        }
+        demoRAF = requestAnimationFrame(tickDemo);
+      });
     }
 
     window.addEventListener("resize", () => {
@@ -437,13 +604,26 @@
     window.addEventListener("keydown", (e) => {
       if (!pdfDoc) return;
 
+      if ((e.key === "a" || e.key === "A") && !aKeyDown) {
+        aKeyDown = true;
+        startDemoMode();
+      }
+
       if (mode === "cover") {
-        if ((e.key === "ArrowRight" || e.key === "Enter" || e.key === " ")) {
-          if (totalPages > 1) {
-            mode = "spread";
-            currentLeftPage = 2;
-            renderBook();
-          }
+        if (e.key === "ArrowRight" || e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          mode = "spread";
+          currentLeftPage = 2;
+          renderBook();
+        }
+        return;
+      }
+
+      if (mode === "backcover") {
+        if (e.key === "ArrowLeft") {
+          mode = "spread";
+          currentLeftPage = 14;
+          renderBook();
         }
         return;
       }
@@ -452,17 +632,29 @@
         if (currentLeftPage <= 2) {
           mode = "cover";
         } else {
-          currentLeftPage = clampSpreadStart(currentLeftPage - 2);
+          currentLeftPage -= 2;
+        }
+        renderBook();
+      } else if (e.key === "ArrowRight") {
+        if (currentLeftPage >= 14) {
+          mode = "backcover";
+        } else {
+          currentLeftPage += 2;
         }
         renderBook();
       }
+    });
 
-      if (e.key === "ArrowRight") {
-        if (currentLeftPage + 2 <= totalPages) {
-          currentLeftPage = clampSpreadStart(currentLeftPage + 2);
-          renderBook();
-        }
+    window.addEventListener("keyup", (e) => {
+      if (e.key === "a" || e.key === "A") {
+        aKeyDown = false;
+        stopDemoMode();
       }
+    });
+
+    window.addEventListener("blur", () => {
+      aKeyDown = false;
+      stopDemoMode();
     });
 
     loadPDF();
