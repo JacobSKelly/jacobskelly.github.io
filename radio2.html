@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Radio Debug</title>
+  <style>
+    :root{
+      --bg:#000;
+      --fg:#fff;
+      --muted:rgba(255,255,255,.65);
+      --line:rgba(255,255,255,.16);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--fg);
+      font-family:Arial,Helvetica,sans-serif;
+    }
+    .wrap{
+      min-height:100%;
+      display:grid;
+      place-items:center;
+      padding:24px;
+    }
+    .radio{
+      width:min(900px,100%);
+      border:1px solid var(--line);
+      padding:20px;
+      display:grid;
+      gap:16px;
+    }
+    .top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+    }
+    .title{
+      font-size:clamp(28px,6vw,56px);
+      text-transform:lowercase;
+      line-height:.95;
+    }
+    .live{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:11px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.15em;
+    }
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:#320000;
+      transition:.2s;
+    }
+    .dot.on{
+      background:#ff2a2a;
+      box-shadow:0 0 12px rgba(255,0,0,.7);
+    }
+    .screen{
+      border:1px solid var(--line);
+      padding:16px;
+      display:grid;
+      gap:12px;
+    }
+    .label{
+      font-size:11px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      margin-bottom:6px;
+    }
+    .value{
+      font-size:clamp(16px,2.4vw,24px);
+      word-break:break-word;
+    }
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    button{
+      background:transparent;
+      color:var(--fg);
+      border:1px solid var(--line);
+      padding:10px 14px;
+      cursor:pointer;
+      font-size:14px;
+    }
+    button:hover{
+      border-color:#fff;
+    }
+    .log{
+      border:1px solid var(--line);
+      min-height:260px;
+      max-height:360px;
+      overflow:auto;
+      padding:12px;
+      font-size:12px;
+      line-height:1.45;
+      color:var(--muted);
+      white-space:pre-wrap;
+    }
+    .row{
+      display:grid;
+      gap:4px;
+    }
+    .tiny{
+      font-size:12px;
+      color:var(--muted);
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="radio">
+    <div class="top">
+      <div class="title">radio debug</div>
+      <div class="live">
+        <div class="dot" id="dot"></div>
+        <div id="liveText">standby</div>
+      </div>
+    </div>
+
+    <div class="screen">
+      <div class="row">
+        <div class="label">State</div>
+        <div class="value" id="status">Stopped</div>
+      </div>
+      <div class="row">
+        <div class="label">Track URL</div>
+        <div class="tiny" id="trackUrl">—</div>
+      </div>
+      <div class="row">
+        <div class="label">Audio Context</div>
+        <div class="tiny" id="ctxState">not created</div>
+      </div>
+      <div class="row">
+        <div class="label">Current Time / Duration</div>
+        <div class="tiny" id="timeInfo">0 / 0</div>
+      </div>
+      <div class="row">
+        <div class="label">Last Error</div>
+        <div class="tiny" id="lastError">none</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="startBtn" type="button">Start</button>
+      <button id="stopBtn" type="button">Stop</button>
+      <button id="nextBtn" type="button">Next Track</button>
+      <button id="clearBtn" type="button">Clear Log</button>
+    </div>
+
+    <div class="log" id="log"></div>
+  </div>
+</div>
+
+<audio id="music" crossorigin="anonymous" preload="auto"></audio>
+
+<script>
+const TRACKS = [
+  { title:'Xenopus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/xenopus.mp3' },
+  { title:'Untitled+', src:'https://peachradio.s3.eu-west-2.amazonaws.com/untitled%2B.mp3' },
+  { title:'Unicorn', src:'https://peachradio.s3.eu-west-2.amazonaws.com/unicorn.mp3' },
+  { title:'Tabret Tabret+', src:'https://peachradio.s3.eu-west-2.amazonaws.com/tabret%2Btabret%2B.mp3' },
+  { title:'Slime Demo+', src:'https://peachradio.s3.eu-west-2.amazonaws.com/slime%2Bdemo%2B.mp3' },
+  { title:'Samantha', src:'https://peachradio.s3.eu-west-2.amazonaws.com/samantha.mp3' },
+  { title:'Rusholme', src:'https://peachradio.s3.eu-west-2.amazonaws.com/rusholme.mp3' },
+  { title:'Red House', src:'https://peachradio.s3.eu-west-2.amazonaws.com/red%2Bhouse.mp3' },
+  { title:'Oumuamua', src:'https://peachradio.s3.eu-west-2.amazonaws.com/oumuamua.mp3' },
+  { title:'Kilimanjaro', src:'https://peachradio.s3.eu-west-2.amazonaws.com/kilimanjaro.mp3' },
+  { title:'Kibo+', src:'https://peachradio.s3.eu-west-2.amazonaws.com/kibo%2B.mp3' },
+  { title:'Joiner', src:'https://peachradio.s3.eu-west-2.amazonaws.com/joiner.mp3' },
+  { title:'Hypna', src:'https://peachradio.s3.eu-west-2.amazonaws.com/hypna.mp3' },
+  { title:'Funeral March', src:'https://peachradio.s3.eu-west-2.amazonaws.com/funeral%2Bmarch.mp3' },
+  { title:'Fuckoffalypse', src:'https://peachradio.s3.eu-west-2.amazonaws.com/fuckoffalypse.mp3' },
+  { title:'Big Black P', src:'https://peachradio.s3.eu-west-2.amazonaws.com/big%2Bblack%2Bp.mp3' },
+  { title:'Banhus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3' },
+  { title:'Ambulance', src:'https://peachradio.s3.eu-west-2.amazonaws.com/ambulance.mp3' },
+  { title:'Agalma', src:'https://peachradio.s3.eu-west-2.amazonaws.com/agalma.mp3' }
+];
+
+const els = {
+  music: document.getElementById('music'),
+  dot: document.getElementById('dot'),
+  liveText: document.getElementById('liveText'),
+  status: document.getElementById('status'),
+  trackUrl: document.getElementById('trackUrl'),
+  ctxState: document.getElementById('ctxState'),
+  timeInfo: document.getElementById('timeInfo'),
+  lastError: document.getElementById('lastError'),
+  log: document.getElementById('log'),
+  startBtn: document.getElementById('startBtn'),
+  stopBtn: document.getElementById('stopBtn'),
+  nextBtn: document.getElementById('nextBtn'),
+  clearBtn: document.getElementById('clearBtn')
+};
+
+let audioCtx = null;
+let currentTrackIndex = 0;
+let running = false;
+let tickTimer = null;
+
+function log(message){
+  const stamp = new Date().toLocaleTimeString();
+  els.log.textContent += `[${stamp}] ${message}\n`;
+  els.log.scrollTop = els.log.scrollHeight;
+  console.log(message);
+}
+
+function setLive(on){
+  els.dot.classList.toggle('on', on);
+  els.liveText.textContent = on ? 'live' : 'standby';
+}
+
+function setError(message){
+  els.lastError.textContent = message || 'none';
+  if(message) log(`ERROR: ${message}`);
+}
+
+function updateTimeInfo(){
+  const ct = Number.isFinite(els.music.currentTime) ? els.music.currentTime.toFixed(2) : 'NaN';
+  const dur = Number.isFinite(els.music.duration) ? els.music.duration.toFixed(2) : 'NaN';
+  els.timeInfo.textContent = `${ct} / ${dur}`;
+}
+
+async function ensureAudioContext(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    log(`AudioContext created. state=${audioCtx.state}`);
+  }
+  els.ctxState.textContent = audioCtx.state;
+
+  if(audioCtx.state === 'suspended'){
+    log('Attempting audioCtx.resume()');
+    await audioCtx.resume();
+    log(`audioCtx resumed. state=${audioCtx.state}`);
+    els.ctxState.textContent = audioCtx.state;
+  }
+}
+
+function attachAudioEventLogging(){
+  const events = [
+    'loadstart','loadedmetadata','loadeddata','canplay','canplaythrough',
+    'play','playing','pause','waiting','stalled','suspend','seeking',
+    'seeked','timeupdate','ended','error'
+  ];
+
+  for(const ev of events){
+    els.music.addEventListener(ev, () => {
+      updateTimeInfo();
+      log(`audio event: ${ev}`);
+      if(ev === 'error'){
+        reportMediaError();
+      }
+    });
+  }
+}
+
+function reportMediaError(){
+  const err = els.music.error;
+  if(!err){
+    setError('Unknown media error');
+    return;
+  }
+
+  const codeMap = {
+    1: 'MEDIA_ERR_ABORTED',
+    2: 'MEDIA_ERR_NETWORK',
+    3: 'MEDIA_ERR_DECODE',
+    4: 'MEDIA_ERR_SRC_NOT_SUPPORTED'
+  };
+
+  setError(`${codeMap[err.code] || 'Unknown code'} (${err.code})`);
+}
+
+function chooseTrack(){
+  const track = TRACKS[currentTrackIndex % TRACKS.length];
+  currentTrackIndex += 1;
+  return track;
+}
+
+async function startPlayback(){
+  try{
+    setError('');
+    await ensureAudioContext();
+
+    const track = chooseTrack();
+    els.status.textContent = `Loading ${track.title}`;
+    els.trackUrl.textContent = track.src;
+    log(`Setting src to: ${track.src}`);
+
+    els.music.src = track.src;
+    els.music.load();
+    log('Called music.load()');
+
+    const playPromise = els.music.play();
+    log('Called music.play()');
+
+    if(playPromise && typeof playPromise.then === 'function'){
+      await playPromise;
+      log('music.play() resolved');
+    } else {
+      log('music.play() returned no promise');
+    }
+
+    running = true;
+    setLive(true);
+    els.status.textContent = track.title;
+    updateTimeInfo();
+  } catch (err) {
+    running = false;
+    setLive(false);
+    els.status.textContent = 'Stopped';
+    const message = err && err.message ? err.message : String(err);
+    setError(message);
+    log(`startPlayback catch: ${message}`);
+  }
+}
+
+function stopPlayback(){
+  running = false;
+  try{
+    els.music.pause();
+    log('Called music.pause()');
+  } catch (err) {
+    log(`pause failed: ${err.message || err}`);
+  }
+  setLive(false);
+  els.status.textContent = 'Stopped';
+}
+
+els.startBtn.addEventListener('click', async () => {
+  log('Start button clicked');
+  await startPlayback();
+});
+
+els.stopBtn.addEventListener('click', () => {
+  log('Stop button clicked');
+  stopPlayback();
+});
+
+els.nextBtn.addEventListener('click', async () => {
+  log('Next Track button clicked');
+  stopPlayback();
+  await startPlayback();
+});
+
+els.clearBtn.addEventListener('click', () => {
+  els.log.textContent = '';
+  els.lastError.textContent = 'none';
+});
+
+window.addEventListener('error', (event) => {
+  setError(`JS error: ${event.message}`);
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  const msg = event.reason && event.reason.message ? event.reason.message : String(event.reason);
+  setError(`Promise rejection: ${msg}`);
+});
+
+attachAudioEventLogging();
+
+tickTimer = setInterval(() => {
+  if(audioCtx){
+    els.ctxState.textContent = audioCtx.state;
+  }
+  updateTimeInfo();
+}, 500);
+
+setLive(false);
+els.status.textContent = 'Stopped';
+els.trackUrl.textContent = '—';
+els.ctxState.textContent = 'not created';
+els.timeInfo.textContent = '0 / 0';
+els.lastError.textContent = 'none';
+log('Debug page ready');
+</script>
+</body>
+</html>
