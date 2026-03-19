@@ -9,37 +9,25 @@
     *{box-sizing:border-box}
     html,body{height:100%}
     body{margin:0;background:var(--bg);color:var(--fg);font-family:Arial,Helvetica,sans-serif}
-
     .wrap{min-height:100%;display:grid;place-items:center;padding:32px}
-
     .radio{width:min(860px,100%);border:1px solid var(--line);padding:22px;display:grid;gap:18px}
-
     .top{display:flex;justify-content:space-between;align-items:center}
     .title{font-size:clamp(28px,6vw,56px);text-transform:lowercase}
-
     .live{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.15em}
     .dot{width:10px;height:10px;border-radius:50%;background:#300;transition:.3s}
     .dot.on{background:#ff2a2a;box-shadow:0 0 12px rgba(255,0,0,.7)}
-
-    .screen{border:1px solid var(--line);padding:16px;min-height:140px;display:grid;gap:10px}
-    .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.14em}
-    .value{font-size:clamp(18px,3vw,28px)}
-
-    .actions{display:flex}
+    .screen{border:1px solid var(--line);padding:16px;min-height:140px;display:grid;align-content:center}
+    .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;margin-bottom:8px}
+    .value{font-size:clamp(18px,3vw,28px);word-break:break-word}
+    .actions{display:flex;gap:10px}
     button{background:transparent;color:var(--fg);border:1px solid var(--line);padding:10px 14px;cursor:pointer}
     button:hover{border-color:#fff}
-
-    .tap{font-size:13px;color:var(--muted);opacity:1;transition:opacity 1.2s}
-    .tap.hide{opacity:0}
-
-    .small{font-size:13px;color:var(--muted)}
-    .log{border-top:1px solid var(--line);padding-top:12px;font-size:12px;color:var(--muted)}
+    .log{border-top:1px solid var(--line);padding-top:12px;font-size:12px;color:var(--muted);min-height:30px}
   </style>
 </head>
 <body>
 <div class="wrap">
   <div class="radio">
-
     <div class="top">
       <div class="title">radio</div>
       <div class="live">
@@ -51,22 +39,16 @@
     <div class="screen">
       <div>
         <div class="label">State</div>
-        <div class="value" id="status">Click anywhere to begin</div>
+        <div class="value" id="status">Stopped</div>
       </div>
     </div>
 
     <div class="actions">
+      <button id="startBtn" type="button">Start</button>
       <button id="stopBtn" type="button">Stop</button>
     </div>
 
-    <div class="tap" id="tap">Click anywhere to begin</div>
-
     <div class="log" id="log"></div>
-
-    <div class="small">
-      Refresh the page to clean signal. Stop / Back closes the transmission. Please be patient while the set warms.
-    </div>
-
   </div>
 </div>
 
@@ -96,132 +78,191 @@ const TRACKS=[
 ];
 
 const els={
-music:document.getElementById('music'),
-status:document.getElementById('status'),
-log:document.getElementById('log'),
-tap:document.getElementById('tap'),
-dot:document.getElementById('dot'),
-liveText:document.getElementById('liveText'),
-stopBtn:document.getElementById('stopBtn')
+  music:document.getElementById('music'),
+  status:document.getElementById('status'),
+  log:document.getElementById('log'),
+  dot:document.getElementById('dot'),
+  liveText:document.getElementById('liveText'),
+  startBtn:document.getElementById('startBtn'),
+  stopBtn:document.getElementById('stopBtn')
 };
 
-let audioCtx,master,mg,sg,source;
-let booted=false;
+let audioCtx=null;
+let master=null;
+let musicGain=null;
+let staticGain=null;
+let sourceNode=null;
+let currentNoise=null;
+let started=false;
+let nextTrackTimer=null;
+let revealTimer=null;
+let currentTrackTitle='';
 
-function rand(a,b){return Math.random()*(b-a)+a}
+function rand(a,b){return Math.random()*(b-a)+a;}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
 
 async function initAudio(){
- if(!audioCtx){
-  audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-  source=audioCtx.createMediaElementSource(els.music);
-  master=audioCtx.createGain();
-  mg=audioCtx.createGain();
-  sg=audioCtx.createGain();
-  mg.gain.value=0; sg.gain.value=0;
-  source.connect(mg); mg.connect(master); sg.connect(master);
-  master.connect(audioCtx.destination);
- }
- if(audioCtx.state==='suspended') await audioCtx.resume();
+  if(!audioCtx){
+    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    sourceNode=audioCtx.createMediaElementSource(els.music);
+    master=audioCtx.createGain();
+    musicGain=audioCtx.createGain();
+    staticGain=audioCtx.createGain();
+    musicGain.gain.value=0;
+    staticGain.gain.value=0;
+    sourceNode.connect(musicGain);
+    musicGain.connect(master);
+    staticGain.connect(master);
+    master.connect(audioCtx.destination);
+  }
+  if(audioCtx.state==='suspended') await audioCtx.resume();
 }
 
 function setLive(on){
- els.dot.classList.toggle('on',on);
- els.liveText.textContent=on?'live':'standby';
+  els.dot.classList.toggle('on',on);
+  els.liveText.textContent=on?'live':'standby';
 }
 
-function fade(g,v,t){
- const now=audioCtx.currentTime;
- g.gain.cancelScheduledValues(now);
- g.gain.setValueAtTime(g.gain.value,now);
- g.gain.linearRampToValueAtTime(v,now+t);
+function fadeGain(gainNode,target,seconds){
+  if(!audioCtx||!gainNode) return;
+  const now=audioCtx.currentTime;
+  gainNode.gain.cancelScheduledValues(now);
+  gainNode.gain.setValueAtTime(gainNode.gain.value,now);
+  gainNode.gain.linearRampToValueAtTime(target,now+seconds);
 }
 
-function noise(){
- const buf=audioCtx.createBuffer(1,44100,44100);
- const d=buf.getChannelData(0);
- for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*0.3;
- const s=audioCtx.createBufferSource();
- s.buffer=buf; s.loop=true;
- const g=audioCtx.createGain(); g.gain.value=0;
- s.connect(g); g.connect(sg); s.start();
- return {s,g};
+function stopNoise(){
+  if(!currentNoise) return;
+  try{currentNoise.source.stop();}catch(e){}
+  try{currentNoise.source.disconnect();}catch(e){}
+  try{currentNoise.filterA.disconnect();}catch(e){}
+  try{currentNoise.filterB.disconnect();}catch(e){}
+  try{currentNoise.gain.disconnect();}catch(e){}
+  currentNoise=null;
 }
 
-async function start(){
- if(booted) return;
- booted=true;
- els.tap.classList.add('hide');
- setLive(true);
- els.status.textContent='Tuning';
- els.log.textContent='Set warming.';
- await initAudio();
- await play();
+function startNoise(){
+  stopNoise();
+  const buffer=audioCtx.createBuffer(1,audioCtx.sampleRate*2,audioCtx.sampleRate);
+  const data=buffer.getChannelData(0);
+  for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*0.28;
+
+  const source=audioCtx.createBufferSource();
+  source.buffer=buffer;
+  source.loop=true;
+
+  const filterA=audioCtx.createBiquadFilter();
+  filterA.type='lowpass';
+  filterA.frequency.value=rand(500,1800);
+
+  const filterB=audioCtx.createBiquadFilter();
+  filterB.type='bandpass';
+  filterB.frequency.value=rand(250,1100);
+  filterB.Q.value=rand(0.2,0.8);
+
+  const gain=audioCtx.createGain();
+  gain.gain.value=0;
+
+  source.connect(filterA);
+  filterA.connect(filterB);
+  filterB.connect(gain);
+  gain.connect(staticGain);
+  source.start();
+
+  currentNoise={source,filterA,filterB,gain};
 }
 
-async function play(){
- const t=TRACKS[Math.floor(Math.random()*TRACKS.length)];
- els.status.textContent='Tuning';
+function clearTimers(){
+  clearTimeout(nextTrackTimer);
+  clearTimeout(revealTimer);
+}
 
- const n=noise();
- fade(sg,0.7,rand(4,10));
+async function playTrack(){
+  clearTimers();
+  if(!started) return;
 
- els.music.src=t.src;
- els.music.load();
- try{
-  await els.music.play();
- }catch(e){
+  const track=pick(TRACKS);
+  currentTrackTitle=track.title;
+  els.status.textContent='Tuning';
+  els.log.textContent='';
+
+  startNoise();
+  fadeGain(staticGain,0.7,rand(3,8));
+  fadeGain(musicGain,0,0.01);
+
+  els.music.src=track.src;
+  els.music.load();
+
+  try{
+    await els.music.play();
+  }catch(e){
+    started=false;
+    setLive(false);
+    els.status.textContent='Stopped';
+    els.log.textContent='Could not start audio.';
+    stopNoise();
+    return;
+  }
+
+  fadeGain(musicGain,1,rand(5,14));
+
+  revealTimer=setTimeout(()=>{
+    els.status.textContent=currentTrackTitle;
+    fadeGain(staticGain,0,rand(8,24));
+  },rand(4000,12000));
+
+  els.music.onended=()=>{
+    if(!started) return;
+    fadeGain(musicGain,0,rand(2,5));
+    fadeGain(staticGain,0.45,rand(2,5));
+    nextTrackTimer=setTimeout(()=>{
+      playTrack();
+    },rand(1000,8000));
+  };
+}
+
+async function startRadio(){
+  if(started) return;
+  started=true;
+  await initAudio();
+  setLive(true);
+  els.status.textContent='Tuning';
+  els.log.textContent='';
+  await playTrack();
+}
+
+function stopRadio(){
+  started=false;
+  clearTimers();
+  try{els.music.pause();}catch(e){}
+  if(audioCtx&&audioCtx.state!=='closed'){
+    fadeGain(musicGain,0,0.4);
+    fadeGain(staticGain,0,0.4);
+  }
+  setTimeout(()=>stopNoise(),500);
   setLive(false);
-  booted=false;
-  els.tap.classList.remove('hide');
-  els.status.textContent='Click anywhere to begin';
-  els.log.textContent='Audio blocked. Click again.';
-  try{n.s.stop()}catch(err){}
-  return;
- }
- fade(mg,1,rand(6,18));
-
- setTimeout(()=>{
-  els.status.textContent=t.title;
-  fade(sg,0,rand(10,40));
- },rand(6000,30000));
-
- els.music.onended=()=>{
-  fade(mg,0,rand(2,6));
-  fade(sg,0.5,rand(2,6));
-  setTimeout(()=>{
-    n.s.stop();
-    play();
-  },rand(1000,8000));
- }
+  els.status.textContent='Stopped';
+  els.log.textContent='';
 }
 
-document.addEventListener('pointerdown',()=>{
- start();
+els.startBtn.addEventListener('click',()=>{
+  startRadio();
 });
 
-// secret key
+els.stopBtn.addEventListener('click',()=>{
+  stopRadio();
+});
+
 window.addEventListener('keydown',e=>{
- if(e.key==='\'){
-  if(Number.isFinite(els.music.duration)){
-   els.music.currentTime=Math.min((els.music.duration||0)-0.5,els.music.currentTime+15);
-   els.log.textContent='skip';
+  if(e.key==='\' && started && Number.isFinite(els.music.duration)){
+    els.music.currentTime=Math.min((els.music.duration||0)-0.5,els.music.currentTime+15);
+    els.log.textContent='skip';
   }
- }
 });
 
 setLive(false);
-els.status.textContent='Click anywhere to begin';
+els.status.textContent='Stopped';
 els.log.textContent='';
-
-els.stopBtn.addEventListener('click',()=>{
- try{els.music.pause()}catch(e){}
- if(audioCtx&&audioCtx.state!=='closed') audioCtx.suspend().catch(()=>{});
- setLive(false);
- els.status.textContent='Stopped';
- els.log.textContent='Transmission closed.';
- booted=false;
- els.tap.classList.remove('hide');
-});
 </script>
 </body>
 </html>
