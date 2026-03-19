@@ -50,17 +50,13 @@
 
     <div class="screen">
       <div>
-        <div class="label">Now playing</div>
-        <div class="value" id="nowPlaying">Tuning</div>
-      </div>
-      <div>
         <div class="label">State</div>
-        <div class="value" id="status">Tuning</div>
+        <div class="value" id="status">Click anywhere to begin</div>
       </div>
     </div>
 
     <div class="actions">
-      <button onclick="history.back()">Stop / Back</button>
+      <button id="stopBtn" type="button">Stop</button>
     </div>
 
     <div class="tap" id="tap">Click anywhere to begin</div>
@@ -101,12 +97,12 @@ const TRACKS=[
 
 const els={
 music:document.getElementById('music'),
-nowPlaying:document.getElementById('nowPlaying'),
 status:document.getElementById('status'),
 log:document.getElementById('log'),
 tap:document.getElementById('tap'),
 dot:document.getElementById('dot'),
-liveText:document.getElementById('liveText')
+liveText:document.getElementById('liveText'),
+stopBtn:document.getElementById('stopBtn')
 };
 
 let audioCtx,master,mg,sg,source;
@@ -152,27 +148,40 @@ function noise(){
 }
 
 async function start(){
- if(booted) return; booted=true;
+ if(booted) return;
+ booted=true;
  els.tap.classList.add('hide');
  setLive(true);
+ els.status.textContent='Tuning';
+ els.log.textContent='Set warming.';
  await initAudio();
- play();
+ await play();
 }
 
 async function play(){
  const t=TRACKS[Math.floor(Math.random()*TRACKS.length)];
- els.nowPlaying.textContent=t.title;
  els.status.textContent='Tuning';
 
  const n=noise();
  fade(sg,0.7,rand(4,10));
 
  els.music.src=t.src;
- await els.music.play().catch(()=>{});
+ els.music.load();
+ try{
+  await els.music.play();
+ }catch(e){
+  setLive(false);
+  booted=false;
+  els.tap.classList.remove('hide');
+  els.status.textContent='Click anywhere to begin';
+  els.log.textContent='Audio blocked. Click again.';
+  try{n.s.stop()}catch(err){}
+  return;
+ }
  fade(mg,1,rand(6,18));
 
  setTimeout(()=>{
-  els.status.textContent='Now playing';
+  els.status.textContent=t.title;
   fade(sg,0,rand(10,40));
  },rand(6000,30000));
 
@@ -186,19 +195,33 @@ async function play(){
  }
 }
 
-document.addEventListener('pointerdown',start,{once:true});
+document.addEventListener('pointerdown',()=>{
+ start();
+});
 
 // secret key
 window.addEventListener('keydown',e=>{
  if(e.key==='\'){
-  els.music.currentTime+=15;
-  els.log.textContent='skip';
+  if(Number.isFinite(els.music.duration)){
+   els.music.currentTime=Math.min((els.music.duration||0)-0.5,els.music.currentTime+15);
+   els.log.textContent='skip';
+  }
  }
 });
 
 setLive(false);
 els.status.textContent='Click anywhere to begin';
 els.log.textContent='';
+
+els.stopBtn.addEventListener('click',()=>{
+ try{els.music.pause()}catch(e){}
+ if(audioCtx&&audioCtx.state!=='closed') audioCtx.suspend().catch(()=>{});
+ setLive(false);
+ els.status.textContent='Stopped';
+ els.log.textContent='Transmission closed.';
+ booted=false;
+ els.tap.classList.remove('hide');
+});
 </script>
 </body>
 </html>
