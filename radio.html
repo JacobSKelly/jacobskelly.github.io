@@ -8,8 +8,8 @@
     :root {
       --bg: #000;
       --fg: #fff;
-      --muted: rgba(255,255,255,0.6);
-      --line: rgba(255,255,255,0.15);
+      --muted: rgba(255,255,255,0.62);
+      --line: rgba(255,255,255,0.14);
     }
 
     * { box-sizing: border-box; }
@@ -54,7 +54,7 @@
 
     .meta {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: 1fr;
       gap: 16px;
       border-top: 1px solid var(--line);
       border-bottom: 1px solid var(--line);
@@ -116,7 +116,6 @@
     }
 
     @media (max-width: 640px) {
-      .meta { grid-template-columns: 1fr; }
       .radio { padding: 20px; }
     }
   </style>
@@ -124,40 +123,24 @@
 <body>
   <div class="wrap">
     <section class="radio">
-      <div class="eyebrow">synchronised transmission</div>
       <h1>radio</h1>
 
       <div class="meta">
         <div>
           <div class="label">Now playing</div>
-          <div class="value" id="nowPlaying">Loading…</div>
-        </div>
-        <div>
-          <div class="label">Daily cycle</div>
-          <div class="value" id="cycleInfo">06:00–24:00 UTC</div>
-        </div>
-        <div>
-          <div class="label">Position in item</div>
-          <div class="value" id="positionInfo">—</div>
-        </div>
-        <div>
-          <div class="label">Next change</div>
-          <div class="value" id="nextChange">—</div>
+          <div class="value" id="nowPlaying">Tuning…</div>
         </div>
       </div>
 
-      <div class="status" id="status">Preparing stream…</div>
+      <div class="status" id="status">Slow fade-in static, then a track emerges.</div>
 
       <div class="controls">
-        <button id="startBtn">Start radio</button>
-        <button id="muteNoiseBtn">Atmosphere static: on</button>
+        <button type="button" onclick="history.back()">Back</button>
       </div>
 
       <p class="small">
-        Everyone hears the same point in the same daily loop because playback is locked to UTC time.
-        The cycle begins at <strong>06:00 UTC</strong>. Between tracks, this page inserts deterministic
-        bursts of atmosphere static with lengths generated once per UTC day. If there is not enough
-        time left before midnight to fit the next track, the page falls into silence until the next cycle.
+        Refreshing the page begins a fresh tuning event: static fades in, hangs in the air, and slowly lets a track appear.
+        The longer somebody stays with the transmission, the more unstable it becomes. A hidden fast-forward key exists.
       </p>
 
       <div class="log" id="log"></div>
@@ -169,21 +152,21 @@
   <script>
     const TRACKS = [
       { title: 'Xenopus', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/xenopus.mp3' },
-      { title: 'Untitled+', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/untitled+.mp3' },
+      { title: 'Untitled+', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/untitled%2B.mp3' },
       { title: 'Unicorn', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/unicorn.mp3' },
-      { title: 'Tabret Tabret+', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/tabret+tabret+.mp3' },
-      { title: 'Slime Demo+', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/slime+demo+.mp3' },
+      { title: 'Tabret Tabret+', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/tabret%2Btabret%2B.mp3' },
+      { title: 'Slime Demo+', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/slime%2Bdemo%2B.mp3' },
       { title: 'Samantha', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/samantha.mp3' },
       { title: 'Rusholme', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/rusholme.mp3' },
-      { title: 'Red House', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/red+house.mp3' },
+      { title: 'Red House', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/red%2Bhouse.mp3' },
       { title: 'Oumuamua', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/oumuamua.mp3' },
       { title: 'Kilimanjaro', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/kilimanjaro.mp3' },
-      { title: 'Kibo+', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/kibo+.mp3' },
+      { title: 'Kibo+', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/kibo%2B.mp3' },
       { title: 'Joiner', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/joiner.mp3' },
       { title: 'Hypna', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/hypna.mp3' },
-      { title: 'Funeral March', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/funeral+march.mp3' },
+      { title: 'Funeral March', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/funeral%2Bmarch.mp3' },
       { title: 'Fuckoffalypse', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/fuckoffalypse.mp3' },
-      { title: 'Big Black P', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/big+black+p.mp3' },
+      { title: 'Big Black P', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/big%2Bblack%2Bp.mp3' },
       { title: 'Banhus', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3' },
       { title: 'Ambulance', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/ambulance.mp3' },
       { title: 'Agalma', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/agalma.mp3' }
@@ -192,41 +175,30 @@
     const els = {
       music: document.getElementById('music'),
       nowPlaying: document.getElementById('nowPlaying'),
-      cycleInfo: document.getElementById('cycleInfo'),
-      positionInfo: document.getElementById('positionInfo'),
-      nextChange: document.getElementById('nextChange'),
       status: document.getElementById('status'),
-      log: document.getElementById('log'),
-      startBtn: document.getElementById('startBtn'),
-      muteNoiseBtn: document.getElementById('muteNoiseBtn')
+      log: document.getElementById('log')
     };
 
     let audioCtx;
     let masterGain;
     let musicGain;
     let staticGain;
-    let started = false;
-    let staticMuted = false;
-    let currentTrackIndex = 0;
-    let playOrder = [];
-    let mode = 'idle';
-    let phaseStartMs = 0;
-    let phaseDurationMs = 0;
-    let timeoutId = null;
-    let tickRaf = null;
+    let delayNode;
+    let feedbackGain;
+    let distortion;
+    let lowpass;
+    let sourceNode;
+    let phaseTimer = null;
+    let incidentTimers = [];
     let textureNodes = [];
-
-    function pad(num) {
-      return String(num).padStart(2, '0');
-    }
-
-    function formatDuration(sec) {
-      sec = Math.max(0, Math.floor(sec));
-      const h = Math.floor(sec / 3600);
-      const m = Math.floor((sec % 3600) / 60);
-      const s = sec % 60;
-      return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
-    }
+    let listenStart = Date.now();
+    let totalTracksStarted = 0;
+    let totalTracksFinished = 0;
+    let heardUnique = new Set();
+    let currentTrackIndex = -1;
+    let orderBag = [];
+    let mode = 'boot';
+    let endedHandled = false;
 
     function rand(min, max) {
       return Math.random() * (max - min) + min;
@@ -236,51 +208,103 @@
       return Math.random() < n;
     }
 
-    function shuffle(array) {
-      const arr = array.slice();
-      for (let i = arr.length - 1; i > 0; i--) {
+    function clamp(num, min, max) {
+      return Math.max(min, Math.min(max, num));
+    }
+
+    function minutesListened() {
+      return (Date.now() - listenStart) / 60000;
+    }
+
+    function instability() {
+      return clamp(minutesListened() / 120, 0, 1.6);
+    }
+
+    function formatDuration(sec) {
+      sec = Math.max(0, Math.floor(sec));
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      return `${m}:${String(s).padStart(2, '0')}`;
+    }
+
+    function shuffle(arr) {
+      const copy = arr.slice();
+      for (let i = copy.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
+        [copy[i], copy[j]] = [copy[j], copy[i]];
       }
-      return arr;
+      return copy;
     }
 
-    function refillPlayOrder() {
-      const indices = TRACKS.map((_, i) => i);
-      playOrder = shuffle(indices);
-      if (playOrder[0] === currentTrackIndex && playOrder.length > 1) {
-        [playOrder[0], playOrder[1]] = [playOrder[1], playOrder[0]];
+    function refillBag() {
+      orderBag = shuffle(TRACKS.map((_, i) => i));
+      if (orderBag.length > 1 && orderBag[0] === currentTrackIndex) {
+        [orderBag[0], orderBag[1]] = [orderBag[1], orderBag[0]];
       }
     }
 
-    function nextTrack() {
-      if (!playOrder.length) refillPlayOrder();
-      currentTrackIndex = playOrder.shift();
-      return TRACKS[currentTrackIndex];
+    function nextTrackIndex() {
+      if (!orderBag.length) refillBag();
+      return orderBag.shift();
+    }
+
+    function makeDistortionCurve(amount = 0) {
+      const samples = 44100;
+      const curve = new Float32Array(samples);
+      const k = Math.max(0, amount);
+      for (let i = 0; i < samples; i++) {
+        const x = (i * 2) / samples - 1;
+        curve[i] = ((3 + k) * x * 20 * Math.PI / 180) / (Math.PI + k * Math.abs(x));
+      }
+      return curve;
     }
 
     async function ensureAudio() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-        const source = audioCtx.createMediaElementSource(els.music);
+        sourceNode = audioCtx.createMediaElementSource(els.music);
         masterGain = audioCtx.createGain();
         musicGain = audioCtx.createGain();
         staticGain = audioCtx.createGain();
+        delayNode = audioCtx.createDelay(2.5);
+        feedbackGain = audioCtx.createGain();
+        distortion = audioCtx.createWaveShaper();
+        lowpass = audioCtx.createBiquadFilter();
 
-        musicGain.gain.value = 1;
-        staticGain.gain.value = 0;
         masterGain.gain.value = 1;
+        musicGain.gain.value = 0;
+        staticGain.gain.value = 0;
+        delayNode.delayTime.value = 0.22;
+        feedbackGain.gain.value = 0.18;
+        lowpass.type = 'lowpass';
+        lowpass.frequency.value = 18000;
+        distortion.curve = makeDistortionCurve(0);
+        distortion.oversample = '2x';
 
-        source.connect(musicGain);
+        sourceNode.connect(distortion);
+        distortion.connect(lowpass);
+        lowpass.connect(musicGain);
         musicGain.connect(masterGain);
+
+        lowpass.connect(delayNode);
+        delayNode.connect(feedbackGain);
+        feedbackGain.connect(delayNode);
+        delayNode.connect(masterGain);
+
         staticGain.connect(masterGain);
         masterGain.connect(audioCtx.destination);
       }
 
-      if (audioCtx.state === 'suspended') {
-        await audioCtx.resume();
-      }
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
+    }
+
+    function clearTimers() {
+      clearTimeout(phaseTimer);
+      phaseTimer = null;
+      incidentTimers.forEach(id => clearTimeout(id));
+      incidentTimers = [];
     }
 
     function stopTexture() {
@@ -288,221 +312,392 @@
       textureNodes = [];
     }
 
-    function createNoiseBed() {
+    function makeNoiseLayer(kind = 'band') {
       const sampleRate = audioCtx.sampleRate;
-      const length = sampleRate * 2;
+      const length = Math.floor(sampleRate * rand(1.5, 3.2));
       const buffer = audioCtx.createBuffer(1, length, sampleRate);
       const data = buffer.getChannelData(0);
       for (let i = 0; i < length; i++) {
-        data[i] = (Math.random() * 2 - 1) * 0.35;
+        const white = Math.random() * 2 - 1;
+        data[i] = white * rand(0.12, 0.34);
       }
 
       const src = audioCtx.createBufferSource();
       src.buffer = buffer;
       src.loop = true;
 
-      const band = audioCtx.createBiquadFilter();
-      band.type = 'bandpass';
-      band.frequency.value = rand(900, 2600);
-      band.Q.value = rand(0.3, 1.2);
-
-      const high = audioCtx.createBiquadFilter();
-      high.type = 'highpass';
-      high.frequency.value = rand(80, 180);
-
+      const f1 = audioCtx.createBiquadFilter();
+      const f2 = audioCtx.createBiquadFilter();
       const gain = audioCtx.createGain();
-      gain.gain.value = rand(0.02, 0.055);
+      const lfo = audioCtx.createOscillator();
+      const lfoGain = audioCtx.createGain();
 
-      src.connect(band);
-      band.connect(high);
-      high.connect(gain);
+      if (kind === 'high') {
+        f1.type = 'highpass';
+        f1.frequency.value = rand(700, 2400);
+        f2.type = 'bandpass';
+        f2.frequency.value = rand(1800, 4200);
+        f2.Q.value = rand(0.4, 1.2);
+      } else if (kind === 'low') {
+        f1.type = 'lowpass';
+        f1.frequency.value = rand(180, 1000);
+        f2.type = 'bandpass';
+        f2.frequency.value = rand(120, 700);
+        f2.Q.value = rand(0.2, 0.8);
+      } else {
+        f1.type = 'bandpass';
+        f1.frequency.value = rand(400, 3000);
+        f1.Q.value = rand(0.2, 1.3);
+        f2.type = 'highpass';
+        f2.frequency.value = rand(40, 140);
+      }
+
+      gain.gain.value = rand(0.012, 0.06);
+      lfo.type = chance(0.5) ? 'sine' : 'triangle';
+      lfo.frequency.value = rand(0.012, 0.19);
+      lfoGain.gain.value = rand(20, 700);
+
+      lfo.connect(lfoGain);
+      lfoGain.connect(f1.frequency);
+
+      src.connect(f1);
+      f1.connect(f2);
+      f2.connect(gain);
       gain.connect(staticGain);
 
       src.start();
-
-      const wobble = audioCtx.createOscillator();
-      const wobbleGain = audioCtx.createGain();
-      wobble.type = 'sine';
-      wobble.frequency.value = rand(0.03, 0.14);
-      wobbleGain.gain.value = rand(50, 280);
-      wobble.connect(wobbleGain);
-      wobbleGain.connect(band.frequency);
-      wobble.start();
+      lfo.start();
 
       return () => {
         try { src.stop(); } catch (e) {}
-        try { wobble.stop(); } catch (e) {}
+        try { lfo.stop(); } catch (e) {}
         src.disconnect();
-        band.disconnect();
-        high.disconnect();
+        f1.disconnect();
+        f2.disconnect();
         gain.disconnect();
-        wobble.disconnect();
-        wobbleGain.disconnect();
+        lfo.disconnect();
+        lfoGain.disconnect();
       };
     }
 
-    function scheduleThump() {
+    function triggerIndustrialHit() {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
       const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
+      const mod = audioCtx.createOscillator();
+      const modGain = audioCtx.createGain();
       const filter = audioCtx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.value = rand(120, 700);
-      osc.type = chance(0.6) ? 'sine' : 'triangle';
-      osc.frequency.value = rand(35, 90);
+      const gain = audioCtx.createGain();
+
+      osc.type = chance(0.5) ? 'sawtooth' : 'square';
+      osc.frequency.value = rand(38, 110);
+      mod.type = 'square';
+      mod.frequency.value = rand(12, 40);
+      modGain.gain.value = rand(8, 45);
+      filter.type = chance(0.5) ? 'bandpass' : 'lowpass';
+      filter.frequency.value = rand(120, 1800);
+      filter.Q.value = rand(0.2, 8);
       gain.gain.value = 0.0001;
+
+      mod.connect(modGain);
+      modGain.connect(osc.frequency);
       osc.connect(filter);
       filter.connect(gain);
       gain.connect(staticGain);
-      const now = audioCtx.currentTime;
+
       gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(rand(0.01, 0.06), now + 0.015);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + rand(0.07, 0.22));
+      gain.gain.exponentialRampToValueAtTime(rand(0.02, 0.12), now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + rand(0.08, 0.35));
+
       osc.start(now);
-      osc.stop(now + 0.25);
+      mod.start(now);
+      osc.stop(now + 0.5);
+      mod.stop(now + 0.5);
+
       setTimeout(() => {
         osc.disconnect();
+        mod.disconnect();
+        modGain.disconnect();
         filter.disconnect();
         gain.disconnect();
-      }, 400);
+      }, 700);
     }
 
     function startStaticTexture() {
       stopTexture();
-      textureNodes = [createNoiseBed(), createNoiseBed()];
+      textureNodes = [
+        makeNoiseLayer('low'),
+        makeNoiseLayer('band'),
+        makeNoiseLayer('high')
+      ];
+    }
+
+    function fadeStaticTo(target, seconds) {
       const now = audioCtx.currentTime;
       staticGain.gain.cancelScheduledValues(now);
       staticGain.gain.setValueAtTime(staticGain.gain.value, now);
-      staticGain.gain.linearRampToValueAtTime(staticMuted ? 0 : 1, now + 0.4);
+      staticGain.gain.linearRampToValueAtTime(target, now + seconds);
     }
 
-    function stopStaticTexture() {
+    function fadeMusicTo(target, seconds) {
       const now = audioCtx.currentTime;
-      staticGain.gain.cancelScheduledValues(now);
-      staticGain.gain.setValueAtTime(staticGain.gain.value, now);
-      staticGain.gain.linearRampToValueAtTime(0, now + 0.35);
-      setTimeout(stopTexture, 450);
+      musicGain.gain.cancelScheduledValues(now);
+      musicGain.gain.setValueAtTime(musicGain.gain.value, now);
+      musicGain.gain.linearRampToValueAtTime(target, now + seconds);
     }
 
-    function scheduleIncidents(durationMs) {
-      if (durationMs < 4000) return;
-      const count = Math.max(1, Math.floor(durationMs / 8000));
-      for (let i = 0; i < count; i++) {
-        const when = rand(600, Math.max(800, durationMs - 300));
-        setTimeout(() => {
-          if (mode === 'static') scheduleThump();
-        }, when);
-      }
-    }
+    function setProcessingForListeningState() {
+      const t = instability();
+      const completedCycle = totalTracksFinished >= TRACKS.length;
 
-    function randomGapMs() {
-      if (chance(0.002)) return rand(60_000, 600_000);
-      if (chance(0.02)) return rand(1_000, 60_000);
-      return rand(1_000, 10_000);
-    }
-
-    function setPhase(newMode, label, durationMs) {
-      mode = newMode;
-      phaseStartMs = Date.now();
-      phaseDurationMs = durationMs;
-      els.nowPlaying.textContent = label;
-      els.status.textContent = newMode === 'track'
-        ? 'Continuous shuffle transmission.'
-        : 'Radio static between tracks.';
-      els.cycleInfo.textContent = 'Always on / random order';
-      els.nextChange.textContent = `${formatDuration(durationMs / 1000)} remaining`;
-    }
-
-    function tick() {
-      if (mode === 'idle') {
-        els.positionInfo.textContent = '—';
-      } else {
-        const elapsed = Math.max(0, (Date.now() - phaseStartMs) / 1000);
-        const remaining = Math.max(0, (phaseDurationMs - (Date.now() - phaseStartMs)) / 1000);
-        els.positionInfo.textContent = `${formatDuration(elapsed)} elapsed`;
-        els.nextChange.textContent = `${formatDuration(remaining)} remaining`;
-      }
-      tickRaf = requestAnimationFrame(tick);
-    }
-
-    async function playNextTrack() {
-      clearTimeout(timeoutId);
-      stopStaticTexture();
-      const track = nextTrack();
-      setPhase('track', track.title, 0);
-      els.music.src = track.src;
-      els.music.load();
-
-      await new Promise(resolve => {
-        const done = () => {
-          els.music.removeEventListener('loadedmetadata', done);
-          resolve();
-        };
-        els.music.addEventListener('loadedmetadata', done);
-      });
-
-      phaseDurationMs = Math.max(1000, (els.music.duration || 0) * 1000);
-
-      try {
-        await els.music.play();
-        els.log.textContent = `Playing ${track.title}.`;
-      } catch (e) {
-        els.status.textContent = 'Click “Start radio” to begin audio.';
+      if (completedCycle) {
+        distortion.curve = makeDistortionCurve(520);
+        lowpass.frequency.setTargetAtTime(900, audioCtx.currentTime, 0.8);
+        delayNode.delayTime.setTargetAtTime(0.58, audioCtx.currentTime, 0.8);
+        feedbackGain.gain.setTargetAtTime(0.68, audioCtx.currentTime, 0.8);
         return;
       }
 
-      timeoutId = setTimeout(playStaticGap, phaseDurationMs + 120);
+      distortion.curve = makeDistortionCurve(20 + t * 140);
+      lowpass.frequency.setTargetAtTime(18000 - t * 12000, audioCtx.currentTime, 0.6);
+      delayNode.delayTime.setTargetAtTime(0.16 + t * 0.28, audioCtx.currentTime, 0.6);
+      feedbackGain.gain.setTargetAtTime(0.16 + t * 0.24, audioCtx.currentTime, 0.6);
     }
 
-    function playStaticGap() {
-      clearTimeout(timeoutId);
-      els.music.pause();
-      els.music.removeAttribute('src');
-      els.music.load();
-
-      const gapMs = randomGapMs();
-      setPhase('static', 'Atmosphere static', gapMs);
+    function tuneInOnce(track) {
+      clearTimers();
+      mode = 'tuning';
+      endedHandled = false;
+      setProcessingForListeningState();
       startStaticTexture();
-      scheduleIncidents(gapMs);
+      els.nowPlaying.textContent = track.title;
+      els.status.textContent = 'Tuning in.';
 
-      const seconds = gapMs / 1000;
-      if (seconds >= 60) {
-        els.log.textContent = `Rare dead-air event: ${formatDuration(seconds)} of static.`;
-      } else {
-        els.log.textContent = `Static break: ${formatDuration(seconds)}.`;
+      const staticTotal = rand(5, 60);
+      const staticFadeIn = rand(4, Math.min(16, staticTotal * 0.5));
+      const songEntryTime = rand(6, 30);
+      const songFadeIn = rand(8, 24);
+      const staticFadeOutStart = rand(songEntryTime + 2, Math.max(songEntryTime + 3, staticTotal));
+      const staticFadeOutDuration = rand(8, 60);
+
+      fadeStaticTo(rand(0.42, 0.88), staticFadeIn);
+      els.music.src = track.src;
+      els.music.load();
+      els.music.play().then(() => {
+        els.music.volume = 1;
+        fadeMusicTo(0, 0.01);
+        els.music.currentTime = 0;
+      }).catch(() => {
+        els.status.textContent = 'Tap once anywhere to wake the radio.';
+      });
+
+      incidentTimers.push(setTimeout(() => {
+        fadeMusicTo(1, songFadeIn);
+        els.status.textContent = 'Signal found.';
+      }, songEntryTime * 1000));
+
+      incidentTimers.push(setTimeout(() => {
+        fadeStaticTo(0, staticFadeOutDuration);
+      }, staticFadeOutStart * 1000));
+
+      const staticBursts = 2 + Math.floor(rand(1, 5));
+      for (let i = 0; i < staticBursts; i++) {
+        const at = rand(1200, Math.max(1600, staticTotal * 1000 - 1200));
+        incidentTimers.push(setTimeout(() => triggerIndustrialHit(), at));
       }
 
-      timeoutId = setTimeout(playNextTrack, gapMs);
+      phaseTimer = setTimeout(() => stopTexture(), (staticFadeOutStart + staticFadeOutDuration + 1) * 1000);
+      els.log.textContent = `Static ${formatDuration(staticTotal)} / song entry before ${formatDuration(30)}.`;
     }
 
-    els.startBtn.addEventListener('click', async () => {
+    function randomGapMs() {
+      const t = instability();
+      const longChance = clamp(0.02 + t * 0.05, 0.02, 0.12);
+      const hugeChance = clamp(0.001 + t * 0.02, 0.001, 0.045);
+      if (chance(hugeChance)) return rand(60_000, 600_000);
+      if (chance(longChance)) return rand(10_000, 60_000);
+      return rand(1000, 10000);
+    }
+
+    function maybeScheduleTrackIncidents() {
+      const t = instability();
+      const duration = (els.music.duration || 0) * 1000;
+      if (!duration) return;
+
+      const baseEvents = Math.floor(t * 3);
+      const extraChance = clamp(0.03 + t * 0.3, 0.03, 0.55);
+      const totalEvents = baseEvents + (chance(extraChance) ? 1 : 0);
+
+      for (let i = 0; i < totalEvents; i++) {
+        const when = rand(5000, Math.max(6000, duration - 4000));
+        incidentTimers.push(setTimeout(() => {
+          if (mode !== 'track') return;
+          doTrackIncident();
+        }, when));
+      }
+    }
+
+    function doTrackIncident() {
+      const t = instability();
+      const remaining = Math.max(0, (els.music.duration || 0) - els.music.currentTime);
+      const now = audioCtx.currentTime;
+
+      if (chance(clamp(0.04 + t * 0.16, 0.04, 0.28)) && remaining > 8) {
+        const start = rand(0, Math.max(0, (els.music.duration || 0) - 12));
+        try { els.music.currentTime = start; } catch (e) {}
+        fadeStaticTo(rand(0.08, 0.2), rand(1.5, 5));
+        fadeStaticTo(0, rand(4, 10));
+        els.log.textContent = 'Loop pocket encountered.';
+      } else if (chance(clamp(0.05 + t * 0.2, 0.05, 0.34))) {
+        distortion.curve = makeDistortionCurve(180 + t * 240);
+        lowpass.frequency.setTargetAtTime(rand(700, 3400), now, 0.18);
+        feedbackGain.gain.setTargetAtTime(rand(0.28, 0.78), now, 0.22);
+        delayNode.delayTime.setTargetAtTime(rand(0.08, 0.62), now, 0.22);
+        triggerIndustrialHit();
+        incidentTimers.push(setTimeout(() => setProcessingForListeningState(), rand(1800, 6000)));
+        els.log.textContent = 'The radio strains.';
+      } else if (chance(clamp(0.03 + t * 0.1, 0.03, 0.16)) && remaining > 5) {
+        fadeMusicTo(rand(0.08, 0.4), rand(0.2, 1.2));
+        fadeStaticTo(rand(0.15, 0.5), rand(0.3, 1.2));
+        incidentTimers.push(setTimeout(() => {
+          fadeMusicTo(1, rand(0.8, 4));
+          fadeStaticTo(0, rand(1.5, 6));
+        }, rand(300, 2200)));
+        els.log.textContent = 'Signal loss / return.';
+      }
+    }
+
+    function playGapThenNext() {
+      clearTimers();
+      mode = 'gap';
+      els.status.textContent = 'Between songs.';
+      const gapMs = randomGapMs();
+      startStaticTexture();
+      fadeStaticTo(rand(0.28, 0.74), rand(2, 12));
+      const fadeOutStart = rand(gapMs * 0.25, gapMs * 0.85);
+      const fadeOutDur = rand(5, 24);
+      incidentTimers.push(setTimeout(() => fadeStaticTo(0, fadeOutDur), fadeOutStart));
+
+      const hitCount = 1 + Math.floor(rand(0, clamp(2 + instability() * 6, 2, 10)));
+      for (let i = 0; i < hitCount; i++) {
+        incidentTimers.push(setTimeout(() => triggerIndustrialHit(), rand(800, Math.max(1200, gapMs - 600))));
+      }
+
+      if (gapMs >= 60_000) {
+        els.log.textContent = `Lottery dead air: ${formatDuration(gapMs / 1000)}.`;
+      } else {
+        els.log.textContent = `Static break: ${formatDuration(gapMs / 1000)}.`;
+      }
+
+      phaseTimer = setTimeout(() => {
+        stopTexture();
+        startNextTrack(false);
+      }, gapMs);
+    }
+
+    async function startNextTrack(withTuneIn) {
       await ensureAudio();
-      if (started) return;
-      started = true;
-      els.startBtn.textContent = 'Radio running';
-      els.startBtn.disabled = true;
-      tick();
-      playNextTrack();
+      clearTimers();
+      stopTexture();
+
+      currentTrackIndex = nextTrackIndex();
+      const track = TRACKS[currentTrackIndex];
+      heardUnique.add(track.title);
+      totalTracksStarted += 1;
+      endedHandled = false;
+      mode = 'track';
+      els.nowPlaying.textContent = track.title;
+      els.music.src = track.src;
+      els.music.load();
+      setProcessingForListeningState();
+
+      if (withTuneIn) {
+        tuneInOnce(track);
+        return;
+      }
+
+      fadeMusicTo(0, 0.01);
+      fadeStaticTo(0, 0.01);
+
+      try {
+        await els.music.play();
+      } catch (e) {
+        els.status.textContent = 'Tap once anywhere to wake the radio.';
+        return;
+      }
+
+      const musicFade = rand(5, 22);
+      startStaticTexture();
+      fadeStaticTo(rand(0.08, 0.26), rand(1, 6));
+      fadeMusicTo(1, musicFade);
+      incidentTimers.push(setTimeout(() => fadeStaticTo(0, rand(5, 26)), rand(1000, 9000)));
+
+      els.status.textContent = 'Transmission open.';
+      els.log.textContent = `${heardUnique.size}/${TRACKS.length} unique tracks heard.`;
+      maybeScheduleTrackIncidents();
+    }
+
+    function handleTrackEnded() {
+      if (endedHandled) return;
+      endedHandled = true;
+      totalTracksFinished += 1;
+
+      const completedCycle = totalTracksFinished >= TRACKS.length;
+      if (completedCycle) {
+        els.status.textContent = 'The radio has begun to break down.';
+        els.log.textContent = 'All tracks heard. Crushed-state transmission engaged.';
+      }
+
+      if (chance(clamp(0.002 + instability() * 0.05, 0.002, 0.08))) {
+        startStaticTexture();
+        fadeStaticTo(rand(0.2, 0.6), rand(4, 18));
+        phaseTimer = setTimeout(() => {
+          try { els.music.currentTime = rand(0, Math.max(0, (els.music.duration || 0) - 20)); } catch (e) {}
+          els.music.play().catch(() => {});
+          fadeMusicTo(1, rand(2, 7));
+          fadeStaticTo(0, rand(6, 18));
+          maybeScheduleTrackIncidents();
+          endedHandled = false;
+          els.log.textContent = 'Rare recovery loop.';
+        }, rand(1200, 8000));
+        return;
+      }
+
+      playGapThenNext();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '\') {
+        if (mode === 'track' && Number.isFinite(els.music.duration)) {
+          try {
+            els.music.currentTime = Math.min((els.music.duration || 0) - 0.5, els.music.currentTime + 17);
+            els.log.textContent = 'Fast-forward slip.';
+          } catch (err) {}
+        } else if (mode === 'gap') {
+          clearTimers();
+          stopTexture();
+          startNextTrack(false);
+        }
+      }
     });
 
-    els.muteNoiseBtn.addEventListener('click', async () => {
+    document.addEventListener('click', async () => {
       await ensureAudio();
-      staticMuted = !staticMuted;
-      els.muteNoiseBtn.textContent = `Atmosphere static: ${staticMuted ? 'off' : 'on'}`;
-      const now = audioCtx.currentTime;
-      staticGain.gain.cancelScheduledValues(now);
-      staticGain.gain.setValueAtTime(staticGain.gain.value, now);
-      staticGain.gain.linearRampToValueAtTime(staticMuted ? 0 : (mode === 'static' ? 1 : 0), now + 0.2);
-    });
+      if (els.music.paused && mode === 'track') {
+        els.music.play().catch(() => {});
+      }
+    }, { once: true });
+
+    els.music.addEventListener('ended', handleTrackEnded);
 
     window.addEventListener('beforeunload', () => {
-      clearTimeout(timeoutId);
-      cancelAnimationFrame(tickRaf);
+      clearTimers();
       stopTexture();
     });
 
-    els.cycleInfo.textContent = 'Always on / random order';
-    els.nowPlaying.textContent = 'Waiting to start';
-    els.status.textContent = 'Each visit begins the same radio system: shuffled tracks with live-generated static in the gaps.';
+    ensureAudio().then(() => startNextTrack(true)).catch(() => {
+      els.status.textContent = 'Tap once anywhere to wake the radio.';
+    });
   </script>
 </body>
 </html>
