@@ -5,24 +5,122 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Radio</title>
   <style>
-    :root{--bg:#000;--fg:#fff;--muted:rgba(255,255,255,.62);--line:rgba(255,255,255,.14)}
+    :root{
+      --bg:#000;
+      --fg:#fff;
+      --muted:rgba(255,255,255,.62);
+      --line:rgba(255,255,255,.14);
+    }
+
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--fg);font-family:Arial,Helvetica,sans-serif}
-    .wrap{min-height:100%;display:grid;place-items:center;padding:32px}
-    .radio{width:min(860px,100%);border:1px solid var(--line);padding:22px;display:grid;gap:18px}
-    .top{display:flex;justify-content:space-between;align-items:center}
-    .title{font-size:clamp(28px,6vw,56px);text-transform:lowercase}
-    .live{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.15em}
-    .dot{width:10px;height:10px;border-radius:50%;background:#300;transition:.3s}
-    .dot.on{background:#ff2a2a;box-shadow:0 0 12px rgba(255,0,0,.7)}
-    .screen{border:1px solid var(--line);padding:16px;min-height:140px;display:grid;align-content:center}
-    .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;margin-bottom:8px}
-    .value{font-size:clamp(18px,3vw,28px);word-break:break-word}
-    .actions{display:flex;gap:10px}
-    button{background:transparent;color:var(--fg);border:1px solid var(--line);padding:10px 14px;cursor:pointer}
-    button:hover{border-color:#fff}
-    .log{border-top:1px solid var(--line);padding-top:12px;font-size:12px;color:var(--muted);min-height:30px}
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--fg);
+      font-family:Arial,Helvetica,sans-serif;
+    }
+
+    .wrap{
+      min-height:100%;
+      display:grid;
+      place-items:center;
+      padding:32px;
+    }
+
+    .radio{
+      width:min(860px,100%);
+      border:1px solid var(--line);
+      padding:22px;
+      display:grid;
+      gap:18px;
+      background:#000;
+    }
+
+    .top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+    }
+
+    .title{
+      font-size:clamp(28px,6vw,56px);
+      text-transform:lowercase;
+      line-height:.95;
+    }
+
+    .live{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:11px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.15em;
+    }
+
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:#320000;
+      transition:.3s;
+    }
+
+    .dot.on{
+      background:#ff2a2a;
+      box-shadow:0 0 12px rgba(255,0,0,.7);
+    }
+
+    .screen{
+      border:1px solid var(--line);
+      padding:16px;
+      min-height:140px;
+      display:grid;
+      align-content:center;
+    }
+
+    .label{
+      font-size:11px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      margin-bottom:8px;
+    }
+
+    .value{
+      font-size:clamp(18px,3vw,28px);
+      word-break:break-word;
+      line-height:1.2;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+    }
+
+    button{
+      background:transparent;
+      color:var(--fg);
+      border:1px solid var(--line);
+      padding:10px 14px;
+      cursor:pointer;
+      font-size:14px;
+    }
+
+    button:hover{
+      border-color:#fff;
+    }
+
+    .log{
+      border-top:1px solid var(--line);
+      padding-top:12px;
+      font-size:12px;
+      color:var(--muted);
+      min-height:30px;
+    }
   </style>
 </head>
 <body>
@@ -55,113 +153,258 @@
 <audio id="music" crossorigin="anonymous" preload="auto"></audio>
 
 <script>
-const TRACKS=[
-{title:'Xenopus',src:'https://peachradio.s3.eu-west-2.amazonaws.com/xenopus.mp3'},
-{title:'Untitled+',src:'https://peachradio.s3.eu-west-2.amazonaws.com/untitled%2B.mp3'},
-{title:'Unicorn',src:'https://peachradio.s3.eu-west-2.amazonaws.com/unicorn.mp3'},
-{title:'Tabret Tabret+',src:'https://peachradio.s3.eu-west-2.amazonaws.com/tabret%2Btabret%2B.mp3'},
-{title:'Slime Demo+',src:'https://peachradio.s3.eu-west-2.amazonaws.com/slime%2Bdemo%2B.mp3'},
-{title:'Samantha',src:'https://peachradio.s3.eu-west-2.amazonaws.com/samantha.mp3'},
-{title:'Rusholme',src:'https://peachradio.s3.eu-west-2.amazonaws.com/rusholme.mp3'},
-{title:'Red House',src:'https://peachradio.s3.eu-west-2.amazonaws.com/red%2Bhouse.mp3'},
-{title:'Oumuamua',src:'https://peachradio.s3.eu-west-2.amazonaws.com/oumuamua.mp3'},
-{title:'Kilimanjaro',src:'https://peachradio.s3.eu-west-2.amazonaws.com/kilimanjaro.mp3'},
-{title:'Kibo+',src:'https://peachradio.s3.eu-west-2.amazonaws.com/kibo%2B.mp3'},
-{title:'Joiner',src:'https://peachradio.s3.eu-west-2.amazonaws.com/joiner.mp3'},
-{title:'Hypna',src:'https://peachradio.s3.eu-west-2.amazonaws.com/hypna.mp3'},
-{title:'Funeral March',src:'https://peachradio.s3.eu-west-2.amazonaws.com/funeral%2Bmarch.mp3'},
-{title:'Fuckoffalypse',src:'https://peachradio.s3.eu-west-2.amazonaws.com/fuckoffalypse.mp3'},
-{title:'Big Black P',src:'https://peachradio.s3.eu-west-2.amazonaws.com/big%2Bblack%2Bp.mp3'},
-{title:'Banhus',src:'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3'},
-{title:'Ambulance',src:'https://peachradio.s3.eu-west-2.amazonaws.com/ambulance.mp3'},
-{title:'Agalma',src:'https://peachradio.s3.eu-west-2.amazonaws.com/agalma.mp3'}
+const TRACKS = [
+  { title:'Xenopus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/xenopus.mp3' },
+  { title:'Untitled+', src:'https://peachradio.s3.eu-west-2.amazonaws.com/untitled%2B.mp3' },
+  { title:'Unicorn', src:'https://peachradio.s3.eu-west-2.amazonaws.com/unicorn.mp3' },
+  { title:'Tabret Tabret+', src:'https://peachradio.s3.eu-west-2.amazonaws.com/tabret%2Btabret%2B.mp3' },
+  { title:'Slime Demo+', src:'https://peachradio.s3.eu-west-2.amazonaws.com/slime%2Bdemo%2B.mp3' },
+  { title:'Samantha', src:'https://peachradio.s3.eu-west-2.amazonaws.com/samantha.mp3' },
+  { title:'Rusholme', src:'https://peachradio.s3.eu-west-2.amazonaws.com/rusholme.mp3' },
+  { title:'Red House', src:'https://peachradio.s3.eu-west-2.amazonaws.com/red%2Bhouse.mp3' },
+  { title:'Oumuamua', src:'https://peachradio.s3.eu-west-2.amazonaws.com/oumuamua.mp3' },
+  { title:'Kilimanjaro', src:'https://peachradio.s3.eu-west-2.amazonaws.com/kilimanjaro.mp3' },
+  { title:'Kibo+', src:'https://peachradio.s3.eu-west-2.amazonaws.com/kibo%2B.mp3' },
+  { title:'Joiner', src:'https://peachradio.s3.eu-west-2.amazonaws.com/joiner.mp3' },
+  { title:'Hypna', src:'https://peachradio.s3.eu-west-2.amazonaws.com/hypna.mp3' },
+  { title:'Funeral March', src:'https://peachradio.s3.eu-west-2.amazonaws.com/funeral%2Bmarch.mp3' },
+  { title:'Fuckoffalypse', src:'https://peachradio.s3.eu-west-2.amazonaws.com/fuckoffalypse.mp3' },
+  { title:'Big Black P', src:'https://peachradio.s3.eu-west-2.amazonaws.com/big%2Bblack%2Bp.mp3' },
+  { title:'Banhus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3' },
+  { title:'Ambulance', src:'https://peachradio.s3.eu-west-2.amazonaws.com/ambulance.mp3' },
+  { title:'Agalma', src:'https://peachradio.s3.eu-west-2.amazonaws.com/agalma.mp3' }
 ];
 
-const els={
-  music:document.getElementById('music'),
-  status:document.getElementById('status'),
-  log:document.getElementById('log'),
-  dot:document.getElementById('dot'),
-  liveText:document.getElementById('liveText'),
-  startBtn:document.getElementById('startBtn'),
-  stopBtn:document.getElementById('stopBtn')
+const els = {
+  music: document.getElementById('music'),
+  status: document.getElementById('status'),
+  log: document.getElementById('log'),
+  dot: document.getElementById('dot'),
+  liveText: document.getElementById('liveText'),
+  startBtn: document.getElementById('startBtn'),
+  stopBtn: document.getElementById('stopBtn')
 };
 
-let audioCtx=null;
-let master=null;
-let musicGain=null;
-let staticGain=null;
-let sourceNode=null;
-let currentNoise=null;
-let started=false;
-let nextTrackTimer=null;
-let revealTimer=null;
-let currentTrackTitle='';
+let audioCtx = null;
+let sourceNode = null;
+let masterGain = null;
+let musicGain = null;
+let staticGain = null;
+let toneGain = null;
+let lowpass = null;
+let distortion = null;
+let sendGain = null;
+let delayNode = null;
+let feedbackGain = null;
 
-function rand(a,b){return Math.random()*(b-a)+a;}
-function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
+let currentNoiseNodes = [];
+let crackleInterval = null;
+let revealTimer = null;
+let nextTrackTimer = null;
+let running = false;
+let sessionStartMs = 0;
+let currentTrackTitle = '';
+let orderBag = [];
+let currentTrackIndex = -1;
 
-async function initAudio(){
-  if(!audioCtx){
-    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-    sourceNode=audioCtx.createMediaElementSource(els.music);
-    master=audioCtx.createGain();
-    musicGain=audioCtx.createGain();
-    staticGain=audioCtx.createGain();
-    musicGain.gain.value=0;
-    staticGain.gain.value=0;
-    sourceNode.connect(musicGain);
-    musicGain.connect(master);
-    staticGain.connect(master);
-    master.connect(audioCtx.destination);
-  }
-  if(audioCtx.state==='suspended') await audioCtx.resume();
+function rand(min, max){
+  return Math.random() * (max - min) + min;
+}
+
+function chance(n){
+  return Math.random() < n;
+}
+
+function clamp(n, min, max){
+  return Math.max(min, Math.min(max, n));
+}
+
+function elapsedMs(){
+  return running ? (Date.now() - sessionStartMs) : 0;
+}
+
+function instability(){
+  return clamp(elapsedMs() / (6 * 60 * 60 * 1000), 0, 1.5);
 }
 
 function setLive(on){
-  els.dot.classList.toggle('on',on);
-  els.liveText.textContent=on?'live':'standby';
+  els.dot.classList.toggle('on', on);
+  els.liveText.textContent = on ? 'live' : 'standby';
 }
 
-function fadeGain(gainNode,target,seconds){
-  if(!audioCtx||!gainNode) return;
-  const now=audioCtx.currentTime;
+function setStatus(text){
+  els.status.textContent = text;
+}
+
+function setLog(text){
+  els.log.textContent = text || '';
+}
+
+function makeDistortionCurve(amount = 0){
+  const samples = 44100;
+  const curve = new Float32Array(samples);
+  const k = Math.max(0, amount);
+
+  for(let i = 0; i < samples; i++){
+    const x = i * 2 / samples - 1;
+    curve[i] = ((3 + k) * x * 20 * Math.PI / 180) / (Math.PI + k * Math.abs(x));
+  }
+
+  return curve;
+}
+
+async function initAudio(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    sourceNode = audioCtx.createMediaElementSource(els.music);
+
+    masterGain = audioCtx.createGain();
+    musicGain = audioCtx.createGain();
+    staticGain = audioCtx.createGain();
+    toneGain = audioCtx.createGain();
+
+    lowpass = audioCtx.createBiquadFilter();
+    lowpass.type = 'lowpass';
+    lowpass.frequency.value = 18000;
+
+    distortion = audioCtx.createWaveShaper();
+    distortion.curve = makeDistortionCurve(0);
+    distortion.oversample = '2x';
+
+    sendGain = audioCtx.createGain();
+    delayNode = audioCtx.createDelay(2.0);
+    feedbackGain = audioCtx.createGain();
+
+    masterGain.gain.value = 1;
+    musicGain.gain.value = 0;
+    staticGain.gain.value = 0;
+    toneGain.gain.value = 0;
+
+    sendGain.gain.value = 0.08;
+    delayNode.delayTime.value = 0.18;
+    feedbackGain.gain.value = 0.15;
+
+    sourceNode.connect(distortion);
+    distortion.connect(lowpass);
+    lowpass.connect(musicGain);
+    musicGain.connect(masterGain);
+
+    lowpass.connect(sendGain);
+    sendGain.connect(delayNode);
+    delayNode.connect(feedbackGain);
+    feedbackGain.connect(delayNode);
+    delayNode.connect(masterGain);
+
+    staticGain.connect(masterGain);
+    toneGain.connect(masterGain);
+    masterGain.connect(audioCtx.destination);
+  }
+
+  if(audioCtx.state === 'suspended'){
+    await audioCtx.resume();
+  }
+}
+
+function fadeGain(gainNode, target, seconds){
+  if(!audioCtx || !gainNode) return;
+  const now = audioCtx.currentTime;
   gainNode.gain.cancelScheduledValues(now);
-  gainNode.gain.setValueAtTime(gainNode.gain.value,now);
-  gainNode.gain.linearRampToValueAtTime(target,now+seconds);
+  gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+  gainNode.gain.linearRampToValueAtTime(target, now + seconds);
+}
+
+function updateProcessing(){
+  if(!audioCtx) return;
+
+  const t = instability();
+  const crushed = t >= 1;
+
+  distortion.curve = makeDistortionCurve(crushed ? 380 : (10 + t * 180));
+  lowpass.frequency.setTargetAtTime(crushed ? 900 : (18000 - t * 13000), audioCtx.currentTime, 0.7);
+  sendGain.gain.setTargetAtTime(crushed ? 0.26 : (0.08 + t * 0.18), audioCtx.currentTime, 0.7);
+  delayNode.delayTime.setTargetAtTime(crushed ? 0.52 : (0.18 + t * 0.18), audioCtx.currentTime, 0.7);
+  feedbackGain.gain.setTargetAtTime(crushed ? 0.62 : (0.15 + t * 0.18), audioCtx.currentTime, 0.7);
+}
+
+function refillBag(){
+  orderBag = TRACKS.map((_, i) => i);
+
+  for(let i = orderBag.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [orderBag[i], orderBag[j]] = [orderBag[j], orderBag[i]];
+  }
+
+  if(orderBag.length > 1 && orderBag[0] === currentTrackIndex){
+    [orderBag[0], orderBag[1]] = [orderBag[1], orderBag[0]];
+  }
+}
+
+function nextTrack(){
+  if(orderBag.length === 0){
+    refillBag();
+  }
+  currentTrackIndex = orderBag.shift();
+  return TRACKS[currentTrackIndex];
+}
+
+function clearTimers(){
+  clearTimeout(revealTimer);
+  clearTimeout(nextTrackTimer);
+  revealTimer = null;
+  nextTrackTimer = null;
 }
 
 function stopNoise(){
-  if(!currentNoise) return;
-  try{currentNoise.source.stop();}catch(e){}
-  try{currentNoise.source.disconnect();}catch(e){}
-  try{currentNoise.filterA.disconnect();}catch(e){}
-  try{currentNoise.filterB.disconnect();}catch(e){}
-  try{currentNoise.gain.disconnect();}catch(e){}
-  currentNoise=null;
+  currentNoiseNodes.forEach(node => {
+    try { node.stop(); } catch(e){}
+    try { node.disconnect(); } catch(e){}
+  });
+  currentNoiseNodes = [];
+
+  if(crackleInterval){
+    clearInterval(crackleInterval);
+    crackleInterval = null;
+  }
 }
 
-function startNoise(){
-  stopNoise();
-  const buffer=audioCtx.createBuffer(1,audioCtx.sampleRate*2,audioCtx.sampleRate);
-  const data=buffer.getChannelData(0);
-  for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*0.28;
+function makeNoiseLayer(type = 'band'){
+  const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 2, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
 
-  const source=audioCtx.createBufferSource();
-  source.buffer=buffer;
-  source.loop=true;
+  for(let i = 0; i < data.length; i++){
+    data[i] = (Math.random() * 2 - 1) * 0.28;
+  }
 
-  const filterA=audioCtx.createBiquadFilter();
-  filterA.type='lowpass';
-  filterA.frequency.value=rand(500,1800);
+  const source = audioCtx.createBufferSource();
+  source.buffer = buffer;
+  source.loop = true;
 
-  const filterB=audioCtx.createBiquadFilter();
-  filterB.type='bandpass';
-  filterB.frequency.value=rand(250,1100);
-  filterB.Q.value=rand(0.2,0.8);
+  const filterA = audioCtx.createBiquadFilter();
+  const filterB = audioCtx.createBiquadFilter();
+  const gain = audioCtx.createGain();
 
-  const gain=audioCtx.createGain();
-  gain.gain.value=0;
+  if(type === 'low'){
+    filterA.type = 'lowpass';
+    filterA.frequency.value = rand(220, 1000);
+    filterB.type = 'bandpass';
+    filterB.frequency.value = rand(120, 600);
+    filterB.Q.value = rand(0.3, 0.8);
+  } else if(type === 'high'){
+    filterA.type = 'highpass';
+    filterA.frequency.value = rand(900, 2400);
+    filterB.type = 'bandpass';
+    filterB.frequency.value = rand(1800, 4200);
+    filterB.Q.value = rand(0.3, 1.0);
+  } else {
+    filterA.type = 'bandpass';
+    filterA.frequency.value = rand(300, 1800);
+    filterA.Q.value = rand(0.2, 1.2);
+    filterB.type = 'highpass';
+    filterB.frequency.value = rand(50, 180);
+  }
+
+  gain.gain.value = rand(0.012, 0.05);
 
   source.connect(filterA);
   filterA.connect(filterB);
@@ -169,100 +412,220 @@ function startNoise(){
   gain.connect(staticGain);
   source.start();
 
-  currentNoise={source,filterA,filterB,gain};
+  currentNoiseNodes.push(source, filterA, filterB, gain);
 }
 
-function clearTimers(){
-  clearTimeout(nextTrackTimer);
-  clearTimeout(revealTimer);
+function triggerCrackle(){
+  if(!audioCtx || !running) return;
+
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const filter = audioCtx.createBiquadFilter();
+  const gain = audioCtx.createGain();
+
+  osc.type = chance(0.5) ? 'square' : 'sawtooth';
+  osc.frequency.value = rand(80, 900);
+  filter.type = chance(0.5) ? 'bandpass' : 'lowpass';
+  filter.frequency.value = rand(300, 2500);
+  filter.Q.value = rand(0.4, 10);
+  gain.gain.value = 0.0001;
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(staticGain);
+
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(rand(0.02, 0.12), now + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + rand(0.05, 0.22));
+
+  osc.start(now);
+  osc.stop(now + 0.25);
+
+  currentNoiseNodes.push(osc, filter, gain);
+}
+
+function startStatic(){
+  stopNoise();
+
+  makeNoiseLayer('low');
+  makeNoiseLayer('band');
+  makeNoiseLayer('high');
+
+  const hum = audioCtx.createOscillator();
+  hum.type = 'sine';
+  hum.frequency.value = chance(0.5) ? 50 : 60;
+  const humGain = audioCtx.createGain();
+  humGain.gain.value = 0.01 + instability() * 0.01;
+  hum.connect(humGain);
+  humGain.connect(toneGain);
+  hum.start();
+
+  currentNoiseNodes.push(hum, humGain);
+
+  crackleInterval = setInterval(() => {
+    const p = 0.08 + instability() * 0.18;
+    if(chance(p)){
+      triggerCrackle();
+    }
+  }, 900);
+}
+
+function rareIncident(){
+  if(!running || !Number.isFinite(els.music.duration)) return;
+
+  const t = instability();
+  if(t < 0.35) return;
+
+  const remaining = Math.max(0, els.music.duration - els.music.currentTime);
+  if(remaining < 8) return;
+
+  if(chance(0.05 + t * 0.12)){
+    try{
+      els.music.currentTime = rand(0, Math.max(0, els.music.duration - 12));
+      setLog('loop pocket');
+    }catch(e){}
+  } else if(chance(0.05 + t * 0.18)){
+    distortion.curve = makeDistortionCurve(220 + t * 180);
+    lowpass.frequency.setTargetAtTime(rand(700, 3000), audioCtx.currentTime, 0.2);
+    feedbackGain.gain.setTargetAtTime(rand(0.25, 0.7), audioCtx.currentTime, 0.2);
+    setLog('signal strain');
+    setTimeout(() => {
+      if(running) updateProcessing();
+    }, rand(1500, 5000));
+  }
+}
+
+function gapMs(){
+  const t = instability();
+  if(chance(0.001 + t * 0.01)) return rand(60000, 180000);
+  if(chance(0.02 + t * 0.04)) return rand(10000, 60000);
+  return rand(2000, 10000);
 }
 
 async function playTrack(){
+  if(!running) return;
+
   clearTimers();
-  if(!started) return;
+  updateProcessing();
 
-  const track=pick(TRACKS);
-  currentTrackTitle=track.title;
-  els.status.textContent='Tuning';
-  els.log.textContent='';
+  const track = nextTrack();
+  currentTrackTitle = track.title;
 
-  startNoise();
-  fadeGain(staticGain,0.7,rand(3,8));
-  fadeGain(musicGain,0,0.01);
+  setStatus('Tuning');
+  setLog('');
 
-  els.music.src=track.src;
+  startStatic();
+  fadeGain(staticGain, 0.65, rand(2, 6));
+  fadeGain(toneGain, 1, rand(2, 6));
+  fadeGain(musicGain, 0, 0.01);
+
+  els.music.src = track.src;
   els.music.load();
 
   try{
     await els.music.play();
-  }catch(e){
-    started=false;
+  }catch(err){
+    console.error('Audio play failed:', err);
+    running = false;
     setLive(false);
-    els.status.textContent='Stopped';
-    els.log.textContent='Could not start audio.';
+    setStatus('Stopped');
+    setLog('Could not start audio.');
     stopNoise();
     return;
   }
 
-  fadeGain(musicGain,1,rand(5,14));
+  fadeGain(musicGain, 1, rand(5, 14));
 
-  revealTimer=setTimeout(()=>{
-    els.status.textContent=currentTrackTitle;
-    fadeGain(staticGain,0,rand(8,24));
-  },rand(4000,12000));
+  revealTimer = setTimeout(() => {
+    setStatus(currentTrackTitle);
+    fadeGain(staticGain, 0, rand(8, 24));
+    fadeGain(toneGain, 0, rand(8, 24));
+  }, rand(4000, 12000));
 
-  els.music.onended=()=>{
-    if(!started) return;
-    fadeGain(musicGain,0,rand(2,5));
-    fadeGain(staticGain,0.45,rand(2,5));
-    nextTrackTimer=setTimeout(()=>{
+  const incidentDelay = rand(18000, 45000);
+  setTimeout(() => {
+    if(running) rareIncident();
+  }, incidentDelay);
+
+  els.music.onended = () => {
+    if(!running) return;
+
+    fadeGain(musicGain, 0, rand(2, 5));
+    fadeGain(staticGain, 0.4, rand(2, 5));
+    fadeGain(toneGain, 0.5, rand(2, 5));
+
+    nextTrackTimer = setTimeout(() => {
       playTrack();
-    },rand(1000,8000));
+    }, gapMs());
   };
 }
 
 async function startRadio(){
-  if(started) return;
-  started=true;
+  if(running) return;
+
+  running = true;
+  if(sessionStartMs === 0){
+    sessionStartMs = Date.now();
+  }
+
   await initAudio();
   setLive(true);
-  els.status.textContent='Tuning';
-  els.log.textContent='';
+  setStatus('Tuning');
+  setLog('');
   await playTrack();
 }
 
 function stopRadio(){
-  started=false;
+  running = false;
   clearTimers();
-  try{els.music.pause();}catch(e){}
-  if(audioCtx&&audioCtx.state!=='closed'){
-    fadeGain(musicGain,0,0.4);
-    fadeGain(staticGain,0,0.4);
+
+  try{
+    els.music.pause();
+  }catch(e){}
+
+  if(audioCtx && audioCtx.state !== 'closed'){
+    fadeGain(musicGain, 0, 0.4);
+    fadeGain(staticGain, 0, 0.4);
+    fadeGain(toneGain, 0, 0.4);
   }
-  setTimeout(()=>stopNoise(),500);
+
+  setTimeout(() => {
+    stopNoise();
+  }, 500);
+
   setLive(false);
-  els.status.textContent='Stopped';
-  els.log.textContent='';
+  setStatus('Stopped');
+  setLog('');
 }
 
-els.startBtn.addEventListener('click',()=>{
-  startRadio();
+els.startBtn.addEventListener('click', async () => {
+  try{
+    await startRadio();
+  }catch(err){
+    console.error('startRadio failed:', err);
+    setLive(false);
+    running = false;
+    setStatus('Stopped');
+    setLog('Start failed.');
+  }
 });
 
-els.stopBtn.addEventListener('click',()=>{
+els.stopBtn.addEventListener('click', () => {
   stopRadio();
 });
 
-window.addEventListener('keydown',e=>{
-  if(e.key==='\' && started && Number.isFinite(els.music.duration)){
-    els.music.currentTime=Math.min((els.music.duration||0)-0.5,els.music.currentTime+15);
-    els.log.textContent='skip';
+window.addEventListener('keydown', e => {
+  if(e.key === '\\' && running && Number.isFinite(els.music.duration)){
+    try{
+      els.music.currentTime = Math.min((els.music.duration || 0) - 0.5, els.music.currentTime + 15);
+      setLog('skip');
+    }catch(err){}
   }
 });
 
 setLive(false);
-els.status.textContent='Stopped';
-els.log.textContent='';
+setStatus('Stopped');
+setLog('');
 </script>
 </body>
 </html>
