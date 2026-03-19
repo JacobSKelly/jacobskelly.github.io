@@ -763,7 +763,6 @@ function beginFineTune(){
   fineTuneDecayMs = rand(60_000, 300_000);
   fineTuneUntil = fineTuneStartAt + fineTuneDecayMs;
   fineTunePeak = rand(0.72, 0.94);
-
   els.fineTuneBtn.classList.add('active');
 
   if(audioCtx){
@@ -871,7 +870,7 @@ function stationPhaseLabel(station){
 function updateTelemetry(){
   const ctxState = audioCtx ? audioCtx.state : 'none';
   const station = currentStationState();
-  const stationTrack = station && station.currentTrack ? station.currentTrack.title : '—';
+  const stationTrack = station && station.phase === 'track' && station.currentTrack ? station.currentTrack.title : '—';
   const fine = getFineTuneAmount();
 
   const fxText = audioCtx
@@ -1371,9 +1370,13 @@ function initStation(channel){
     phaseStartedAt: 0,
     phaseEndsAt: 0,
     currentTrack: null,
+    preparedTrack: null,
+    preparedPreviewOffset: 15,
     playOffsetAtPhaseStart: 0,
     lastTrackSrc: null,
     lastAmbulanceAt: 0,
+    nextTrackStartsMidway: true,
+    trackEntryMode: 'mid',
     bags: {
       centrepieces: shuffle(meta.centrepieces),
       textures: shuffle(meta.textures),
@@ -1492,11 +1495,20 @@ function chooseRandomTrackStart(duration, station){
   return maxStart > minStart ? rand(minStart, maxStart) : minStart;
 }
 
-function enterTuning(station, at){
+function chooseRareShortenStart(duration){
+  if(!Number.isFinite(duration) || duration < 40) return 0;
+  return rand(duration * 0.04, duration * 0.22);
+}
+
+function enterTuning(station, at, preparedTrack = null){
   station.phase = 'tuning';
   station.phaseStartedAt = at;
   station.phaseEndsAt = at + tuningDurationFor(station);
   station.currentTrack = null;
+  station.preparedTrack = preparedTrack;
+  station.preparedPreviewOffset = preparedTrack && preparedTrack.forcedWindow
+    ? preparedTrack.windowStart
+    : rand(12, 90);
   station.playOffsetAtPhaseStart = 0;
   station.ambience = stationAmbience(station.mode, station);
 }
@@ -1506,12 +1518,15 @@ function enterDeadAir(station, at){
   station.phaseStartedAt = at;
   station.phaseEndsAt = at + deadAirDurationFor();
   station.currentTrack = null;
+  station.preparedTrack = null;
   station.playOffsetAtPhaseStart = 0;
   station.ambience = stationAmbience(station.mode, station);
 }
 
 function enterTrack(station, at){
-  const picked = chooseTrackForStation(station);
+  const picked = station.preparedTrack || chooseTrackForStation(station);
+  station.preparedTrack = null;
+
   if(!picked){
     enterTuning(station, at);
     return;
@@ -1520,15 +1535,35 @@ function enterTrack(station, at){
   station.currentTrack = picked;
   station.lastTrackSrc = picked.src;
 
-  const fallbackDuration = picked.forcedWindow ? (picked.windowEnd - picked.windowStart) : 300;
-  const knownDur = picked.durationHint || fallbackDuration;
-  const startOffset = picked.forcedWindow ? picked.windowStart : 0;
+  let entryMode = 'start';
+  if(picked.forcedWindow){
+    entryMode = 'window';
+  } else if(station.nextTrackStartsMidway){
+    entryMode = 'mid';
+  } else if(chance(0.06)){
+    entryMode = 'short';
+  }
+
+  station.trackEntryMode = entryMode;
+  station.nextTrackStartsMidway = false;
+
+  const fallbackDuration =
+    picked.forcedWindow ? (picked.windowEnd - picked.windowStart) :
+    entryMode === 'start' ? 300 :
+    entryMode === 'short' ? 230 :
+    220;
 
   station.phase = 'track';
   station.phaseStartedAt = at;
-  station.playOffsetAtPhaseStart = startOffset;
-  station.phaseEndsAt = at + (knownDur * 1000);
+  station.playOffsetAtPhaseStart = entryMode === 'window' ? picked.windowStart : 0;
+  station.phaseEndsAt = at + (fallbackDuration * 1000);
   station.ambience = stationAmbience(station.mode, station);
+}
+
+function retuneStationNow(station){
+  const picked = station.mode === 'dead-air' ? null : chooseTrackForStation(station);
+  station.nextTrackStartsMidway = true;
+  enterTuning(station, nowMs(), picked);
 }
 
 function bootStation(station){
@@ -1542,8 +1577,9 @@ function advanceStationToNow(station, t = nowMs()){
   }
 
   let safety = 0;
-  while(station.phaseEndsAt <= t && safety < 100){
+  while(station.phaseEndsAt <= t && safety < 120){
     const edge = station.phaseEndsAt;
+
     if(station.mode === 'dead-air'){
       if(station.phase === 'tuning'){
         enterDeadAir(station, edge);
@@ -1557,6 +1593,7 @@ function advanceStationToNow(station, t = nowMs()){
         enterTrack(station, edge);
       }
     }
+
     safety += 1;
   }
 
@@ -1585,19 +1622,29 @@ async function getTrackDurationCached(src){
 async function stabilizeStationDurations(station){
   if(station.phase !== 'track' || !station.currentTrack) return;
 
-  if(station.currentTrack.forcedWindow){
-    station.phaseEndsAt = station.phaseStartedAt + ((station.currentTrack.windowEnd - station.currentTrack.windowStart) * 1000);
+  const track = station.currentTrack;
+
+  if(track.forcedWindow){
+    station.playOffsetAtPhaseStart = track.windowStart;
+    station.phaseEndsAt = station.phaseStartedAt + ((track.windowEnd - track.windowStart) * 1000);
     return;
   }
 
-  if(station.currentTrack.durationHint) return;
-
-  const dur = await getTrackDurationCached(station.currentTrack.src);
+  const dur = track.fullDuration || await getTrackDurationCached(track.src);
   if(!dur) return;
 
-  const startOffset = chooseRandomTrackStart(dur, station);
+  track.fullDuration = dur;
+
+  let startOffset = 0;
+  if(station.trackEntryMode === 'mid'){
+    startOffset = chooseRandomTrackStart(dur, station);
+  } else if(station.trackEntryMode === 'short'){
+    startOffset = chooseRareShortenStart(dur);
+  } else {
+    startOffset = 0;
+  }
+
   station.playOffsetAtPhaseStart = startOffset;
-  station.currentTrack.durationHint = dur - startOffset;
   station.phaseEndsAt = station.phaseStartedAt + ((dur - startOffset) * 1000);
 }
 
@@ -1718,7 +1765,7 @@ async function playGhostSignal(track, offset, meta){
     await prepareTrackPlayback(track, offset);
     updateProcessing(true);
 
-    currentTrack = track;
+    currentTrack = null;
     currentMode = 'tuning';
     setStatusTuning();
 
@@ -1757,8 +1804,14 @@ async function renderSelectedStation(fromRetune = false){
     }
   } else {
     currentTrack = null;
-    try{ els.music.pause(); }catch(e){}
-    fadeGain(mainGain, 0.0001, 0.14);
+
+    if(station.phase === 'tuning' && station.preparedTrack){
+      await playGhostSignal(station.preparedTrack, station.preparedPreviewOffset, meta);
+    } else {
+      try{ els.music.pause(); }catch(e){}
+      fadeGain(mainGain, 0.0001, 0.14);
+    }
+
     setStatusTuning();
     scheduleSelectedStationRefresh(station.phaseEndsAt - nowMs() + 40);
     log(`Listening to ${meta.name} / ${station.phase}`);
@@ -1779,7 +1832,9 @@ async function tuneToChannel(channel){
   });
 
   const meta = CHANNELS[channel];
-  const station = advanceStationToNow(stationStates[channel]);
+  const station = stationStates[channel];
+
+  retuneStationNow(station);
 
   setLive(true);
   if(!sessionStart) sessionStart = nowMs();
@@ -1794,10 +1849,8 @@ async function tuneToChannel(channel){
 
   playTuningBurstFor(meta);
 
-  if(station.phase === 'track' && station.currentTrack){
-    await stabilizeStationDurations(station);
-    const offset = stationTrackOffsetNow(station);
-    await playGhostSignal(station.currentTrack, offset, meta);
+  if(station.preparedTrack){
+    await playGhostSignal(station.preparedTrack, station.preparedPreviewOffset, meta);
   }
 
   const lockDelay = meta.mode === 'all-clean'
@@ -1987,7 +2040,7 @@ setInterval(() => {
   if(heartbeatCounter % 10 === 0){
     const station = currentStationState();
     log(
-      `tick | ch ${currentChannel} ${CHANNELS[currentChannel].mode} | mode ${currentMode} | station ${station.phase} | main ${station.currentTrack ? station.currentTrack.title : '—'} | live ${running ? (muted ? 'muted' : (pausedByKey ? 'paused' : 'on')) : 'off'}`
+      `tick | ch ${currentChannel} ${CHANNELS[currentChannel].mode} | mode ${currentMode} | station ${station.phase} | main ${station.phase === 'track' && station.currentTrack ? station.currentTrack.title : '—'} | live ${running ? (muted ? 'muted' : (pausedByKey ? 'paused' : 'on')) : 'off'}`
     );
   }
 }, 250);
