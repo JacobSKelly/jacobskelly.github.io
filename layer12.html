@@ -11,7 +11,6 @@
     :root{
       --bg:#000;
       --fg:#fff;
-      --panel:#0b0b0b;
       --line:rgba(255,255,255,0.12);
       --shadow:0 24px 60px rgba(0,0,0,0.45);
     }
@@ -52,14 +51,6 @@
       font-size:clamp(1rem, 2.5vw, 1.15rem);
       line-height:1.2;
       font-weight:600;
-    }
-
-    .meta{
-      margin-top:18px;
-      color:rgba(255,255,255,0.72);
-      font-size:0.92rem;
-      line-height:1.4;
-      max-width:28ch;
     }
 
     a.back{
@@ -115,16 +106,10 @@
     }
 
     .page-wrap.cover,
-    .page-wrap.backcover{
-      cursor:pointer;
-    }
-
-    .page-wrap.left{
-      cursor:w-resize;
-    }
-
+    .page-wrap.backcover,
+    .page-wrap.left,
     .page-wrap.right{
-      cursor:e-resize;
+      cursor:pointer;
     }
 
     .page-wrap::after{
@@ -135,12 +120,11 @@
       box-shadow:inset 0 0 0 1px rgba(255,255,255,0.04);
     }
 
-    canvas{
+    .page-canvas{
       display:block;
       width:100%;
       height:100%;
       background:#fff;
-      image-rendering:auto;
     }
 
     .loading,
@@ -162,17 +146,6 @@
       text-align:center;
       pointer-events:none;
       white-space:nowrap;
-    }
-
-    .stats{
-      position:absolute;
-      top:18px;
-      right:22px;
-      text-align:right;
-      color:rgba(255,255,255,0.7);
-      font-size:0.82rem;
-      line-height:1.35;
-      pointer-events:none;
     }
 
     @media (max-width: 900px){
@@ -205,12 +178,6 @@
         width:calc(100% - 24px);
         bottom:10px;
       }
-
-      .stats{
-        top:10px;
-        right:12px;
-        font-size:0.74rem;
-      }
     }
   </style>
 </head>
@@ -220,14 +187,9 @@
     <a href="index.html" class="back">← Back</a>
     <h1>Ambuland Land 2025</h1>
     <p><strong>Jacob Kelly</strong></p>
-    <p>PDF publication.</p>
-    <div class="meta">
-      A deterministic ten-year deterioration. The same pixels darken for everyone at the same hour.
-    </div>
   </div>
 
   <div class="viewer-shell">
-    <div class="stats" id="stats"></div>
     <div class="book-stage" id="bookStage">
       <div class="loading">Loading PDF…</div>
     </div>
@@ -242,25 +204,19 @@
 
     const PDF_URL = "https://phfinal.s3.eu-west-2.amazonaws.com/AmbulanceWeb.pdf";
 
-    // ===== Project constants =====
-    const BOOK_TITLE = "Ambuland Land 2025";
     const TOTAL_LOGICAL_PAGES = 16;
 
-    // Exact page raster size you want to base the decay on
     const PAGE_PIXEL_WIDTH = 1746;
     const PAGE_PIXEL_HEIGHT = 2478;
-    const PIXELS_PER_PAGE = PAGE_PIXEL_WIDTH * PAGE_PIXEL_HEIGHT; // 4,326,588
-    const TOTAL_PIXELS = TOTAL_LOGICAL_PAGES * PIXELS_PER_PAGE;   // 69,225,408
+    const PIXELS_PER_PAGE = PAGE_PIXEL_WIDTH * PAGE_PIXEL_HEIGHT;
+    const TOTAL_PIXELS = TOTAL_LOGICAL_PAGES * PIXELS_PER_PAGE;
 
-    // Ten-year artwork timeline
-    const START_DATE = new Date("2025-01-01T00:00:00Z");
-    const END_DATE   = new Date("2035-01-01T00:00:00Z");
+    const START_DATE = new Date("2026-03-19T00:00:00Z");
+    const END_DATE   = new Date("2036-03-19T00:00:00Z");
 
-    // Fixed seed so everyone sees the same loss
     const SEED = 2097152;
 
-    // Secret demo mode
-    const DEMO_DURATION_MS = 60000; // one minute
+    const DEMO_DURATION_MS = 60000;
     let demoMode = false;
     let demoStartTime = 0;
     let demoRAF = null;
@@ -268,13 +224,12 @@
 
     const stage = document.getElementById("bookStage");
     const hint = document.getElementById("hint");
-    const stats = document.getElementById("stats");
 
     let pdfDoc = null;
+    const pageBaseCanvasCache = new Map();
 
-    // modes: cover | spread | backcover
     let mode = "cover";
-    let currentLeftPage = 2; // logical pages 2+3 are first spread
+    let currentLeftPage = 2;
 
     function setHint(text){
       hint.textContent = text || "";
@@ -321,18 +276,6 @@
       return activePixelsToBlackNow() / TOTAL_PIXELS;
     }
 
-    function updateStats(){
-      const blacked = artworkPixelsToBlackNow();
-      const pct = (100 * blacked / TOTAL_PIXELS).toFixed(4);
-      stats.innerHTML = `
-        ${BOOK_TITLE}<br>
-        ${blacked.toLocaleString()} / ${TOTAL_PIXELS.toLocaleString()} darkened<br>
-        ${pct}% complete
-      `;
-    }
-
-    // PDF is backwards:
-    // logical 1 -> pdf 16, logical 2 -> pdf 15 ... logical 16 -> pdf 1
     function logicalToPdfPage(logicalPage){
       return (TOTAL_LOGICAL_PAGES - logicalPage) + 1;
     }
@@ -380,40 +323,47 @@
       return x / 4294967296;
     }
 
-    async function renderLogicalPage(logicalPage, visibleCanvas){
+    async function getBasePageCanvas(logicalPage){
+      if (pageBaseCanvasCache.has(logicalPage)) {
+        return pageBaseCanvasCache.get(logicalPage);
+      }
+
       const pdfPageNumber = logicalToPdfPage(logicalPage);
       const page = await pdfDoc.getPage(pdfPageNumber);
 
-      // Render to temp canvas from the PDF, then resample to exact working grid
       const viewport = page.getViewport({ scale: 1 });
       const tempScale = PAGE_PIXEL_WIDTH / viewport.width;
       const tempViewport = page.getViewport({ scale: tempScale });
 
-      const tempCanvas = document.createElement("canvas");
-      tempCanvas.width = Math.round(tempViewport.width);
-      tempCanvas.height = Math.round(tempViewport.height);
+      const renderedCanvas = document.createElement("canvas");
+      renderedCanvas.width = PAGE_PIXEL_WIDTH;
+      renderedCanvas.height = PAGE_PIXEL_HEIGHT;
 
-      const tempCtx = tempCanvas.getContext("2d", { willReadFrequently: true });
+      const renderCtx = renderedCanvas.getContext("2d", { willReadFrequently: true });
 
       await page.render({
-        canvasContext: tempCtx,
+        canvasContext: renderCtx,
         viewport: tempViewport
       }).promise;
 
-      visibleCanvas.width = PAGE_PIXEL_WIDTH;
-      visibleCanvas.height = PAGE_PIXEL_HEIGHT;
+      pageBaseCanvasCache.set(logicalPage, renderedCanvas);
+      return renderedCanvas;
+    }
 
-      const ctx = visibleCanvas.getContext("2d", { willReadFrequently: true });
-      ctx.drawImage(tempCanvas, 0, 0, PAGE_PIXEL_WIDTH, PAGE_PIXEL_HEIGHT);
+    function paintDecayOverlay(targetCtx, logicalPage, threshold){
+      if (threshold <= 0) return;
+      if (threshold >= 1) {
+        targetCtx.fillStyle = "#000";
+        targetCtx.fillRect(0, 0, PAGE_PIXEL_WIDTH, PAGE_PIXEL_HEIGHT);
+        return;
+      }
 
-      const img = ctx.getImageData(0, 0, PAGE_PIXEL_WIDTH, PAGE_PIXEL_HEIGHT);
-      const data = img.data;
-      const threshold = activeThresholdNow();
+      const overlay = targetCtx.createImageData(PAGE_PIXEL_WIDTH, PAGE_PIXEL_HEIGHT);
+      const data = overlay.data;
       const pageOffset = (logicalPage - 1) * PIXELS_PER_PAGE;
 
       for (let y = 0; y < PAGE_PIXEL_HEIGHT; y++) {
         const rowBase = y * PAGE_PIXEL_WIDTH;
-
         for (let x = 0; x < PAGE_PIXEL_WIDTH; x++) {
           const pagePixelIndex = rowBase + x;
           const globalIndex = pageOffset + pagePixelIndex;
@@ -429,7 +379,20 @@
         }
       }
 
-      ctx.putImageData(img, 0, 0);
+      targetCtx.putImageData(overlay, 0, 0);
+    }
+
+    async function renderLogicalPageIntoCanvas(logicalPage, visibleCanvas){
+      const baseCanvas = await getBasePageCanvas(logicalPage);
+
+      visibleCanvas.width = PAGE_PIXEL_WIDTH;
+      visibleCanvas.height = PAGE_PIXEL_HEIGHT;
+
+      const ctx = visibleCanvas.getContext("2d", { willReadFrequently: true });
+      ctx.clearRect(0, 0, PAGE_PIXEL_WIDTH, PAGE_PIXEL_HEIGHT);
+      ctx.drawImage(baseCanvas, 0, 0);
+
+      paintDecayOverlay(ctx, logicalPage, activeThresholdNow());
     }
 
     async function makePageWrap(logicalPage, className, displayW, displayH){
@@ -439,10 +402,27 @@
       wrap.style.height = `${Math.round(displayH)}px`;
 
       const canvas = document.createElement("canvas");
+      canvas.className = "page-canvas";
       wrap.appendChild(canvas);
 
-      await renderLogicalPage(logicalPage, canvas);
+      await renderLogicalPageIntoCanvas(logicalPage, canvas);
+
+      wrap.dataset.logicalPage = logicalPage;
+      wrap._canvas = canvas;
       return wrap;
+    }
+
+    async function refreshVisibleCanvases(){
+      const wraps = stage.querySelectorAll(".page-wrap");
+      const tasks = [];
+
+      wraps.forEach((wrap) => {
+        if (!wrap._canvas) return;
+        const logicalPage = Number(wrap.dataset.logicalPage);
+        tasks.push(renderLogicalPageIntoCanvas(logicalPage, wrap._canvas));
+      });
+
+      await Promise.all(tasks);
     }
 
     async function renderCover(){
@@ -453,7 +433,7 @@
       const size = getPageDisplaySize(true);
       const pageWrap = await makePageWrap(1, "cover", size.w, size.h);
 
-      pageWrap.addEventListener("click", () => {
+      pageWrap.addEventListener("dblclick", () => {
         mode = "spread";
         currentLeftPage = 2;
         renderBook();
@@ -461,7 +441,7 @@
 
       view.appendChild(pageWrap);
       stage.appendChild(view);
-      setHint("Click the cover to open");
+      setHint("Double click to open");
     }
 
     async function renderBackCover(){
@@ -472,7 +452,7 @@
       const size = getPageDisplaySize(true);
       const pageWrap = await makePageWrap(16, "backcover", size.w, size.h);
 
-      pageWrap.addEventListener("click", () => {
+      pageWrap.addEventListener("dblclick", () => {
         mode = "spread";
         currentLeftPage = 14;
         renderBook();
@@ -480,7 +460,7 @@
 
       view.appendChild(pageWrap);
       stage.appendChild(view);
-      setHint("Click to return inside");
+      setHint("Double click to return inside");
     }
 
     async function renderSpread(){
@@ -491,10 +471,9 @@
       const size = getPageDisplaySize(false);
 
       const leftWrap = await makePageWrap(currentLeftPage, "left", size.w, size.h);
-      const rightPage = currentLeftPage + 1;
-      const rightWrap = await makePageWrap(rightPage, "right", size.w, size.h);
+      const rightWrap = await makePageWrap(currentLeftPage + 1, "right", size.w, size.h);
 
-      leftWrap.addEventListener("click", () => {
+      leftWrap.addEventListener("dblclick", () => {
         if (currentLeftPage <= 2) {
           mode = "cover";
         } else {
@@ -503,7 +482,7 @@
         renderBook();
       });
 
-      rightWrap.addEventListener("click", () => {
+      rightWrap.addEventListener("dblclick", () => {
         if (currentLeftPage >= 14) {
           mode = "backcover";
         } else {
@@ -517,11 +496,11 @@
       stage.appendChild(view);
 
       if (currentLeftPage <= 2) {
-        setHint("Click left page for cover • Click right page to go forward");
+        setHint("Double click left page for cover • Double click right page to go forward");
       } else if (currentLeftPage >= 14) {
-        setHint("Click left page to go back • Click right page for back cover");
+        setHint("Double click left page to go back • Double click right page for back cover");
       } else {
-        setHint("Click left page to go back • Click right page to go forward");
+        setHint("Double click left page to go back • Double click right page to go forward");
       }
     }
 
@@ -529,7 +508,6 @@
       if (!pdfDoc) return;
 
       stage.innerHTML = '<div class="loading">Rendering…</div>';
-      updateStats();
 
       try {
         if (mode === "cover") {
@@ -579,18 +557,18 @@
         cancelAnimationFrame(demoRAF);
         demoRAF = null;
       }
-      renderBook();
+      refreshVisibleCanvases();
     }
 
     function tickDemo(){
       if (!demoMode) return;
 
-      renderBook().finally(() => {
+      refreshVisibleCanvases().finally(() => {
         const elapsed = performance.now() - demoStartTime;
-        if (elapsed >= DEMO_DURATION_MS) {
+        if (!demoMode || elapsed >= DEMO_DURATION_MS) {
           demoMode = false;
           demoRAF = null;
-          renderBook();
+          refreshVisibleCanvases();
           return;
         }
         demoRAF = requestAnimationFrame(tickDemo);
