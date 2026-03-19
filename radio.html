@@ -439,6 +439,7 @@
         <div id="telemetryLeft">ENG: offline
 CH: 1
 MODE: idle
+AUDIO: standby
 ELAPSED: 0:00
 CHAN ELAPSED: 0:00</div>
         <div id="telemetryRight">MAIN: —
@@ -632,6 +633,7 @@ let ambientFeedback = null;
 let ambientWet = null;
 
 let running = false;
+let muted = false;
 let currentChannel = 1;
 let currentTrack = null;
 let currentTexture = null;
@@ -744,9 +746,42 @@ function ambienceBias(){
   return clamp(0.28 + chDrift * 0.18 + tide * 0.2 + t * 0.1, 0, 1);
 }
 
+function syncLiveState(){
+  els.dot.classList.toggle('on', running && !muted);
+
+  if(!running){
+    els.liveText.textContent = 'standby';
+  } else if(muted){
+    els.liveText.textContent = 'muted';
+  } else {
+    els.liveText.textContent = 'live';
+  }
+}
+
+function setMuted(nextMuted, immediate = false){
+  muted = !!nextMuted;
+
+  if(audioCtx && masterGain){
+    const now = audioCtx.currentTime;
+    const target = muted ? 0.0001 : 0.95;
+
+    masterGain.gain.cancelScheduledValues(now);
+
+    if(immediate){
+      masterGain.gain.setValueAtTime(target, now);
+    } else {
+      masterGain.gain.setValueAtTime(masterGain.gain.value, now);
+      masterGain.gain.linearRampToValueAtTime(target, now + (muted ? 0.08 : 0.25));
+    }
+  }
+
+  syncLiveState();
+  updateTelemetry();
+}
+
 function setLive(on){
-  els.dot.classList.toggle('on', on);
-  els.liveText.textContent = on ? 'live' : 'standby';
+  running = !!on;
+  syncLiveState();
 }
 
 function createDigit(){
@@ -796,6 +831,7 @@ function updateTelemetry(){
 `ENG: ${ctxState}
 CH: ${currentChannel}
 MODE: ${currentMode}
+AUDIO: ${running ? (muted ? 'muted' : 'live') : 'standby'}
 ELAPSED: ${formatTime(elapsedSec())}
 CHAN ELAPSED: ${formatTime(channelElapsedSec())}`;
 
@@ -848,6 +884,43 @@ function allTracksForChannel(channel){
 function findTrackBySrc(channel, src){
   if(!src) return null;
   return allTracksForChannel(channel).find(track => track.src === src) || null;
+}
+
+function getJoinerTrack(){
+  const station = activeStation();
+  return station.textures.find(track =>
+    track.title.trim().toLowerCase() === 'joiner' ||
+    track.src.toLowerCase().includes('/joiner.mp3')
+  ) || null;
+}
+
+function pickGapTexture(){
+  const station = activeStation();
+
+  if(station.mode === 'all-clean' || station.mode === 'dead-air') return null;
+  if(station.textures.length === 0) return null;
+  if(currentTrackIsFXProtected()) return null;
+
+  const joiner = getJoinerTrack();
+
+  if(joiner && chance(0.58)){
+    return {
+      track: joiner,
+      joinerMode: true
+    };
+  }
+
+  if(joiner && chance(0.28)){
+    return {
+      track: joiner,
+      joinerMode: false
+    };
+  }
+
+  return {
+    track: nextTexture(),
+    joinerMode: false
+  };
 }
 
 function saveCurrentChannelState(){
@@ -1366,24 +1439,47 @@ function chooseTrackForChannel(){
   return null;
 }
 
-async function playTextureSnippet(style = 'overlay'){
+async function playTextureSnippet(style = 'overlay', options = {}){
   const station = activeStation();
   if(station.mode === 'all-clean' || station.mode === 'dead-air') return;
   if(station.textures.length === 0) return;
   if(currentTrackIsFXProtected()) return;
 
-  const track = nextTexture();
+  const track = options.track || nextTexture();
+  const joinerMode = !!options.joinerMode;
+
   if(!track) return;
 
   currentTexture = track;
   updateTelemetry();
 
   const ambient = ambienceBias();
-  const duration = style === 'gap' ? rand(10, 24) : rand(7, 18);
-  const playRate = style === 'gap' ? rand(0.42, 0.78) : rand(0.62, 1.02);
-  const targetGain = style === 'gap'
-    ? rand(0.2, 0.38) + ambient * 0.05
-    : rand(0.08, 0.22) + ambient * 0.03;
+
+  const playRate = joinerMode
+    ? rand(0.10, 1.0)
+    : style === 'gap'
+      ? rand(0.42, 0.78)
+      : rand(0.62, 1.02);
+
+  const duration = joinerMode
+    ? rand(12, 42)
+    : style === 'gap'
+      ? rand(10, 24)
+      : rand(7, 18);
+
+  const targetGain = joinerMode
+    ? rand(0.16, 0.42) + ambient * 0.05
+    : style === 'gap'
+      ? rand(0.2, 0.38) + ambient * 0.05
+      : rand(0.08, 0.22) + ambient * 0.03;
+
+  const fadeInSec = joinerMode
+    ? rand(0, duration * 0.4)
+    : rand(1.5, 4);
+
+  const fadeOutSec = joinerMode
+    ? rand(0, duration * 0.4)
+    : rand(1.5, 4);
 
   return new Promise((resolve) => {
     const audio = els.texture;
@@ -1408,25 +1504,31 @@ async function playTextureSnippet(style = 'overlay'){
 
     const onMeta = async () => {
       try{
-        if(Number.isFinite(audio.duration) && audio.duration > duration + 1){
-          audio.currentTime = rand(0, Math.max(0, audio.duration - duration - 1));
+        if(Number.isFinite(audio.duration) && audio.duration > 1){
+          const sourceWindow = duration * playRate;
+          const maxStart = Math.max(0, audio.duration - sourceWindow - 0.5);
+          audio.currentTime = maxStart > 0 ? rand(0, maxStart) : 0;
         }
 
         audio.playbackRate = playRate;
         await audio.play();
 
-        fadeGain(textureGain, targetGain, rand(1.5, 4));
+        fadeGain(textureGain, targetGain, fadeInSec);
 
         overlayTimers.push(setTimeout(() => {
-          fadeGain(textureGain, 0, rand(1.5, 4));
-        }, Math.max(2000, (duration - rand(1.2, 3.5)) * 1000)));
+          fadeGain(textureGain, 0, fadeOutSec);
+        }, Math.max(150, (duration - fadeOutSec) * 1000)));
 
         overlayTimers.push(setTimeout(() => {
           try{ audio.pause(); }catch(e){}
           finish();
         }, duration * 1000));
 
-        log(`Texture ${style}: ${track.title}`);
+        log(
+          joinerMode
+            ? `Gap Joiner: ${track.title} @ ${playRate.toFixed(2)}x`
+            : `Texture ${style}: ${track.title}`
+        );
       } catch(err){
         fail(err.message || err);
       } finally {
@@ -1680,6 +1782,7 @@ async function startTrack(track){
 
   if(station.mode === 'dead-air'){
     running = true;
+    setMuted(false, true);
     setLive(true);
     currentMode = 'dead air';
     els.status.textContent = '...';
@@ -1794,9 +1897,10 @@ async function startTrack(track){
   }
 
   running = true;
+  setMuted(false, true);
   setLive(true);
 
-  const stationFade = station.mode === 'all-clean' ? rand(1.8, 4) : rand(5, 14);
+  const stationFade = rand(8, 30);
   fadeGain(mainGain, 1, stationFade);
 
   overlayTimers.push(setTimeout(() => {
@@ -1842,7 +1946,10 @@ function beginGap(){
   }
 
   if(station.mode === 'main' || station.mode === 'textures-only'){
-    playTextureSnippet('gap');
+    const gapPick = pickGapTexture();
+    if(gapPick){
+      playTextureSnippet('gap', gapPick);
+    }
   }
 
   if(station.mode !== 'all-clean' && chance(0.35 + ambienceBias() * 0.3)){
@@ -1888,6 +1995,7 @@ function stopPlayback(keepMemory = false){
   }
 
   stopAllFX();
+  muted = false;
   setLive(false);
   els.status.textContent = 'Stopped';
   currentTrack = null;
@@ -1917,14 +2025,30 @@ els.music.addEventListener('error', () => {
 });
 
 els.startBtn.addEventListener('click', async () => {
-  if(running) return;
+  await ensureAudio();
+
+  if(running){
+    if(muted){
+      setMuted(false);
+      log('Unmuted');
+    }
+    return;
+  }
+
   if(!sessionStart) sessionStart = Date.now();
   channelStart = Date.now();
+  setMuted(false, true);
   await startTrack();
 });
 
-els.stopBtn.addEventListener('click', () => {
-  stopPlayback();
+els.stopBtn.addEventListener('click', async () => {
+  await ensureAudio();
+
+  if(!running) return;
+  if(muted) return;
+
+  setMuted(true);
+  log('Muted');
 });
 
 els.clearBtn.addEventListener('click', () => {
@@ -1977,12 +2101,12 @@ setInterval(() => {
   heartbeatCounter += 1;
   const station = activeStation();
   log(
-    `tick | ch ${currentChannel} ${station.mode} | mode ${currentMode} | main ${currentTrack ? currentTrack.title : '—'} | tex ${currentTexture ? currentTexture.title : '—'} | inst ${instability().toFixed(2)} | amb ${ambienceBias().toFixed(2)}`
+    `tick | ch ${currentChannel} ${station.mode} | mode ${currentMode} | audio ${running ? (muted ? 'muted' : 'live') : 'standby'} | main ${currentTrack ? currentTrack.title : '—'} | tex ${currentTexture ? currentTexture.title : '—'} | inst ${instability().toFixed(2)} | amb ${ambienceBias().toFixed(2)}`
   );
 }, 1000);
 
 setChannel(1);
-setLive(false);
+syncLiveState();
 els.status.textContent = 'Stopped';
 updateTelemetry();
 log('radio debug ready');
