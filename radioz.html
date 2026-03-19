@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>radio debug</title>
+  <style>
+    :root{
+      --bg:#000;
+      --fg:#fff;
+      --muted:rgba(255,255,255,.62);
+      --line:rgba(255,255,255,.14);
+      --green:#86ff8a;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--fg);
+      font-family:Arial,Helvetica,sans-serif;
+    }
+
+    .wrap{
+      min-height:100%;
+      display:grid;
+      place-items:center;
+      padding:32px;
+    }
+
+    .radio{
+      width:min(980px,100%);
+      border:1px solid var(--line);
+      padding:22px;
+      display:grid;
+      gap:18px;
+      background:#000;
+    }
+
+    .top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+    }
+
+    .title{
+      font-size:clamp(28px,6vw,56px);
+      text-transform:lowercase;
+      line-height:.95;
+    }
+
+    .rightCluster{
+      display:grid;
+      gap:10px;
+      justify-items:end;
+    }
+
+    .live{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:11px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.15em;
+    }
+
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:#320000;
+      transition:.2s;
+    }
+
+    .dot.on{
+      background:#ff2a2a;
+      box-shadow:0 0 12px rgba(255,0,0,.7);
+    }
+
+    .clock{
+      font-family:monospace;
+      font-size:30px;
+      letter-spacing:.12em;
+      color:var(--green);
+      text-shadow:
+        0 0 8px rgba(134,255,138,.35),
+        0 0 18px rgba(134,255,138,.18);
+    }
+
+    .channels{
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:8px;
+    }
+
+    .channels button{
+      min-width:0;
+    }
+
+    .channels button.active{
+      border-color:var(--green);
+      color:var(--green);
+    }
+
+    .screen{
+      border:1px solid var(--line);
+      padding:16px;
+      display:grid;
+      gap:14px;
+      min-height:180px;
+      align-content:start;
+    }
+
+    .label{
+      font-size:11px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      margin-bottom:6px;
+    }
+
+    .value{
+      font-size:clamp(20px,3vw,30px);
+      word-break:break-word;
+      line-height:1.2;
+    }
+
+    .telemetry{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px 20px;
+      font-family:monospace;
+      font-size:12px;
+      color:var(--muted);
+      border-top:1px solid var(--line);
+      padding-top:12px;
+    }
+
+    .telemetry div{
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    button{
+      background:transparent;
+      color:var(--fg);
+      border:1px solid var(--line);
+      padding:10px 14px;
+      cursor:pointer;
+      font-size:14px;
+    }
+
+    button:hover{
+      border-color:#fff;
+    }
+
+    .log{
+      border-top:1px solid var(--line);
+      padding-top:12px;
+      font-size:12px;
+      color:var(--muted);
+      min-height:44px;
+      white-space:pre-wrap;
+      line-height:1.45;
+    }
+
+    @media(max-width:720px){
+      .top{
+        display:grid;
+        grid-template-columns:1fr;
+      }
+
+      .rightCluster{
+        justify-items:start;
+      }
+
+      .channels{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+
+      .clock{
+        font-size:24px;
+      }
+
+      .telemetry{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="radio">
+    <div class="top">
+      <div class="title">radio</div>
+      <div class="rightCluster">
+        <div class="clock" id="clock">00:00</div>
+        <div class="live">
+          <div class="dot" id="dot"></div>
+          <div id="liveText">standby</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="channels">
+      <button class="active" id="ch1Btn" type="button">Channel 1</button>
+      <button id="ch2Btn" type="button">Channel 2</button>
+      <button id="ch3Btn" type="button">Channel 3</button>
+      <button id="ch4Btn" type="button">Channel 4</button>
+      <button id="ch5Btn" type="button">Channel 5</button>
+    </div>
+
+    <div class="screen">
+      <div>
+        <div class="label">State</div>
+        <div class="value" id="status">Stopped</div>
+      </div>
+
+      <div class="telemetry">
+        <div id="telemetryLeft">ENG: offline
+CH: 1
+MODE: idle</div>
+        <div id="telemetryRight">TRACK: —
+FX: —
+URL: —</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="startBtn" type="button">Start</button>
+      <button id="stopBtn" type="button">Stop</button>
+      <button id="clearBtn" type="button">Clear Log</button>
+    </div>
+
+    <div class="log" id="log"></div>
+  </div>
+</div>
+
+<audio id="music" crossorigin="anonymous" preload="auto"></audio>
+<audio id="texture" crossorigin="anonymous" preload="auto"></audio>
+
+<script>
+/*
+  CHANNEL SETUP
+  ------------
+  Channel 1 is active.
+  Channels 2–5 are placeholders for future stations.
+
+  To wire future stations:
+  - set enabled: true
+  - put your track objects inside centrepieces and textures
+*/
+const CHANNELS = {
+  1: {
+    name: 'Channel 1',
+    enabled: true,
+
+    // Main centrepiece broadcasts
+    centrepieces: [
+      { title:'Banhus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3' },
+      { title:'Redhouse', src:'https://peachradio.s3.eu-west-2.amazonaws.com/redhouse.mp3' },
+      { title:'Slimedemo', src:'https://peachradio.s3.eu-west-2.amazonaws.com/slimedemo.mp3' },
+      { title:'Funeral March', src:'https://peachradio.s3.eu-west-2.amazonaws.com/funeral+march.mp3' },
+      { title:'Bigblackpearl', src:'https://peachradio.s3.eu-west-2.amazonaws.com/bigblackpearl.mp3' },
+      { title:'Hypna', src:'https://peachradio.s3.eu-west-2.amazonaws.com/hypna.mp3' },
+      { title:'Xenopus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/xenopus.mp3' },
+      { title:'Ambulance', src:'https://peachradio.s3.eu-west-2.amazonaws.com/ambulance.mp3' },
+      { title:'Samantha', src:'https://peachradio.s3.eu-west-2.amazonaws.com/samantha.mp3' },
+      { title:'Agalma', src:'https://peachradio.s3.eu-west-2.amazonaws.com/agalma.mp3' }
+    ],
+
+    // Used more freely in gaps, overlays, corruption, textures
+    textures: [
+      { title:'Joiner', src:'https://peachradio.s3.eu-west-2.amazonaws.com/joiner.mp3' },
+      { title:'Unicorn', src:'https://peachradio.s3.eu-west-2.amazonaws.com/unicorn.mp3' },
+      { title:'Fuckoffalypse', src:'https://peachradio.s3.eu-west-2.amazonaws.com/fuckoffalypse.mp3' },
+      { title:'Tabrettabret', src:'https://peachradio.s3.eu-west-2.amazonaws.com/tabrettabret.mp3' },
+      { title:'Kibo', src:'https://peachradio.s3.eu-west-2.amazonaws.com/kibo.mp3' },
+      { title:'Oumuamua', src:'https://peachradio.s3.eu-west-2.amazonaws.com/oumuamua.mp3' },
+      { title:'Rusholme', src:'https://peachradio.s3.eu-west-2.amazonaws.com/rusholme.mp3' },
+      { title:'Kilimanjaro', src:'https://peachradio.s3.eu-west-2.amazonaws.com/kilimanjaro.mp3' },
+      { title:'Untitled', src:'https://peachradio.s3.eu-west-2.amazonaws.com/untitled.mp3' }
+    ]
+  },
+
+  2: { name:'Channel 2', enabled:false, centrepieces:[], textures:[] },
+  3: { name:'Channel 3', enabled:false, centrepieces:[], textures:[] },
+  4: { name:'Channel 4', enabled:false, centrepieces:[], textures:[] },
+  5: { name:'Channel 5', enabled:false, centrepieces:[], textures:[] }
+};
+
+const els = {
+  music: document.getElementById('music'),
+  texture: document.getElementById('texture'),
+  dot: document.getElementById('dot'),
+  liveText: document.getElementById('liveText'),
+  status: document.getElementById('status'),
+  log: document.getElementById('log'),
+  clock: document.getElementById('clock'),
+  telemetryLeft: document.getElementById('telemetryLeft'),
+  telemetryRight: document.getElementById('telemetryRight'),
+  startBtn: document.getElementById('startBtn'),
+  stopBtn: document.getElementById('stopBtn'),
+  clearBtn: document.getElementById('clearBtn'),
+  channelButtons: [1,2,3,4,5].map(i => document.getElementById(`ch${i}Btn`))
+};
+
+let audioCtx = null;
+let mainSource = null;
+let textureSource = null;
+
+let masterGain = null;
+let mainGain = null;
+let textureGain = null;
+let noiseGain = null;
+let humGain = null;
+
+let mainDrive = null;
+let mainFilter = null;
+let textureFilter = null;
+let textureDrive = null;
+
+let mainSend = null;
+let mainDelay = null;
+let mainFeedback = null;
+let mainWet = null;
+
+let running = false;
+let currentChannel = 1;
+let currentTrack = null;
+let currentMode = 'idle';
+let sessionStart = 0;
+
+let centrepieceBag = [];
+let textureBag = [];
+
+let crackleTimer = null;
+let gapTimer = null;
+let overlayTimers = [];
+let activeNodeStops = [];
+
+function log(message){
+  const stamp = new Date().toLocaleTimeString();
+  els.log.textContent += `[${stamp}] ${message}\n`;
+  const lines = els.log.textContent.trimEnd().split('\n');
+  if(lines.length > 18){
+    els.log.textContent = lines.slice(lines.length - 18).join('\n') + '\n';
+  }
+  els.log.scrollTop = els.log.scrollHeight;
+  console.log(message);
+}
+
+function rand(min, max){
+  return Math.random() * (max - min) + min;
+}
+
+function chance(n){
+  return Math.random() < n;
+}
+
+function clamp(v, min, max){
+  return Math.max(min, Math.min(max, v));
+}
+
+function formatTime(sec){
+  sec = Math.max(0, Math.floor(sec));
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  if(h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+
+function elapsedSec(){
+  return running ? (Date.now() - sessionStart) / 1000 : 0;
+}
+
+function instability(){
+  return clamp(elapsedSec() / (6 * 60 * 60), 0, 1.35);
+}
+
+function activeStation(){
+  return CHANNELS[currentChannel];
+}
+
+function setLive(on){
+  els.dot.classList.toggle('on', on);
+  els.liveText.textContent = on ? 'live' : 'standby';
+}
+
+function updateClock(){
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  els.clock.textContent = `${hh}:${mm}`;
+}
+
+function updateTelemetry(){
+  const ctxState = audioCtx ? audioCtx.state : 'none';
+  const station = activeStation();
+  const trackName = currentTrack ? currentTrack.title : '—';
+  const url = currentTrack ? currentTrack.src : '—';
+  const fx = [
+    currentMode,
+    `inst ${instability().toFixed(2)}`,
+    `main ${mainGain ? mainGain.gain.value.toFixed(2) : '0.00'}`,
+    `tex ${textureGain ? textureGain.gain.value.toFixed(2) : '0.00'}`,
+    `noise ${noiseGain ? noiseGain.gain.value.toFixed(2) : '0.00'}`
+  ].join(' / ');
+
+  els.telemetryLeft.textContent =
+`ENG: ${ctxState}
+CH: ${currentChannel} (${station.name})
+MODE: ${currentMode}
+ELAPSED: ${formatTime(elapsedSec())}`;
+
+  els.telemetryRight.textContent =
+`TRACK: ${trackName}
+FX: ${fx}
+URL: ${url}`;
+}
+
+function refillBags(){
+  const station = activeStation();
+  centrepieceBag = station.centrepieces.slice();
+  textureBag = station.textures.slice();
+
+  for(let i = centrepieceBag.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [centrepieceBag[i], centrepieceBag[j]] = [centrepieceBag[j], centrepieceBag[i]];
+  }
+
+  for(let i = textureBag.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [textureBag[i], textureBag[j]] = [textureBag[j], textureBag[i]];
+  }
+}
+
+function nextCentrepiece(){
+  if(centrepieceBag.length === 0) refillBags();
+  return centrepieceBag.shift() || null;
+}
+
+function nextTexture(){
+  if(textureBag.length === 0) refillBags();
+  return textureBag.shift() || null;
+}
+
+function setChannel(channel){
+  currentChannel = channel;
+  els.channelButtons.forEach((btn, idx) => {
+    btn.classList.toggle('active', idx + 1 === channel);
+  });
+  refillBags();
+  currentTrack = null;
+  updateTelemetry();
+  log(`Switched to ${CHANNELS[channel].name}`);
+}
+
+function makeDistortionCurve(amount = 0){
+  const samples = 44100;
+  const curve = new Float32Array(samples);
+  const k = Math.max(0, amount);
+
+  for(let i = 0; i < samples; i++){
+    const x = i * 2 / samples - 1;
+    curve[i] = ((3 + k) * x * 20 * Math.PI / 180) / (Math.PI + k * Math.abs(x));
+  }
+
+  return curve;
+}
+
+async function ensureAudio(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    mainSource = audioCtx.createMediaElementSource(els.music);
+    textureSource = audioCtx.createMediaElementSource(els.texture);
+
+    masterGain = audioCtx.createGain();
+    mainGain = audioCtx.createGain();
+    textureGain = audioCtx.createGain();
+    noiseGain = audioCtx.createGain();
+    humGain = audioCtx.createGain();
+
+    mainDrive = audioCtx.createWaveShaper();
+    mainDrive.curve = makeDistortionCurve(0);
+    mainDrive.oversample = '2x';
+
+    mainFilter = audioCtx.createBiquadFilter();
+    mainFilter.type = 'lowpass';
+    mainFilter.frequency.value = 18000;
+
+    textureDrive = audioCtx.createWaveShaper();
+    textureDrive.curve = makeDistortionCurve(40);
+    textureDrive.oversample = '2x';
+
+    textureFilter = audioCtx.createBiquadFilter();
+    textureFilter.type = 'bandpass';
+    textureFilter.frequency.value = 1200;
+    textureFilter.Q.value = 0.7;
+
+    mainSend = audioCtx.createGain();
+    mainDelay = audioCtx.createDelay(2.0);
+    mainFeedback = audioCtx.createGain();
+    mainWet = audioCtx.createGain();
+
+    masterGain.gain.value = 0.95;
+    mainGain.gain.value = 0;
+    textureGain.gain.value = 0;
+    noiseGain.gain.value = 0;
+    humGain.gain.value = 0;
+
+    mainSend.gain.value = 0.08;
+    mainDelay.delayTime.value = 0.17;
+    mainFeedback.gain.value = 0.16;
+    mainWet.gain.value = 0.16;
+
+    mainSource.connect(mainDrive);
+    mainDrive.connect(mainFilter);
+    mainFilter.connect(mainGain);
+    mainGain.connect(masterGain);
+
+    textureSource.connect(textureDrive);
+    textureDrive.connect(textureFilter);
+    textureFilter.connect(textureGain);
+    textureGain.connect(masterGain);
+
+    mainFilter.connect(mainSend);
+    mainSend.connect(mainDelay);
+    mainDelay.connect(mainWet);
+    mainWet.connect(masterGain);
+    mainDelay.connect(mainFeedback);
+    mainFeedback.connect(mainDelay);
+
+    noiseGain.connect(masterGain);
+    humGain.connect(masterGain);
+    masterGain.connect(audioCtx.destination);
+
+    log(`AudioContext created. state=${audioCtx.state}`);
+  }
+
+  if(audioCtx.state === 'suspended'){
+    await audioCtx.resume();
+    log(`AudioContext resumed. state=${audioCtx.state}`);
+  }
+
+  updateTelemetry();
+}
+
+function fadeGain(gainNode, target, seconds){
+  if(!audioCtx || !gainNode) return;
+  const now = audioCtx.currentTime;
+  gainNode.gain.cancelScheduledValues(now);
+  gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+  gainNode.gain.linearRampToValueAtTime(target, now + seconds);
+}
+
+function stopOneShotNodes(){
+  activeNodeStops.forEach(fn => {
+    try{ fn(); }catch(e){}
+  });
+  activeNodeStops = [];
+}
+
+function clearTimers(){
+  clearTimeout(gapTimer);
+  overlayTimers.forEach(id => clearTimeout(id));
+  overlayTimers = [];
+}
+
+function stopAllFX(){
+  clearTimers();
+  stopOneShotNodes();
+
+  if(crackleTimer){
+    clearTimeout(crackleTimer);
+    crackleTimer = null;
+  }
+
+  try{ els.texture.pause(); }catch(e){}
+  els.texture.removeAttribute('src');
+  els.texture.load();
+
+  if(audioCtx){
+    fadeGain(textureGain, 0, 0.2);
+    fadeGain(noiseGain, 0, 0.2);
+    fadeGain(humGain, 0, 0.2);
+  }
+}
+
+function makeFilteredNoise(durationSec, config = {}){
+  const now = audioCtx.currentTime;
+  const buffer = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * durationSec), audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+
+  for(let i = 0; i < data.length; i++){
+    data[i] = (Math.random() * 2 - 1) * (config.noiseLevel || 0.24);
+  }
+
+  const src = audioCtx.createBufferSource();
+  src.buffer = buffer;
+
+  const pre = audioCtx.createBiquadFilter();
+  pre.type = config.preType || 'lowpass';
+  pre.frequency.value = config.preFreq || 1200;
+
+  const band = audioCtx.createBiquadFilter();
+  band.type = config.bandType || 'bandpass';
+  band.frequency.value = config.bandFreq || 900;
+  band.Q.value = config.bandQ || 0.7;
+
+  const gain = audioCtx.createGain();
+  gain.gain.value = 0.0001;
+
+  src.connect(pre);
+  pre.connect(band);
+  band.connect(gain);
+  gain.connect(noiseGain);
+
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(config.peak || 0.05, now + (config.attack || 1.5));
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+
+  src.start(now);
+  src.stop(now + durationSec + 0.05);
+
+  const stop = () => {
+    try{ src.stop(); }catch(e){}
+    [src, pre, band, gain].forEach(node => {
+      try{ node.disconnect(); }catch(e){}
+    });
+  };
+
+  activeNodeStops.push(stop);
+  return stop;
+}
+
+function makeHumCluster(durationSec){
+  const now = audioCtx.currentTime;
+  const base = chance(0.5) ? 50 : 60;
+  const osc1 = audioCtx.createOscillator();
+  const osc2 = audioCtx.createOscillator();
+  const osc3 = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc1.type = 'sine';
+  osc2.type = 'sine';
+  osc3.type = 'triangle';
+
+  osc1.frequency.value = base;
+  osc2.frequency.value = base * 2;
+  osc3.frequency.value = base * 0.5;
+
+  gain.gain.value = 0.0001;
+
+  osc1.connect(gain);
+  osc2.connect(gain);
+  osc3.connect(gain);
+  gain.connect(humGain);
+
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.022, now + 1.5);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+
+  osc1.start(now); osc2.start(now); osc3.start(now);
+  osc1.stop(now + durationSec + 0.05);
+  osc2.stop(now + durationSec + 0.05);
+  osc3.stop(now + durationSec + 0.05);
+
+  const stop = () => {
+    try{ osc1.stop(); }catch(e){}
+    try{ osc2.stop(); }catch(e){}
+    try{ osc3.stop(); }catch(e){}
+    [osc1, osc2, osc3, gain].forEach(node => {
+      try{ node.disconnect(); }catch(e){}
+    });
+  };
+
+  activeNodeStops.push(stop);
+  return stop;
+}
+
+function makeValveSweep(durationSec){
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const filter = audioCtx.createBiquadFilter();
+  const gain = audioCtx.createGain();
+
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(90, now);
+  osc.frequency.exponentialRampToValueAtTime(420, now + durationSec * 0.45);
+  osc.frequency.exponentialRampToValueAtTime(110, now + durationSec);
+
+  filter.type = 'lowpass';
+  filter.frequency.value = 900;
+
+  gain.gain.value = 0.0001;
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(noiseGain);
+
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.02, now + 0.5);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+
+  osc.start(now);
+  osc.stop(now + durationSec + 0.05);
+
+  const stop = () => {
+    try{ osc.stop(); }catch(e){}
+    [osc, filter, gain].forEach(node => {
+      try{ node.disconnect(); }catch(e){}
+    });
+  };
+
+  activeNodeStops.push(stop);
+  return stop;
+}
+
+function triggerCrackle(){
+  if(!audioCtx || !running) return;
+
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const filter = audioCtx.createBiquadFilter();
+  const gain = audioCtx.createGain();
+
+  osc.type = chance(0.6) ? 'square' : 'sawtooth';
+  osc.frequency.value = rand(120, 1600);
+
+  filter.type = chance(0.5) ? 'bandpass' : 'highpass';
+  filter.frequency.value = rand(500, 3000);
+  filter.Q.value = rand(0.5, 8);
+
+  gain.gain.value = 0.0001;
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(noiseGain);
+
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(rand(0.015, 0.08), now + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + rand(0.05, 0.18));
+
+  osc.start(now);
+  osc.stop(now + 0.22);
+
+  const stop = () => {
+    try{ osc.stop(); }catch(e){}
+    [osc, filter, gain].forEach(node => {
+      try{ node.disconnect(); }catch(e){}
+    });
+  };
+
+  activeNodeStops.push(stop);
+}
+
+function crackleLoop(){
+  if(!running) return;
+  const p = 0.28 + instability() * 0.28;
+  if(chance(p)){
+    triggerCrackle();
+  }
+  crackleTimer = setTimeout(crackleLoop, rand(600, 2200));
+}
+
+function updateProcessing(){
+  if(!audioCtx) return;
+  const t = instability();
+
+  mainDrive.curve = makeDistortionCurve(20 + t * 180);
+  textureDrive.curve = makeDistortionCurve(90 + t * 220);
+
+  mainFilter.frequency.setTargetAtTime(18000 - t * 11000, audioCtx.currentTime, 0.7);
+  textureFilter.frequency.setTargetAtTime(900 + Math.random() * 1200, audioCtx.currentTime, 0.7);
+
+  mainSend.gain.setTargetAtTime(0.08 + t * 0.18, audioCtx.currentTime, 0.7);
+  mainDelay.delayTime.setTargetAtTime(0.17 + t * 0.28, audioCtx.currentTime, 0.7);
+  mainFeedback.gain.setTargetAtTime(0.16 + t * 0.26, audioCtx.currentTime, 0.7);
+  mainWet.gain.setTargetAtTime(0.16 + t * 0.2, audioCtx.currentTime, 0.7);
+
+  updateTelemetry();
+}
+
+function startValveRadioStartup(){
+  currentMode = 'startup';
+  updateTelemetry();
+
+  makeFilteredNoise(12 + rand(2,6), {
+    preType:'highpass',
+    preFreq:650,
+    bandType:'bandpass',
+    bandFreq:1450,
+    bandQ:0.65,
+    peak:0.09,
+    attack:2.2,
+    noiseLevel:0.26
+  });
+
+  makeHumCluster(16);
+  makeValveSweep(9);
+
+  overlayTimers.push(setTimeout(() => {
+    makeFilteredNoise(10 + rand(0,8), {
+      preType:'lowpass',
+      preFreq:1200,
+      bandType:'bandpass',
+      bandFreq:720,
+      bandQ:0.45,
+      peak:0.06,
+      attack:1.5,
+      noiseLevel:0.22
+    });
+  }, 1800));
+
+  log('Valve startup storm engaged');
+}
+
+async function playTextureSnippet(style = 'overlay'){
+  const track = nextTexture();
+  if(!track) return;
+
+  const duration = style === 'gap'
+    ? rand(8, 22)
+    : rand(6, 16);
+
+  const playRate = style === 'gap'
+    ? rand(0.45, 0.8)
+    : rand(0.65, 1.05);
+
+  const gainTarget = style === 'gap'
+    ? rand(0.24, 0.42)
+    : rand(0.08, 0.22);
+
+  currentMode = style === 'gap' ? 'texture gap' : 'texture overlay';
+  updateTelemetry();
+
+  return new Promise((resolve) => {
+    const audio = els.texture;
+    audio.pause();
+    audio.src = track.src;
+    audio.load();
+
+    const fail = (errText) => {
+      log(`Texture skip: ${track.title} / ${errText}`);
+      audio.removeEventListener('loadedmetadata', onMeta);
+      audio.removeEventListener('error', onErr);
+      resolve();
+    };
+
+    const onErr = () => fail('could not decode');
+
+    const onMeta = async () => {
+      try{
+        if(Number.isFinite(audio.duration) && audio.duration > duration + 1){
+          audio.currentTime = rand(0, Math.max(0, audio.duration - duration - 1));
+        }
+        audio.playbackRate = playRate;
+
+        await audio.play();
+        fadeGain(textureGain, gainTarget, rand(1.5, 4));
+
+        const fadeOutAt = Math.max(2, duration - rand(1.2, 3.8));
+        overlayTimers.push(setTimeout(() => {
+          fadeGain(textureGain, 0, rand(1.5, 4));
+        }, fadeOutAt * 1000));
+
+        overlayTimers.push(setTimeout(() => {
+          try{ audio.pause(); }catch(e){}
+          resolve();
+        }, duration * 1000));
+
+        log(`Texture ${style}: ${track.title}`);
+      } catch(err){
+        fail(err.message || err);
+      } finally {
+        audio.removeEventListener('loadedmetadata', onMeta);
+        audio.removeEventListener('error', onErr);
+      }
+    };
+
+    audio.addEventListener('loadedmetadata', onMeta);
+    audio.addEventListener('error', onErr);
+  });
+}
+
+async function reverseGhostLayer(){
+  if(!running || !currentTrack || !Number.isFinite(els.music.duration)) return;
+  if(els.music.duration < 12) return;
+
+  const duration = rand(6, 12);
+  const startTime = Math.max(0, els.music.currentTime - rand(2, 8));
+  const endTime = Math.min(els.music.duration, startTime + duration);
+
+  try{
+    const response = await fetch(currentTrack.src);
+    const arr = await response.arrayBuffer();
+    const decoded = await audioCtx.decodeAudioData(arr.slice(0));
+
+    const channelData = decoded.getChannelData(0);
+    const sliceStart = Math.floor(startTime * decoded.sampleRate);
+    const sliceEnd = Math.floor(endTime * decoded.sampleRate);
+    const slice = channelData.slice(sliceStart, sliceEnd).reverse();
+
+    const buffer = audioCtx.createBuffer(1, slice.length, decoded.sampleRate);
+    buffer.copyToChannel(slice, 0);
+
+    const src = audioCtx.createBufferSource();
+    src.buffer = buffer;
+    src.playbackRate.value = rand(0.28, 0.6);
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = rand(700, 1800);
+
+    const drive = audioCtx.createWaveShaper();
+    drive.curve = makeDistortionCurve(120 + rand(0,100));
+
+    const gain = audioCtx.createGain();
+    gain.gain.value = 0.0001;
+
+    const delay = audioCtx.createDelay(1.5);
+    delay.delayTime.value = rand(0.18, 0.46);
+    const wet = audioCtx.createGain();
+    wet.gain.value = rand(0.12, 0.24);
+    const feedback = audioCtx.createGain();
+    feedback.gain.value = rand(0.18, 0.32);
+
+    src.connect(filter);
+    filter.connect(drive);
+    drive.connect(gain);
+    gain.connect(masterGain);
+
+    gain.connect(delay);
+    delay.connect(wet);
+    wet.connect(masterGain);
+    delay.connect(feedback);
+    feedback.connect(delay);
+
+    const now = audioCtx.currentTime;
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(rand(0.035, 0.08), now + 2.5);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration + 5);
+
+    src.start(now);
+    src.stop(now + duration + 5);
+
+    const stop = () => {
+      try{ src.stop(); }catch(e){}
+      [src, filter, drive, gain, delay, wet, feedback].forEach(node => {
+        try{ node.disconnect(); }catch(e){}
+      });
+    };
+
+    activeNodeStops.push(stop);
+    log('Reverse ghost inserted');
+  } catch(err){
+    log(`Reverse ghost skipped: ${err.message || err}`);
+  }
+}
+
+function scheduleTrackIncidents(){
+  if(!running) return;
+
+  const t = instability();
+  const overlayCount = 1 + Math.floor(t * 2);
+
+  for(let i = 0; i < overlayCount; i++){
+    overlayTimers.push(setTimeout(() => {
+      if(running) playTextureSnippet('overlay');
+    }, rand(9000, 60000)));
+  }
+
+  if(chance(0.45 + t * 0.25)){
+    overlayTimers.push(setTimeout(() => {
+      if(running) reverseGhostLayer();
+    }, rand(15000, 70000)));
+  }
+}
+
+async function startCentrepiece(track = null){
+  await ensureAudio();
+  updateProcessing();
+
+  currentTrack = track || nextCentrepiece();
+  if(!currentTrack){
+    els.status.textContent = 'No tracks in this channel';
+    return;
+  }
+
+  currentMode = 'loading';
+  updateTelemetry();
+  els.status.textContent = `Loading ${currentTrack.title}`;
+
+  stopAllFX();
+  startValveRadioStartup();
+
+  els.music.src = currentTrack.src;
+  els.music.load();
+  log(`Loading ${currentTrack.title}`);
+
+  try{
+    const playPromise = els.music.play();
+    if(playPromise && typeof playPromise.then === 'function'){
+      await playPromise;
+    }
+  } catch(err){
+    log(`Main track failed: ${currentTrack.title} / ${err.message || err}`);
+    setTimeout(() => {
+      if(running) startCentrepiece();
+    }, 500);
+    return;
+  }
+
+  running = true;
+  setLive(true);
+
+  fadeGain(mainGain, 1, rand(6, 16));
+  overlayTimers.push(setTimeout(() => {
+    els.status.textContent = currentTrack.title;
+    currentMode = 'main broadcast';
+    updateTelemetry();
+  }, rand(4000, 12000)));
+
+  crackleLoop();
+  scheduleTrackIncidents();
+  updateTelemetry();
+  log(`Broadcast: ${currentTrack.title}`);
+}
+
+function beginGap(){
+  if(!running) return;
+
+  currentMode = 'gap';
+  updateTelemetry();
+  els.status.textContent = 'Tuning';
+
+  fadeGain(mainGain, 0, rand(2, 5));
+  makeFilteredNoise(rand(10, 28), {
+    preType:'highpass',
+    preFreq:420,
+    bandType:'bandpass',
+    bandFreq:820,
+    bandQ:0.55,
+    peak:0.07,
+    attack:1.8,
+    noiseLevel:0.26
+  });
+  makeHumCluster(rand(8, 20));
+
+  playTextureSnippet('gap');
+
+  if(chance(0.5 + instability() * 0.25)){
+    overlayTimers.push(setTimeout(() => {
+      if(running) reverseGhostLayer();
+    }, rand(3000, 10000)));
+  }
+
+  const wait = rand(4000, 18000) + instability() * 12000;
+  gapTimer = setTimeout(() => {
+    if(running) startCentrepiece();
+  }, wait);
+
+  log('Gap / tuning interval');
+}
+
+function stopPlayback(){
+  running = false;
+  currentMode = 'idle';
+  clearTimers();
+
+  try{ els.music.pause(); }catch(e){}
+  try{ els.texture.pause(); }catch(e){}
+
+  if(audioCtx){
+    fadeGain(mainGain, 0, 0.4);
+    fadeGain(textureGain, 0, 0.4);
+    fadeGain(noiseGain, 0, 0.4);
+    fadeGain(humGain, 0, 0.4);
+  }
+
+  stopAllFX();
+  setLive(false);
+  els.status.textContent = 'Stopped';
+  updateTelemetry();
+  log('Stopped');
+}
+
+els.music.addEventListener('ended', () => {
+  if(!running) return;
+  beginGap();
+});
+
+els.music.addEventListener('error', () => {
+  log(`Main audio error on ${currentTrack ? currentTrack.title : 'unknown track'}`);
+  if(running){
+    startCentrepiece();
+  }
+});
+
+els.startBtn.addEventListener('click', async () => {
+  if(running) return;
+  if(!sessionStart) sessionStart = Date.now();
+  await startCentrepiece();
+});
+
+els.stopBtn.addEventListener('click', () => {
+  stopPlayback();
+});
+
+els.clearBtn.addEventListener('click', () => {
+  els.log.textContent = '';
+});
+
+els.channelButtons.forEach((btn, idx) => {
+  btn.addEventListener('click', async () => {
+    const channel = idx + 1;
+    if(!CHANNELS[channel].enabled){
+      log(`${CHANNELS[channel].name} not wired yet`);
+      return;
+    }
+    const wasRunning = running;
+    stopPlayback();
+    setChannel(channel);
+    if(wasRunning){
+      if(!sessionStart) sessionStart = Date.now();
+      await startCentrepiece();
+    }
+  });
+});
+
+window.addEventListener('keydown', e => {
+  if(e.key === '\\' && running && Number.isFinite(els.music.duration)){
+    try{
+      els.music.currentTime = Math.min((els.music.duration || 0) - 0.5, els.music.currentTime + 15);
+      log('skip');
+    }catch(err){}
+  }
+});
+
+updateClock();
+setInterval(() => {
+  updateClock();
+  updateTelemetry();
+  if(running) updateProcessing();
+}, 1000);
+
+setChannel(1);
+setLive(false);
+els.status.textContent = 'Stopped';
+updateTelemetry();
+log('radio debug ready');
+</script>
+</body>
+</html>
