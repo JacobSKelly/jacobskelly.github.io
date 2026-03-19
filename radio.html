@@ -88,6 +88,10 @@
       flex:0 0 auto;
     }
 
+    .leftCluster{
+  justify-items:start;
+    }
+
     .live{
       display:flex;
       align-items:center;
@@ -317,17 +321,15 @@
 
 <div class="wrap">
   <div class="radio">
-    <div class="top">
-      <div class="title">radio</div>
-
-      <div class="rightCluster">
-        <div class="clock" id="clock" aria-label="clock"></div>
-        <div class="live">
-          <div class="dot" id="dot"></div>
-          <div id="liveText">standby</div>
-        </div>
-      </div>
+  <div class="top">
+  <div class="rightCluster leftCluster">
+    <div class="clock" id="clock" aria-label="clock"></div>
+    <div class="live">
+      <div class="dot" id="dot"></div>
+      <div id="liveText">standby</div>
     </div>
+  </div>
+</div>
 
     <div class="channels">
       <button class="active" id="ch1Btn" type="button">Channel 1</button>
