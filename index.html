@@ -79,6 +79,44 @@ color:#111;
 margin:0 2px;
 }
 
+/* DROPDOWNS */
+
+.menu-group{
+display:inline-block;
+position:relative;
+}
+
+.dropdown{
+display:none;
+position:absolute;
+top:100%;
+left:50%;
+transform:translateX(-50%);
+margin-top:6px;
+padding:6px 0;
+background:#fff;
+z-index:20;
+white-space:nowrap;
+min-width:120px;
+}
+
+.dropdown a{
+display:block;
+font-size:0.72rem;
+color:#111;
+text-decoration:none;
+padding:2px 8px;
+line-height:1.2;
+}
+
+.dropdown a:hover{
+text-decoration:underline;
+}
+
+.menu-group.open .dropdown{
+display:block;
+}
+
 /* BLUR CENTREPIECE */
 
 .hero{
@@ -323,13 +361,20 @@ margin-bottom:2px;
 <div class="controls-line">
   <a id="galleryBtn">gallery</a>
   <span class="separator">/</span>
+
+  <div class="menu-group" id="projectsMenu">
+    <a id="projectsBtn">projects</a>
+    <div class="dropdown" id="projectsDropdown">
+      <a href="radio.html">radio</a>
+    </div>
+  </div>
+
+  <span class="separator">/</span>
   <a id="bioBtn">bio</a>
   <span class="separator">/</span>
   <a id="exhibitionsBtn">exhibitions</a>
   <span class="separator">/</span>
   <a href="shop.html">shop</a>
-</div>
-
 </div>
 
 </header>
@@ -498,6 +543,8 @@ margin-bottom:2px;
 const bioBtn = document.getElementById("bioBtn");
 const galleryBtn = document.getElementById("galleryBtn");
 const exhibitionsBtn = document.getElementById("exhibitionsBtn");
+const projectsBtn = document.getElementById("projectsBtn");
+const projectsMenu = document.getElementById("projectsMenu");
 
 const bio = document.getElementById("bio");
 const exhibitions = document.getElementById("exhibitions");
@@ -510,11 +557,16 @@ const loadingMessage = document.getElementById("loadingMessage");
 
 /* VIEW HELPERS */
 
+function closeMenus(){
+  projectsMenu.classList.remove("open");
+}
+
 function showHero(){
   hero.style.display = "flex";
   bio.classList.remove("show");
   exhibitions.classList.remove("show");
   gallery.classList.remove("show");
+  closeMenus();
 }
 
 function showBio(){
@@ -522,6 +574,7 @@ function showBio(){
   bio.classList.add("show");
   exhibitions.classList.remove("show");
   gallery.classList.remove("show");
+  closeMenus();
 }
 
 function showExhibitions(){
@@ -529,6 +582,7 @@ function showExhibitions(){
   bio.classList.remove("show");
   exhibitions.classList.add("show");
   gallery.classList.remove("show");
+  closeMenus();
 }
 
 function showGallery(){
@@ -536,6 +590,7 @@ function showGallery(){
   bio.classList.remove("show");
   exhibitions.classList.remove("show");
   gallery.classList.add("show");
+  closeMenus();
 }
 
 /* TOGGLES */
@@ -561,6 +616,21 @@ galleryBtn.addEventListener("click", () => {
     showHero();
   }else{
     showGallery();
+  }
+});
+
+projectsBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  const isOpen = projectsMenu.classList.contains("open");
+  closeMenus();
+  if(!isOpen){
+    projectsMenu.classList.add("open");
+  }
+});
+
+document.addEventListener("click", (e) => {
+  if(!projectsMenu.contains(e.target)){
+    projectsMenu.classList.remove("open");
   }
 });
 
