@@ -1664,6 +1664,15 @@ try{
           } else {
             log(`Saved position passed track end on channel ${currentChannel}; starting fresh`);
           }
+        } else if(Number.isFinite(els.music.duration)){
+          const minStart = Math.min(12, els.music.duration * 0.25);
+          const maxStart = Math.max(minStart + 2, els.music.duration - 8);
+
+          if(maxStart > minStart){
+            const startAt = rand(minStart, maxStart);
+            els.music.currentTime = startAt;
+            log(`Started mid-track at ${formatTime(startAt)}`);
+          }
         }
       }catch(e){}
 
