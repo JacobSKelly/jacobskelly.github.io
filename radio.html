@@ -548,6 +548,13 @@ let gapTimer = null;
 let overlayTimers = [];
 let activeNodeStops = [];
 let heartbeatCounter = 0;
+let channelMemory = {
+  1: { trackSrc:null, time:0, title:null, leftAt:0 },
+  2: { trackSrc:null, time:0, title:null, leftAt:0 },
+  3: { trackSrc:null, time:0, title:null, leftAt:0 },
+  4: { trackSrc:null, time:0, title:null, leftAt:0 },
+  5: { trackSrc:null, time:0, title:null, leftAt:0 }
+};
 
 function log(message){
   const stamp = new Date().toLocaleTimeString();
@@ -731,7 +738,39 @@ function nextAnyFromChannel4(){
   if(centrepieceBag.length === 0) refillBags();
   return centrepieceBag.shift() || null;
 }
+function allTracksForChannel(channel){
+  const station = CHANNELS[channel];
+  return [...station.centrepieces, ...station.textures];
+}
 
+function findTrackBySrc(channel, src){
+  if(!src) return null;
+  return allTracksForChannel(channel).find(track => track.src === src) || null;
+}
+
+function saveCurrentChannelState(){
+  if(!running) return;
+  if(!currentTrack) return;
+  if(currentChannel === 5) return;
+
+  let currentTime = 0;
+
+  try{
+    currentTime = Number.isFinite(els.music.currentTime) ? els.music.currentTime : 0;
+  }catch(e){
+    currentTime = 0;
+  }
+
+  channelMemory[currentChannel] = {
+    trackSrc: currentTrack.src,
+    time: currentTime,
+    title: currentTrack.title,
+    leftAt: Date.now()
+  };
+
+  log(`Saved channel ${currentChannel} @ ${formatTime(currentTime)} / ${currentTrack.title}`);
+}
+  
 function setChannel(channel){
   currentChannel = channel;
   currentTrack = null;
@@ -1528,7 +1567,12 @@ async function startTrack(track){
   updateProcessing();
 
   const station = activeStation();
-  currentTrack = track || chooseTrackForChannel();
+  const memory = channelMemory[currentChannel];
+const rememberedTrack = !track && memory && memory.trackSrc
+  ? findTrackBySrc(currentChannel, memory.trackSrc)
+  : null;
+
+currentTrack = track || rememberedTrack || chooseTrackForChannel();
   updateTelemetry();
 
   if(station.mode === 'dead-air'){
@@ -1581,18 +1625,61 @@ async function startTrack(track){
   els.music.load();
   log(`Loading ${currentTrack.title}`);
 
-  try{
-    const playPromise = els.music.play();
-    if(playPromise && typeof playPromise.then === 'function'){
-      await playPromise;
-    }
-  } catch(err){
-    log(`Main track failed: ${currentTrack.title} / ${err.message || err}`);
-    setTimeout(() => {
-      if(running) startTrack();
-    }, 500);
-    return;
+  const activeMemory =
+    channelMemory[currentChannel] &&
+    channelMemory[currentChannel].trackSrc === currentTrack.src
+      ? channelMemory[currentChannel]
+      : null;
+
+  const timeAway = activeMemory && activeMemory.leftAt
+    ? (Date.now() - activeMemory.leftAt) / 1000
+    : 0;
+
+  const rememberedTime = activeMemory
+    ? activeMemory.time + timeAway
+    : 0;
+  
+try{
+  await new Promise((resolve, reject) => {
+    const onLoaded = () => {
+      els.music.removeEventListener('loadedmetadata', onLoaded);
+      els.music.removeEventListener('error', onError);
+
+      try{
+        if(Number.isFinite(els.music.duration) && rememberedTime > 0){
+          if(rememberedTime < els.music.duration - 0.25){
+            els.music.currentTime = rememberedTime;
+            log(`Returned to channel ${currentChannel} at ${formatTime(rememberedTime)}`);
+          } else {
+            log(`Saved position passed track end on channel ${currentChannel}; starting fresh`);
+          }
+        }
+      }catch(e){}
+
+      resolve();
+    };
+
+    const onError = () => {
+      els.music.removeEventListener('loadedmetadata', onLoaded);
+      els.music.removeEventListener('error', onError);
+      reject(new Error('metadata load failed'));
+    };
+
+    els.music.addEventListener('loadedmetadata', onLoaded, { once:true });
+    els.music.addEventListener('error', onError, { once:true });
+  });
+
+  const playPromise = els.music.play();
+  if(playPromise && typeof playPromise.then === 'function'){
+    await playPromise;
   }
+} catch(err){
+  log(`Main track failed: ${currentTrack.title} / ${err.message || err}`);
+  setTimeout(() => {
+    if(running) startTrack();
+  }, 500);
+  return;
+}
 
   running = true;
   setLive(true);
@@ -1669,7 +1756,11 @@ function beginGap(){
   log('Gap / tuning interval');
 }
 
-function stopPlayback(){
+function stopPlayback(keepMemory = false){
+  if(keepMemory){
+    saveCurrentChannelState();
+  }
+
   running = false;
   currentMode = 'idle';
   clearTimers();
@@ -1699,6 +1790,9 @@ function clearVisibleLog(){
 }
 
 els.music.addEventListener('ended', () => {
+  if(currentChannel !== 5){
+    channelMemory[currentChannel] = { trackSrc:null, time:0, title:null, leftAt:0 };
+  }
   if(!running) return;
   beginGap();
 });
@@ -1733,8 +1827,8 @@ els.channelButtons.forEach((btn, idx) => {
       return;
     }
 
-    const wasRunning = running;
-    stopPlayback();
+  const wasRunning = running;
+    stopPlayback(true);
     setChannel(channel);
 
     if(wasRunning){
