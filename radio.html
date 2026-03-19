@@ -130,4 +130,518 @@
       <div class="meta">
         <div>
           <div class="label">Now playing</div>
-          <div class="value" id="
+          <div class="value" id="nowPlaying">Loading…</div>
+        </div>
+        <div>
+          <div class="label">Daily cycle</div>
+          <div class="value" id="cycleInfo">06:00–24:00 UTC</div>
+        </div>
+        <div>
+          <div class="label">Position in item</div>
+          <div class="value" id="positionInfo">—</div>
+        </div>
+        <div>
+          <div class="label">Next change</div>
+          <div class="value" id="nextChange">—</div>
+        </div>
+      </div>
+
+      <div class="status" id="status">Preparing stream…</div>
+
+      <div class="controls">
+        <button id="startBtn">Start radio</button>
+        <button id="muteNoiseBtn">Atmosphere static: on</button>
+      </div>
+
+      <p class="small">
+        Everyone hears the same point in the same daily loop because playback is locked to UTC time.
+        The cycle begins at <strong>06:00 UTC</strong>. Between tracks, this page inserts deterministic
+        bursts of atmosphere static with lengths generated once per UTC day. If there is not enough
+        time left before midnight to fit the next track, the page falls into silence until the next cycle.
+      </p>
+
+      <div class="log" id="log"></div>
+    </section>
+  </div>
+
+  <audio id="music" crossorigin="anonymous" preload="auto"></audio>
+
+  <script>
+    /*
+      Replace these with your real files.
+      durationSec should be the exact track length in seconds for accurate synchronisation.
+      Use UTC day time so everyone hears the same thing at once, everywhere.
+    */
+    const TRACKS = [
+      { title: 'Xenopus', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/xenopus.mp3' },
+      { title: 'Untitled+', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/untitled+.mp3' },
+      { title: 'Unicorn', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/unicorn.mp3' },
+      { title: 'Tabret Tabret+', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/tabret+tabret+.mp3' },
+      { title: 'Slime Demo+', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/slime+demo+.mp3' },
+      { title: 'Samantha', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/samantha.mp3' },
+      { title: 'Rusholme', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/rusholme.mp3' },
+      { title: 'Red House', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/red+house.mp3' },
+      { title: 'Oumuamua', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/oumuamua.mp3' },
+      { title: 'Kilimanjaro', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/kilimanjaro.mp3' },
+      { title: 'Kibo+', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/kibo+.mp3' },
+      { title: 'Joiner', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/joiner.mp3' },
+      { title: 'Hypna', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/hypna.mp3' },
+      { title: 'Funeral March', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/funeral+march.mp3' },
+      { title: 'Fuckoffalypse', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/fuckoffalypse.mp3' },
+      { title: 'Big Black P', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/big+black+p.mp3' },
+      { title: 'Banhus', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3' },
+      { title: 'Ambulance', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/ambulance.mp3' },
+      { title: 'Agalma', src: 'https://peachradio.s3.eu-west-2.amazonaws.com/agalma.mp3' }
+    ].map((track, index) => ({ ...track, id: index + 1, durationSec: null }));
+
+    const CONFIG = {
+      cycleStartHourUTC: 6,
+      maxStaticSec: 300,
+      minStaticSec: 25,
+      fadeMs: 1800,
+      silenceLabel: 'Dead air',
+      staticLabel: 'Atmosphere static'
+    };
+
+    const els = {
+      music: document.getElementById('music'),
+      nowPlaying: document.getElementById('nowPlaying'),
+      cycleInfo: document.getElementById('cycleInfo'),
+      positionInfo: document.getElementById('positionInfo'),
+      nextChange: document.getElementById('nextChange'),
+      status: document.getElementById('status'),
+      log: document.getElementById('log'),
+      startBtn: document.getElementById('startBtn'),
+      muteNoiseBtn: document.getElementById('muteNoiseBtn')
+    };
+
+    let audioCtx;
+    let trackMetadataPromise = null;
+    let noiseGain;
+    let staticMuted = false;
+    let state = {
+      started: false,
+      currentSegment: null,
+      schedule: null,
+      raf: null,
+      segmentTimer: null
+    };
+
+    function pad(num) {
+      return String(num).padStart(2, '0');
+    }
+
+    function formatClock(date) {
+      return `${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}:${pad(date.getUTCSeconds())} UTC`;
+    }
+
+    function formatDuration(sec) {
+      sec = Math.max(0, Math.floor(sec));
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      if (h > 0) return `${h}:${pad(m)}:${pad(s)}`;
+      return `${m}:${pad(s)}`;
+    }
+
+    function mulberry32(seed) {
+      return function() {
+        let t = seed += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
+
+    function daySeedUTC(date = new Date()) {
+      return Number(`${date.getUTCFullYear()}${pad(date.getUTCMonth() + 1)}${pad(date.getUTCDate())}`);
+    }
+
+    function getUtcBounds(date = new Date()) {
+      const year = date.getUTCFullYear();
+      const month = date.getUTCMonth();
+      const day = date.getUTCDate();
+      const cycleStart = Date.UTC(year, month, day, CONFIG.cycleStartHourUTC, 0, 0, 0);
+      const cycleEnd = Date.UTC(year, month, day + 1, 0, 0, 0, 0);
+      return { cycleStart, cycleEnd };
+    }
+
+    function buildDailySchedule(now = new Date()) {
+      const { cycleStart, cycleEnd } = getUtcBounds(now);
+      const seedRand = mulberry32(daySeedUTC(now));
+      const segments = [];
+      let cursor = cycleStart;
+      let trackIndex = 0;
+      const readyTracks = TRACKS.filter(track => Number.isFinite(track.durationSec) && track.durationSec > 0);
+
+      while (cursor < cycleEnd && readyTracks.length) {
+        const track = readyTracks[trackIndex % readyTracks.length];
+        const trackMs = Math.round(track.durationSec * 1000);
+
+        if (cursor + trackMs > cycleEnd) break;
+
+        segments.push({
+          kind: 'track',
+          title: track.title,
+          src: track.src,
+          startMs: cursor,
+          endMs: cursor + trackMs,
+          durationSec: track.durationSec
+        });
+        cursor += trackMs;
+        trackIndex += 1;
+
+        const rawStatic = CONFIG.minStaticSec + Math.floor(seedRand() * (CONFIG.maxStaticSec - CONFIG.minStaticSec + 1));
+        const staticMs = rawStatic * 1000;
+
+        if (cursor + staticMs > cycleEnd) {
+          segments.push({
+            kind: 'silence',
+            title: CONFIG.silenceLabel,
+            startMs: cursor,
+            endMs: cycleEnd
+          });
+          cursor = cycleEnd;
+          break;
+        }
+
+        const nextTrack = readyTracks[trackIndex % readyTracks.length];
+        const nextTrackMs = Math.round(nextTrack.durationSec * 1000);
+
+        if (cursor + staticMs + nextTrackMs > cycleEnd) {
+          segments.push({
+            kind: 'static',
+            title: CONFIG.staticLabel,
+            startMs: cursor,
+            endMs: cursor + staticMs,
+            durationSec: rawStatic
+          });
+          cursor += staticMs;
+          if (cursor < cycleEnd) {
+            segments.push({
+              kind: 'silence',
+              title: CONFIG.silenceLabel,
+              startMs: cursor,
+              endMs: cycleEnd
+            });
+          }
+          break;
+        }
+
+        segments.push({
+          kind: 'static',
+          title: CONFIG.staticLabel,
+          startMs: cursor,
+          endMs: cursor + staticMs,
+          durationSec: rawStatic
+        });
+        cursor += staticMs;
+      }
+
+      if (!segments.length && cycleStart < cycleEnd) {
+        segments.push({
+          kind: readyTracks.length ? 'silence' : 'loading',
+          title: readyTracks.length ? CONFIG.silenceLabel : 'Loading tracks',
+          startMs: cycleStart,
+          endMs: cycleEnd
+        });
+      }
+
+      return { cycleStart, cycleEnd, segments };
+    }
+
+    function getCurrentSegment(schedule, nowMs = Date.now()) {
+      if (nowMs < schedule.cycleStart || nowMs >= schedule.cycleEnd) return null;
+      return schedule.segments.find(seg => nowMs >= seg.startMs && nowMs < seg.endMs) || null;
+    }
+
+    function describeSegment(segment) {
+      if (!segment) return 'Off air until 06:00 UTC';
+      if (segment.kind === 'track') return segment.title;
+      if (segment.kind === 'static') return CONFIG.staticLabel;
+      if (segment.kind === 'loading') return 'Loading tracks';
+      return CONFIG.silenceLabel;
+    }
+
+    function log(message) {
+      els.log.textContent = message;
+    }
+
+    function updateReadout() {
+      const now = new Date();
+      const schedule = buildDailySchedule(now);
+      state.schedule = schedule;
+      const segment = getCurrentSegment(schedule, now.getTime());
+      state.currentSegment = segment;
+
+      els.cycleInfo.textContent = `${pad(CONFIG.cycleStartHourUTC)}:00–24:00 UTC`;
+      els.nowPlaying.textContent = describeSegment(segment);
+
+      if (!segment) {
+        els.positionInfo.textContent = 'Waiting for next cycle';
+        const nextStart = new Date(schedule.cycleStart);
+        els.nextChange.textContent = formatClock(nextStart);
+        els.status.textContent = 'Off air until the daily cycle begins.';
+      } else {
+        const offsetSec = Math.floor((now.getTime() - segment.startMs) / 1000);
+        const remainingSec = Math.ceil((segment.endMs - now.getTime()) / 1000);
+        els.positionInfo.textContent = `${formatDuration(offsetSec)} elapsed`;
+        els.nextChange.textContent = `${formatClock(new Date(segment.endMs))} (${formatDuration(remainingSec)} remaining)`;
+        if (segment.kind === 'track') {
+          els.status.textContent = 'Locked to the shared daily broadcast.';
+        } else if (segment.kind === 'static') {
+          els.status.textContent = 'Atmosphere static between transmissions.';
+        } else if (segment.kind === 'loading') {
+          els.status.textContent = 'Reading track durations…';
+        } else if (segment.kind === 'loading') {
+          els.status.textContent = 'Reading track durations…';
+        } else {
+          els.status.textContent = 'Dead air until the next cycle.';
+        }
+      }
+
+      state.raf = requestAnimationFrame(updateReadout);
+    }
+
+    async function loadTrackDurations() {
+      if (trackMetadataPromise) return trackMetadataPromise;
+
+      trackMetadataPromise = Promise.all(
+        TRACKS.map(track => new Promise(resolve => {
+          const probe = new Audio();
+          probe.preload = 'metadata';
+          probe.crossOrigin = 'anonymous';
+          probe.src = track.src;
+
+          const finish = () => {
+            cleanup();
+            if (Number.isFinite(probe.duration) && probe.duration > 0) {
+              track.durationSec = probe.duration;
+            }
+            resolve(track);
+          };
+
+          const cleanup = () => {
+            probe.removeEventListener('loadedmetadata', finish);
+            probe.removeEventListener('canplaythrough', finish);
+            probe.removeEventListener('error', finish);
+          };
+
+          probe.addEventListener('loadedmetadata', finish, { once: true });
+          probe.addEventListener('canplaythrough', finish, { once: true });
+          probe.addEventListener('error', finish, { once: true });
+          probe.load();
+        }))
+      );
+
+      return trackMetadataPromise;
+    }
+
+    async function ensureAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        const source = audioCtx.createMediaElementSource(els.music);
+        noiseGain = audioCtx.createGain();
+        noiseGain.gain.value = 0;
+
+        source.connect(audioCtx.destination);
+        noiseGain.connect(audioCtx.destination);
+      }
+
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
+    }
+
+    function stopStatic() {
+      if (!noiseGain || !audioCtx) return;
+      const now = audioCtx.currentTime;
+      noiseGain.gain.cancelScheduledValues(now);
+      noiseGain.gain.setValueAtTime(noiseGain.gain.value, now);
+      noiseGain.gain.linearRampToValueAtTime(0, now + CONFIG.fadeMs / 1000);
+    }
+
+    function playStatic() {
+      if (!audioCtx || !noiseGain || staticMuted) return;
+      const sampleRate = audioCtx.sampleRate;
+      const bufferSize = sampleRate * 2;
+      const noiseBuffer = audioCtx.createBuffer(1, bufferSize, sampleRate);
+      const data = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * 0.18;
+      }
+
+      const whiteNoise = audioCtx.createBufferSource();
+      whiteNoise.buffer = noiseBuffer;
+      whiteNoise.loop = true;
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 1800;
+      filter.Q.value = 0.9;
+
+      const wobble = audioCtx.createOscillator();
+      wobble.type = 'sine';
+      wobble.frequency.value = 0.08;
+
+      const wobbleGain = audioCtx.createGain();
+      wobbleGain.gain.value = 600;
+
+      const localGain = audioCtx.createGain();
+      localGain.gain.value = 0.0001;
+
+      wobble.connect(wobbleGain);
+      wobbleGain.connect(filter.frequency);
+
+      whiteNoise.connect(filter);
+      filter.connect(localGain);
+      localGain.connect(noiseGain);
+
+      const now = audioCtx.currentTime;
+      noiseGain.gain.cancelScheduledValues(now);
+      noiseGain.gain.setValueAtTime(noiseGain.gain.value, now);
+      noiseGain.gain.linearRampToValueAtTime(0.22, now + CONFIG.fadeMs / 1000);
+
+      whiteNoise.start();
+      wobble.start();
+
+      return () => {
+        const t = audioCtx.currentTime;
+        localGain.gain.cancelScheduledValues(t);
+        localGain.gain.setValueAtTime(localGain.gain.value, t);
+        localGain.gain.linearRampToValueAtTime(0.0001, t + CONFIG.fadeMs / 1000);
+        setTimeout(() => {
+          try { whiteNoise.stop(); } catch (e) {}
+          try { wobble.stop(); } catch (e) {}
+          whiteNoise.disconnect();
+          filter.disconnect();
+          localGain.disconnect();
+          wobble.disconnect();
+          wobbleGain.disconnect();
+        }, CONFIG.fadeMs + 100);
+      };
+    }
+
+    let stopCurrentStatic = null;
+
+    async function syncPlayback() {
+      if (!state.started) return;
+
+      clearTimeout(state.segmentTimer);
+      await loadTrackDurations();
+      const now = new Date();
+      const schedule = buildDailySchedule(now);
+      state.schedule = schedule;
+      const segment = getCurrentSegment(schedule, now.getTime());
+      state.currentSegment = segment;
+
+      if (!segment) {
+        els.music.pause();
+        els.music.removeAttribute('src');
+        els.music.load();
+        if (stopCurrentStatic) stopCurrentStatic();
+        stopStatic();
+        const nextWake = schedule.cycleStart - now.getTime();
+        log('Off air. Waiting for next cycle.');
+        state.segmentTimer = setTimeout(syncPlayback, Math.max(500, nextWake + 40));
+        return;
+      }
+
+      const msUntilEnd = Math.max(0, segment.endMs - now.getTime());
+
+      if (segment.kind === 'track') {
+        if (stopCurrentStatic) {
+          stopCurrentStatic();
+          stopCurrentStatic = null;
+        }
+        stopStatic();
+
+        const desiredOffset = Math.max(0, (now.getTime() - segment.startMs) / 1000);
+        const needsSrcChange = els.music.src !== new URL(segment.src, window.location.href).href;
+
+        if (needsSrcChange) {
+          els.music.src = segment.src;
+          els.music.load();
+          await new Promise(resolve => {
+            const done = () => {
+              els.music.removeEventListener('loadedmetadata', done);
+              resolve();
+            };
+            els.music.addEventListener('loadedmetadata', done);
+          });
+        }
+
+        const safeOffset = Math.min(desiredOffset, Math.max(0, (els.music.duration || desiredOffset) - 0.25));
+        if (Math.abs((els.music.currentTime || 0) - safeOffset) > 0.75) {
+          try { els.music.currentTime = safeOffset; } catch (e) {}
+        }
+
+        try { await els.music.play(); } catch (e) {
+          els.status.textContent = 'Click “Start radio” to begin audio.';
+        }
+
+        log(`Playing ${segment.title} at ${formatDuration(safeOffset)}.`);
+      } else {
+        els.music.pause();
+        els.music.removeAttribute('src');
+        els.music.load();
+
+        if (segment.kind === 'static') {
+          if (stopCurrentStatic) stopCurrentStatic();
+          stopCurrentStatic = playStatic();
+          log(`Atmosphere static for ${formatDuration((segment.endMs - segment.startMs) / 1000)}.`);
+        } else if (segment.kind === 'loading') {
+          if (stopCurrentStatic) {
+            stopCurrentStatic();
+            stopCurrentStatic = null;
+          }
+          stopStatic();
+          log('Reading track durations…');
+        } else {
+          if (stopCurrentStatic) {
+            stopCurrentStatic();
+            stopCurrentStatic = null;
+          }
+          stopStatic();
+          log('Dead air until the next cycle.');
+        }
+      }
+
+      state.segmentTimer = setTimeout(syncPlayback, msUntilEnd + 60);
+    }
+
+    els.startBtn.addEventListener('click', async () => {
+      state.started = true;
+      await ensureAudioContext();
+      els.startBtn.textContent = 'Radio running';
+      els.startBtn.disabled = true;
+      syncPlayback();
+    });
+
+    els.muteNoiseBtn.addEventListener('click', () => {
+      staticMuted = !staticMuted;
+      els.muteNoiseBtn.textContent = `Atmosphere static: ${staticMuted ? 'off' : 'on'}`;
+      if (staticMuted) {
+        if (stopCurrentStatic) stopCurrentStatic();
+        stopCurrentStatic = null;
+        stopStatic();
+      } else if (state.started && state.currentSegment?.kind === 'static') {
+        stopCurrentStatic = playStatic();
+      }
+    });
+
+    window.addEventListener('visibilitychange', () => {
+      if (!document.hidden && state.started) syncPlayback();
+    });
+
+    window.addEventListener('focus', () => {
+      if (state.started) syncPlayback();
+    });
+
+    loadTrackDurations().then(() => {
+      log(`Loaded ${TRACKS.filter(track => Number.isFinite(track.durationSec)).length} tracks.`);
+    });
+
+    updateReadout();
+  </script>
+</body>
+</html>
