@@ -1116,7 +1116,7 @@ els.channelButtons.forEach((btn, idx) => {
 });
 
 window.addEventListener('keydown', e => {
-  if(e.key === '\' && running && Number.isFinite(els.music.duration)){
+  if(e.key === '\\' && running && Number.isFinite(els.music.duration)){
     try{
       els.music.currentTime = Math.min((els.music.duration || 0) - 0.5, els.music.currentTime + 15);
       log('skip');
