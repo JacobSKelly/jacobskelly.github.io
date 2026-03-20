@@ -271,8 +271,8 @@
       border:1px solid var(--line);
       padding:16px;
       display:grid;
-      gap:14px;
-      min-height:190px;
+      gap:12px;
+      min-height:0;
       align-content:start;
       flex:0 0 auto;
     }
@@ -355,7 +355,7 @@
     .telemetry{
       display:grid;
       grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:12px 20px;
+      gap:10px 16px;
       font-family:monospace;
       font-size:12px;
       color:var(--muted);
@@ -366,7 +366,8 @@
     .telemetry div{
       white-space:pre-wrap;
       word-break:break-word;
-      min-height:10em;
+      min-height:7.25em;
+      line-height:1.32;
     }
 
     .gold-egg{
@@ -429,8 +430,8 @@
       padding-top:12px;
       font-size:12px;
       color:var(--muted);
-      line-height:1.38;
-      height:8.2em;
+      line-height:1.42;
+      height:8.9em;
       overflow:hidden;
       white-space:pre-wrap;
       flex:0 0 auto;
@@ -538,6 +539,7 @@
 
       .telemetry{
         grid-template-columns:1fr;
+        gap:8px;
       }
 
       .telemetry div{
@@ -555,12 +557,8 @@
         min-width:0;
       }
 
-      .screen{
-        min-height:0;
-      }
-
       .log{
-        height:10em;
+        height:10.5em;
       }
 
       .stateRow{
@@ -638,15 +636,17 @@ CH: 1
 MODE: idle
 AUDIO: standby
 ELAPSED: 0:00
-CHAN ELAPSED: 0:00
-WEATHER: emenating</div>
+WEATHER: emenating
+SIG: 1.00
+PEACE: 0.00
+REWARD: 0.00</div>
         <div id="telemetryRight">MAIN: —
-TEX: —
 INST: 0.00
 AMB: 0.00
 FX: —
 MIC: off
 PITCH: —
+CLR/STRM: 0.00 / 0.00
 EGG: <span id="eggSlot"></span></div>
       </div>
     </div>
@@ -781,6 +781,9 @@ const PERCEIVED_FINE_BOOST = 0.34;
 const FX_PEACE_WINDOW_SEC = 60;
 const WEATHER_REFRESH_MS = 15 * 60 * 1000;
 const MAX_EXTRA_NOISE_REWARD_SEC = 3 * 60 * 60;
+const HEARTBEAT_INTERVAL_MS = 400;
+const TICK_LOG_EVERY = 15;
+const POETIC_LOG_EVERY = 55;
 
 const DIGIT_MAP = {
   '0': ['a','b','c','d','e','f'],
@@ -923,7 +926,6 @@ let micState = {
 };
 
 let POETRY_LINES = [];
-
 const stationStates = {};
 
 function log(message){
@@ -936,7 +938,7 @@ function log(message){
 }
 
 function renderVisibleLog(){
-  const visible = fullLog.slice(-5);
+  const visible = fullLog.slice(-6);
   els.log.textContent = visible.join('\n');
   els.log.scrollTop = els.log.scrollHeight;
 }
@@ -1199,12 +1201,12 @@ Mood: clarity ${weatherState.clarityBias.toFixed(2)} / intensity ${weatherState.
 function getPoeticFragment(){
   if(!POETRY_LINES.length) return 'signal weak / emenating';
   const base = POETRY_LINES[Math.floor(Math.random() * POETRY_LINES.length)];
-  const chaos = clamp(instability() * 0.6 + weatherState.intensity * 0.45, 0, 1);
+  const chaos = clamp(instability() * 0.45 + weatherState.intensity * 0.35, 0, 1);
   return base.split('').map(c => {
-    if(Math.random() < chaos * 0.16) return ['#','~','/','\\','…'][Math.floor(Math.random() * 5)];
-    if(Math.random() < chaos * 0.1) return '';
+    if(Math.random() < chaos * 0.12) return ['#','~','/','\\','…'][Math.floor(Math.random() * 5)];
+    if(Math.random() < chaos * 0.06) return '';
     return c;
-  }).join('').slice(0, 120);
+  }).join('').slice(0, 105);
 }
 
 function updateTelemetry(){
@@ -1213,16 +1215,9 @@ function updateTelemetry(){
   const stationTrack = station && station.phase === 'track' && station.currentTrack ? station.currentTrack.title : '—';
   const fine = getFineTuneAmount();
   const weatherTag = weatherState.enabled ? weatherState.label : 'emenating';
-  const transmission = running ? getPoeticFragment() : '—';
-  const extra =
-`SIG: ${(1 - levelPeakSuppression).toFixed(2)}
-CLR: ${weatherState.clarityBias.toFixed(2)}
-STRM: ${weatherState.stormBias.toFixed(2)}
-PEACE: ${getPeaceCurve().toFixed(2)}
-REWARD: ${getLongListenReward().toFixed(2)}`;
 
   const fxText = audioCtx
-    ? `m ${mainGain ? mainGain.gain.value.toFixed(2) : '0.00'} / t ${textureGain ? textureGain.gain.value.toFixed(2) : '0.00'} / n ${noiseGain ? noiseGain.gain.value.toFixed(2) : '0.00'} / a ${ambientGain ? ambientGain.gain.value.toFixed(2) : '0.00'} / out ${outputGain ? outputGain.gain.value.toFixed(2) : '0.00'} / ag ${autoLevelGain ? autoLevelGain.gain.value.toFixed(2) : '0.00'}${cleanOverride ? ' / clean' : fine > 0.02 ? ` / ft ${fine.toFixed(2)}` : ''}`
+    ? `m ${mainGain ? mainGain.gain.value.toFixed(2) : '0.00'} / n ${noiseGain ? noiseGain.gain.value.toFixed(2) : '0.00'} / out ${outputGain ? outputGain.gain.value.toFixed(2) : '0.00'}${cleanOverride ? ' / clean' : fine > 0.02 ? ` / ft ${fine.toFixed(2)}` : ''}`
     : '—';
 
   els.telemetryLeft.textContent =
@@ -1231,19 +1226,19 @@ CH: ${currentChannel}
 MODE: ${currentMode}
 AUDIO: ${running ? (pausedByKey ? 'paused' : (muted ? 'muted' : 'live')) : 'standby'}
 ELAPSED: ${formatTime(elapsedSec())}
-CHAN ELAPSED: ${formatTime(channelElapsedSec())}
 WEATHER: ${weatherTag}
-${extra}`;
+SIG: ${(1 - levelPeakSuppression).toFixed(2)}
+PEACE: ${getPeaceCurve().toFixed(2)}
+REWARD: ${getLongListenReward().toFixed(2)}`;
 
   els.telemetryRight.textContent =
 `MAIN: ${currentTrack ? currentTrack.title : stationTrack}
-TEX: ${currentTexture ? currentTexture.title : '—'}
 INST: ${instability().toFixed(2)}
 AMB: ${station ? station.ambience.toFixed(2) : '0.00'}
 FX: ${fxText}
 MIC: ${micState.recording ? 'recording' : micState.loopPlaying ? 'looping' : micState.permission === 'granted' ? 'ready' : 'off'}
 PITCH: ${detectedPitchHz ? detectedPitchHz.toFixed(1) + 'Hz' : '—'}
-TX: ${transmission}
+CLR/STRM: ${weatherState.clarityBias.toFixed(2)} / ${weatherState.stormBias.toFixed(2)}
 EGG: `;
   mountEggInTelemetry();
   syncFineTuneButton();
@@ -1754,7 +1749,6 @@ function updateProcessing(forceGhost = false){
 
 function makeFilteredNoise(durationSec, config = {}){
   if(!audioCtx || cleanOverride) return;
-
   const now = audioCtx.currentTime;
   const buffer = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * durationSec), audioCtx.sampleRate);
   const data = buffer.getChannelData(0);
@@ -2326,7 +2320,7 @@ function scheduleSelectedStationRefresh(delayMs){
   selectedStationTimer = setTimeout(() => {
     if(!running || pausedByKey) return;
     renderSelectedStation(false);
-  }, Math.max(30, delayMs));
+  }, Math.max(40, delayMs));
 }
 
 function scheduleAmbulanceFadeIfNeeded(station){
@@ -2730,11 +2724,16 @@ setInterval(() => {
   syncWeatherButton();
 
   heartbeatCounter += 1;
-  if(heartbeatCounter % 10 === 0){
+
+  if(running && heartbeatCounter % POETIC_LOG_EVERY === 0){
+    log(`tx > ${getPoeticFragment()}`);
+  }
+
+  if(heartbeatCounter % TICK_LOG_EVERY === 0){
     const station = currentStationState();
     log(`tick | ch ${currentChannel} ${CHANNELS[currentChannel].mode} | mode ${currentMode} | station ${station.phase} | main ${station.phase === 'track' && station.currentTrack ? station.currentTrack.title : '—'} | live ${running ? (muted ? 'muted' : (pausedByKey ? 'paused' : 'on')) : 'off'}`);
   }
-}, 250);
+}, HEARTBEAT_INTERVAL_MS);
 
 currentChannel = 1;
 syncLiveState();
