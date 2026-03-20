@@ -577,75 +577,30 @@ grid-column:1;
   <section class="shop-panel" id="booksPanel">
     <div class="gallery">
 
-      <div class="product placeholder">
+      <div class="product">
         <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Book 01</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
+          <div class="product-image-frame">
+            <div class="product-track" data-full-link="layer12.html">
+              <div class="product-slide">
+                <img src="images/ambulancelandthumbnail.jpg" alt="Ambuland Land 2025">
+              </div>
+            </div>
+          </div>
 
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Book 02</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
+          <div class="carousel-controls hidden">
+            <span class="carousel-dot active"></span>
+          </div>
 
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Book 03</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
+          <div class="product-info">
+            <p class="product-title">Ambuland Land 2025</p>
+            <p class="product-price">£10</p>
+            <p class="product-type">Book</p>
+            <div class="square-wrap">
+              <a target="_blank" href="#" class="square-button">BUY</a>
+            </div>
+          </div>
 
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Book 04</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Book 05</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Book 06</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Book 07</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Book 08</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Book 09</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
+          <p class="product-note">Double click for full-size artwork.</p>
         </div>
       </div>
 
@@ -764,7 +719,7 @@ toggleButtons.forEach(button => {
   });
 });
 
-document.querySelectorAll('#apparelPanel .product').forEach(product => {
+document.querySelectorAll('#apparelPanel .product, #booksPanel .product').forEach(product => {
   const track = product.querySelector('.product-track');
   if(!track){ return; }
 
