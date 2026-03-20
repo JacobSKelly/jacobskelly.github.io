@@ -26,6 +26,24 @@
       font-family:Arial,Helvetica,sans-serif;
     }
 
+    .back-link{
+      position:fixed;
+      top:18px;
+      left:18px;
+      z-index:4;
+      color:rgba(255,255,255,.68);
+      text-decoration:none;
+      font-size:13px;
+      letter-spacing:.04em;
+      line-height:1;
+      transition:color .18s ease, opacity .18s ease;
+    }
+
+    .back-link:hover{
+      color:#fff;
+      opacity:1;
+    }
+
     .page-title{
       position:fixed;
       top:16px;
@@ -303,6 +321,12 @@
         overflow:auto;
       }
 
+      .back-link{
+        top:16px;
+        left:14px;
+        font-size:12px;
+      }
+
       .wrap{
         position:relative;
         inset:auto;
@@ -419,6 +443,7 @@
   </style>
 </head>
 <body>
+<a href="index.html" class="back-link">back</a>
 <div class="page-title">radio</div>
 
 <div class="wrap">
