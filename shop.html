@@ -33,6 +33,7 @@ min-height:100vh;
 /* HEADER */
 
 header{
+position:relative;
 padding:2vh 20px 1vh 20px;
 line-height:1.2;
 }
@@ -49,7 +50,10 @@ color:#555;
 }
 
 .controls-line{
-margin-top:6px;
+position:absolute;
+top:2vh;
+left:20px;
+margin-top:0;
 }
 
 .controls-line a,
@@ -96,6 +100,55 @@ text-decoration:underline;
 font-size:0.85rem;
 color:#111;
 margin:0 5px;
+}
+
+/* HERO */
+
+.hero{
+display:flex;
+justify-content:center;
+align-items:center;
+margin:60px 0;
+}
+
+.blur-box{
+width:300px;
+height:300px;
+position:relative;
+overflow:hidden;
+background:#fff;
+}
+
+.blur-box img{
+position:absolute;
+width:150%;
+height:150%;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%) scale(1.2);
+object-fit:cover;
+opacity:0;
+will-change:opacity,transform,filter;
+pointer-events:none;
+}
+
+.loading-message{
+position:absolute;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+font-size:0.78rem;
+color:#555;
+letter-spacing:0.02em;
+opacity:0;
+transition:opacity 0.25s ease;
+pointer-events:none;
+z-index:3;
+white-space:nowrap;
+}
+
+.loading-message.show{
+opacity:1;
 }
 
 /* MAIN AREA */
@@ -329,6 +382,10 @@ margin-bottom:2px;
 
 @media(max-width:768px){
 
+header{
+padding-top:20px;
+}
+
 header h1{
 font-size:28px;
 }
@@ -337,9 +394,28 @@ header p{
 font-size:14px;
 }
 
+.controls-line{
+position:static;
+text-align:left;
+margin-bottom:10px;
+}
+
 .shop-nav{
 padding:0 14px;
 line-height:1.8;
+}
+
+.hero{
+margin:44px 0;
+}
+
+.blur-box{
+width:260px;
+height:260px;
+}
+
+.loading-message{
+font-size:0.74rem;
 }
 
 .shop-panel{
@@ -373,13 +449,13 @@ grid-column:1;
 
 <header>
 
+<div class="controls-line">
+  <a href="index.html">back</a>
+</div>
+
 <h1>Shop</h1>
 
 <p>The Fruit That Ate Itself</p>
-
-<div class="controls-line">
-  <a href="index.html">← back</a>
-</div>
 
 <div class="shop-nav">
   <button class="shop-toggle" data-target="printsPanel">Prints</button>
@@ -392,6 +468,14 @@ grid-column:1;
 </div>
 
 </header>
+
+<section class="hero" id="hero">
+  <div class="blur-box">
+    <div class="loading-message" id="loadingMessage">one moment...</div>
+    <img id="imgA" alt="">
+    <img id="imgB" alt="">
+  </div>
+</section>
 
 <main class="shop-shell">
 
@@ -505,7 +589,7 @@ grid-column:1;
                 <img src="images/eggsblack.png" alt="Black T, Nearly Six Eggs">
               </div>
               <div class="product-slide">
-                <img src="images/thumbnailegg.png" alt="Black T, Nearly Six Eggs">
+                <img src="images/thumbnailegg.jpg" alt="Black T, Nearly Six Eggs">
               </div>
               <div class="product-slide">
                 <img src="images/eggsblack2.png" alt="Black T, Nearly Six Eggs">
@@ -695,6 +779,7 @@ grid-column:1;
 <script>
 const toggleButtons = document.querySelectorAll(".shop-toggle");
 const panels = document.querySelectorAll(".shop-panel");
+const hero = document.getElementById("hero");
 
 function closeAllPanels(){
   panels.forEach(panel => panel.classList.remove("show"));
@@ -712,6 +797,9 @@ toggleButtons.forEach(button => {
     if(!isOpen){
       targetPanel.classList.add("show");
       button.classList.add("active");
+      hero.style.display = "none";
+    }else{
+      hero.style.display = "flex";
     }
   });
 });
@@ -763,6 +851,268 @@ document.querySelectorAll('#printsPanel .product, #apparelPanel .product, #books
     });
   });
 });
+
+/* HERO SLIDESHOW */
+
+const imgA = document.getElementById("imgA");
+const imgB = document.getElementById("imgB");
+const loadingMessage = document.getElementById("loadingMessage");
+
+const images = [
+  "images/mantisthumb.png",
+  "images/thumbring.png",
+  "images/knotthumb.png",
+  "images/thumbnailegg.jpg",
+  "images/eggsblack.png",
+  "images/eggsblack2.png",
+  "images/mercurythumbnail.png",
+  "images/mercury1.png",
+  "images/mercury2.png",
+  "images/mercury3.png",
+  "images/dreamthumb.jpg",
+  "images/midtripthumb.jpg",
+  "images/thumbnut.jpg",
+  "images/etrthumb.jpg",
+  "images/cthumb.png",
+  "images/thumbman.jpg",
+  "images/ambulancelandthumb.jpg",
+  "images/t1.jpg",
+  "images/t2.jpg",
+  "images/t3.jpg",
+  "images/t4.jpg",
+  "images/t5.jpg"
+];
+
+function rand(min,max){
+  return Math.random() * (max - min) + min;
+}
+
+function chance(n){
+  return Math.random() < n;
+}
+
+function easeInOut(t){
+  return 0.5 - Math.cos(Math.PI * t) / 2;
+}
+
+let loadingTimer = null;
+
+function scheduleLoadingMessage(){
+  clearTimeout(loadingTimer);
+  loadingTimer = setTimeout(() => {
+    loadingMessage.classList.add("show");
+  }, 350);
+}
+
+function hideLoadingMessage(){
+  clearTimeout(loadingTimer);
+  loadingMessage.classList.remove("show");
+}
+
+let bag = [];
+let lastImage = "";
+
+function refillBag(){
+  bag = images.slice();
+
+  for(let i = bag.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [bag[i], bag[j]] = [bag[j], bag[i]];
+  }
+
+  if(bag.length > 1 && bag[0] === lastImage){
+    [bag[0], bag[1]] = [bag[1], bag[0]];
+  }
+}
+
+function nextImage(){
+  if(bag.length === 0){
+    refillBag();
+  }
+  const src = bag.shift();
+  lastImage = src;
+  return src;
+}
+
+const stateMap = new Map();
+
+function newState(){
+  const now = performance.now();
+
+  const baseScale = rand(1.08,1.46);
+  const pulseTarget = Math.max(1.06, Math.min(1.5, baseScale + rand(-0.06,0.06)));
+
+  const moveRangeFrom = Math.max(0, (baseScale - 1) * 30);
+  const moveRangeTo = Math.max(0, (pulseTarget - 1) * 30);
+
+  return {
+    blurFrom: rand(26,42),
+    blurTo: rand(30,52),
+    blurStart: now,
+    blurDuration: rand(9000,18000),
+
+    xFrom: rand(-moveRangeFrom,moveRangeFrom),
+    yFrom: rand(-moveRangeFrom,moveRangeFrom),
+    xTo: rand(-moveRangeTo,moveRangeTo),
+    yTo: rand(-moveRangeTo,moveRangeTo),
+    moveStart: now,
+    moveDuration: rand(9000,18000),
+
+    scaleFrom: baseScale,
+    scaleTo: pulseTarget,
+    scaleStart: now,
+    scaleDuration: rand(14000,26000)
+  };
+}
+
+function resetMotion(img){
+  stateMap.set(img,newState());
+}
+
+function animateLayer(img,now){
+  const s = stateMap.get(img);
+  if(!s){ return; }
+
+  let blurT = (now - s.blurStart) / s.blurDuration;
+  if(blurT >= 1){
+    s.blurFrom = s.blurTo;
+    s.blurTo = rand(30,52);
+    s.blurStart = now;
+    s.blurDuration = rand(9000,18000);
+    blurT = 0;
+  }
+  const blurEase = easeInOut(Math.max(0,Math.min(1,blurT)));
+  const blurValue = s.blurFrom + (s.blurTo - s.blurFrom) * blurEase;
+
+  let scaleT = (now - s.scaleStart) / s.scaleDuration;
+  if(scaleT >= 1){
+    s.scaleFrom = s.scaleTo;
+    s.scaleTo = Math.max(1.06, Math.min(1.5, s.scaleFrom + rand(-0.06,0.06)));
+    s.scaleStart = now;
+    s.scaleDuration = rand(14000,26000);
+    scaleT = 0;
+  }
+  const scaleEase = easeInOut(Math.max(0,Math.min(1,scaleT)));
+  const scale = s.scaleFrom + (s.scaleTo - s.scaleFrom) * scaleEase;
+
+  let moveT = (now - s.moveStart) / s.moveDuration;
+  if(moveT >= 1){
+    s.xFrom = s.xTo;
+    s.yFrom = s.yTo;
+
+    const currentRange = Math.max(0, (scale - 1) * 30);
+
+    s.xTo = rand(-currentRange,currentRange);
+    s.yTo = rand(-currentRange,currentRange);
+
+    s.moveStart = now;
+    s.moveDuration = rand(9000,18000);
+    moveT = 0;
+  }
+  const moveEase = easeInOut(Math.max(0,Math.min(1,moveT)));
+  const x = s.xFrom + (s.xTo - s.xFrom) * moveEase;
+  const y = s.yFrom + (s.yTo - s.yFrom) * moveEase;
+
+  img.style.filter = "blur(" + blurValue + "px)";
+  img.style.transform =
+    "translate(calc(-50% + " + x + "%), calc(-50% + " + y + "%)) scale(" + scale + ")";
+}
+
+function animate(now){
+  animateLayer(imgA,now);
+  animateLayer(imgB,now);
+  requestAnimationFrame(animate);
+}
+
+let active = imgA;
+let hidden = imgB;
+let switchTimer = null;
+
+function nextDelayMs(){
+  if(chance(0.8)){
+    return rand(14000,24000);
+  }else{
+    return rand(24000,36000);
+  }
+}
+
+function nextFadeSeconds(){
+  if(chance(0.8)){
+    return rand(8,14);
+  }else{
+    return rand(14,20);
+  }
+}
+
+function showNextImage(){
+  const nextSrc = nextImage();
+  const preload = new Image();
+
+  preload.onload = function(){
+    const fade = nextFadeSeconds();
+
+    hidden.src = nextSrc;
+    resetMotion(hidden);
+
+    hidden.style.transition = "none";
+    hidden.style.opacity = 0;
+
+    hidden.offsetHeight;
+
+    hidden.style.transition = "opacity " + fade + "s linear";
+    active.style.transition = "opacity " + fade + "s linear";
+
+    hidden.style.opacity = 1;
+    active.style.opacity = 0;
+
+    const temp = active;
+    active = hidden;
+    hidden = temp;
+
+    switchTimer = setTimeout(showNextImage, nextDelayMs());
+  };
+
+  preload.onerror = function(){
+    switchTimer = setTimeout(showNextImage, 8000);
+  };
+
+  preload.src = nextSrc;
+}
+
+const firstSrc = nextImage();
+const firstPreload = new Image();
+
+scheduleLoadingMessage();
+
+firstPreload.onload = function(){
+  imgA.src = firstSrc;
+  imgA.style.opacity = 1;
+  imgB.style.opacity = 0;
+
+  hideLoadingMessage();
+
+  resetMotion(imgA);
+  resetMotion(imgB);
+
+  requestAnimationFrame(animate);
+  switchTimer = setTimeout(showNextImage, nextDelayMs());
+};
+
+firstPreload.onerror = function(){
+  hideLoadingMessage();
+
+  imgA.src = firstSrc;
+  imgA.style.opacity = 1;
+  imgB.style.opacity = 0;
+
+  resetMotion(imgA);
+  resetMotion(imgB);
+
+  requestAnimationFrame(animate);
+  switchTimer = setTimeout(showNextImage, nextDelayMs());
+};
+
+firstPreload.src = firstSrc;
 </script>
 
 </body>
