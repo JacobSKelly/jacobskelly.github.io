@@ -206,16 +206,19 @@
 
     const TOTAL_LOGICAL_PAGES = 16;
 
+    // Logical working grid for the long-term decay
     const PAGE_PIXEL_WIDTH = 1746;
     const PAGE_PIXEL_HEIGHT = 2478;
     const PIXELS_PER_PAGE = PAGE_PIXEL_WIDTH * PAGE_PIXEL_HEIGHT;
     const TOTAL_PIXELS = TOTAL_LOGICAL_PAGES * PIXELS_PER_PAGE;
 
-    const START_DATE = new Date("2026-03-19T00:00:00Z");
-    const END_DATE   = new Date("2036-03-19T00:00:00Z");
+    // Starts at zero on this date
+    const START_DATE = new Date("2026-03-20T00:00:00Z");
+    const END_DATE   = new Date("2036-03-20T00:00:00Z");
 
     const SEED = 2097152;
 
+    // Secret demo mode
     const DEMO_DURATION_MS = 60000;
     let demoMode = false;
     let demoStartTime = 0;
@@ -226,7 +229,7 @@
     const hint = document.getElementById("hint");
 
     let pdfDoc = null;
-    const pageBaseCanvasCache = new Map();
+    const pageBaseImageDataCache = new Map();
 
     let mode = "cover";
     let currentLeftPage = 2;
@@ -276,6 +279,8 @@
       return activePixelsToBlackNow() / TOTAL_PIXELS;
     }
 
+    // PDF is backwards:
+    // logical page 1 should show the final PDF page
     function logicalToPdfPage(logicalPage){
       return (TOTAL_LOGICAL_PAGES - logicalPage) + 1;
     }
@@ -291,10 +296,12 @@
         const maxH = availH * 0.92;
         let w = maxW;
         let h = w / aspect;
+
         if (h > maxH) {
           h = maxH;
           w = h * aspect;
         }
+
         return { w, h };
       }
 
@@ -323,47 +330,76 @@
       return x / 4294967296;
     }
 
-    async function getBasePageCanvas(logicalPage){
-      if (pageBaseCanvasCache.has(logicalPage)) {
-        return pageBaseCanvasCache.get(logicalPage);
+    async function getBasePageImageData(logicalPage){
+      if (pageBaseImageDataCache.has(logicalPage)) {
+        return pageBaseImageDataCache.get(logicalPage);
       }
 
       const pdfPageNumber = logicalToPdfPage(logicalPage);
       const page = await pdfDoc.getPage(pdfPageNumber);
 
       const viewport = page.getViewport({ scale: 1 });
-      const tempScale = PAGE_PIXEL_WIDTH / viewport.width;
-      const tempViewport = page.getViewport({ scale: tempScale });
 
-      const renderedCanvas = document.createElement("canvas");
-      renderedCanvas.width = PAGE_PIXEL_WIDTH;
-      renderedCanvas.height = PAGE_PIXEL_HEIGHT;
+      // Render PDF page to a temporary canvas first
+      const renderScale = Math.max(
+        PAGE_PIXEL_WIDTH / viewport.width,
+        PAGE_PIXEL_HEIGHT / viewport.height
+      );
 
-      const renderCtx = renderedCanvas.getContext("2d", { willReadFrequently: true });
+      const renderViewport = page.getViewport({ scale: renderScale });
+
+      const tempCanvas = document.createElement("canvas");
+      tempCanvas.width = Math.ceil(renderViewport.width);
+      tempCanvas.height = Math.ceil(renderViewport.height);
+
+      const tempCtx = tempCanvas.getContext("2d", { willReadFrequently: true });
 
       await page.render({
-        canvasContext: renderCtx,
-        viewport: tempViewport
+        canvasContext: tempCtx,
+        viewport: renderViewport
       }).promise;
 
-      pageBaseCanvasCache.set(logicalPage, renderedCanvas);
-      return renderedCanvas;
+      // Now fit it into the exact working grid
+      const baseCanvas = document.createElement("canvas");
+      baseCanvas.width = PAGE_PIXEL_WIDTH;
+      baseCanvas.height = PAGE_PIXEL_HEIGHT;
+
+      const baseCtx = baseCanvas.getContext("2d", { willReadFrequently: true });
+      baseCtx.drawImage(tempCanvas, 0, 0, PAGE_PIXEL_WIDTH, PAGE_PIXEL_HEIGHT);
+
+      const imageData = baseCtx.getImageData(0, 0, PAGE_PIXEL_WIDTH, PAGE_PIXEL_HEIGHT);
+      pageBaseImageDataCache.set(logicalPage, imageData);
+      return imageData;
     }
 
-    function paintDecayOverlay(targetCtx, logicalPage, threshold){
-      if (threshold <= 0) return;
-      if (threshold >= 1) {
-        targetCtx.fillStyle = "#000";
-        targetCtx.fillRect(0, 0, PAGE_PIXEL_WIDTH, PAGE_PIXEL_HEIGHT);
-        return;
+    function applyDecayToImageData(sourceImageData, logicalPage, threshold){
+      const output = new ImageData(
+        new Uint8ClampedArray(sourceImageData.data),
+        sourceImageData.width,
+        sourceImageData.height
+      );
+
+      if (threshold <= 0) {
+        return output;
       }
 
-      const overlay = targetCtx.createImageData(PAGE_PIXEL_WIDTH, PAGE_PIXEL_HEIGHT);
-      const data = overlay.data;
+      if (threshold >= 1) {
+        const d = output.data;
+        for (let i = 0; i < d.length; i += 4) {
+          d[i] = 0;
+          d[i + 1] = 0;
+          d[i + 2] = 0;
+          d[i + 3] = 255;
+        }
+        return output;
+      }
+
+      const data = output.data;
       const pageOffset = (logicalPage - 1) * PIXELS_PER_PAGE;
 
       for (let y = 0; y < PAGE_PIXEL_HEIGHT; y++) {
         const rowBase = y * PAGE_PIXEL_WIDTH;
+
         for (let x = 0; x < PAGE_PIXEL_WIDTH; x++) {
           const pagePixelIndex = rowBase + x;
           const globalIndex = pageOffset + pagePixelIndex;
@@ -379,20 +415,18 @@
         }
       }
 
-      targetCtx.putImageData(overlay, 0, 0);
+      return output;
     }
 
     async function renderLogicalPageIntoCanvas(logicalPage, visibleCanvas){
-      const baseCanvas = await getBasePageCanvas(logicalPage);
+      const baseImageData = await getBasePageImageData(logicalPage);
+      const finalImageData = applyDecayToImageData(baseImageData, logicalPage, activeThresholdNow());
 
       visibleCanvas.width = PAGE_PIXEL_WIDTH;
       visibleCanvas.height = PAGE_PIXEL_HEIGHT;
 
       const ctx = visibleCanvas.getContext("2d", { willReadFrequently: true });
-      ctx.clearRect(0, 0, PAGE_PIXEL_WIDTH, PAGE_PIXEL_HEIGHT);
-      ctx.drawImage(baseCanvas, 0, 0);
-
-      paintDecayOverlay(ctx, logicalPage, activeThresholdNow());
+      ctx.putImageData(finalImageData, 0, 0);
     }
 
     async function makePageWrap(logicalPage, className, displayW, displayH){
@@ -565,12 +599,14 @@
 
       refreshVisibleCanvases().finally(() => {
         const elapsed = performance.now() - demoStartTime;
+
         if (!demoMode || elapsed >= DEMO_DURATION_MS) {
           demoMode = false;
           demoRAF = null;
           refreshVisibleCanvases();
           return;
         }
+
         demoRAF = requestAnimationFrame(tickDemo);
       });
     }
