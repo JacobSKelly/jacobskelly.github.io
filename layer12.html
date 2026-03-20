@@ -1,678 +1,747 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ambuland Land 2025 — Jacob Kelly</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ambuland Land 2025 — Jacob Kelly</title>
 
-  <style>
-    * { box-sizing: border-box; }
+<style>
+* { box-sizing: border-box; }
 
-    :root{
-      --bg:#000;
-      --fg:#fff;
-      --line:rgba(255,255,255,0.12);
-      --shadow:0 24px 60px rgba(0,0,0,0.45);
-    }
+:root{
+--bg:#000;
+--fg:#fff;
+--line:rgba(255,255,255,0.12);
+--shadow:0 24px 60px rgba(0,0,0,0.45);
+}
 
-    html, body {
-      margin:0;
-      min-height:100%;
-      background:var(--bg);
-      color:var(--fg);
-      font-family: Helvetica, Arial, sans-serif;
-    }
+html, body {
+margin:0;
+min-height:100%;
+background:var(--bg);
+color:var(--fg);
+font-family: Helvetica, Arial, sans-serif;
+}
 
-    body{
-      min-height:100vh;
-      display:flex;
-      overflow:hidden;
-    }
+body{
+min-height:100vh;
+display:flex;
+overflow:hidden;
+}
 
-    .text-area{
-      width:30%;
-      padding:40px;
-      display:flex;
-      flex-direction:column;
-      justify-content:flex-start;
-      margin-top:20px;
-      z-index:2;
-    }
+.text-area{
+width:30%;
+padding:40px;
+display:flex;
+flex-direction:column;
+justify-content:flex-start;
+margin-top:20px;
+z-index:2;
+}
 
-    .text-area h1{
-      margin:0 0 6px 0;
-      font-size:clamp(1.8rem, 5vw, 2.2rem);
-      font-weight:900;
-      line-height:1;
-    }
+.text-area h1{
+margin:0 0 6px 0;
+font-size:clamp(1.8rem, 5vw, 2.2rem);
+font-weight:900;
+line-height:1;
+}
 
-    .text-area p{
-      margin:2px 0;
-      font-size:clamp(1rem, 2.5vw, 1.15rem);
-      line-height:1.2;
-      font-weight:600;
-    }
+.text-area p{
+margin:2px 0;
+font-size:clamp(1rem, 2.5vw, 1.15rem);
+line-height:1.2;
+font-weight:600;
+}
 
-    a.back{
-      display:inline-block;
-      margin-bottom:20px;
-      color:#fff;
-      text-decoration:none;
-      font-weight:bold;
-      letter-spacing:1px;
-      font-size:0.9rem;
-    }
+a.back{
+display:inline-block;
+margin-bottom:20px;
+color:#fff;
+text-decoration:none;
+font-weight:bold;
+letter-spacing:1px;
+font-size:0.9rem;
+}
 
-    .viewer-shell{
-      width:70%;
-      min-height:100vh;
-      position:relative;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:28px;
-      overflow:hidden;
-    }
+.viewer-shell{
+width:70%;
+min-height:100vh;
+position:relative;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:28px;
+overflow:hidden;
+}
 
-    .book-stage{
-      width:100%;
-      height:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
+.book-stage{
+width:100%;
+height:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+}
 
-    .cover-view,
-    .spread-view,
-    .back-view{
-      width:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:18px;
-    }
+.cover-view,
+.spread-view,
+.back-view{
+width:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:18px;
+}
 
-    .page-wrap{
-      position:relative;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#111;
-      border:1px solid var(--line);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-      user-select:none;
-      flex:0 0 auto;
-    }
+.page-wrap{
+position:relative;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#111;
+border:1px solid var(--line);
+box-shadow:var(--shadow);
+overflow:hidden;
+user-select:none;
+flex:0 0 auto;
+}
 
-    .page-wrap.cover,
-    .page-wrap.backcover,
-    .page-wrap.left,
-    .page-wrap.right{
-      cursor:pointer;
-    }
+.page-wrap.cover,
+.page-wrap.backcover,
+.page-wrap.left,
+.page-wrap.right{
+cursor:pointer;
+}
 
-    .page-wrap::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,0.04);
-    }
+.page-wrap::after{
+content:"";
+position:absolute;
+inset:0;
+pointer-events:none;
+box-shadow:inset 0 0 0 1px rgba(255,255,255,0.04);
+}
 
-    .page-canvas{
-      display:block;
-      width:100%;
-      height:100%;
-      background:#fff;
-    }
+.page-canvas{
+display:block;
+width:100%;
+height:100%;
+background:#fff;
+}
 
-    .loading,
-    .error{
-      color:#fff;
-      text-align:center;
-      line-height:1.5;
-      max-width:520px;
-    }
+.loading,
+.error{
+color:#fff;
+text-align:center;
+line-height:1.5;
+max-width:520px;
+}
 
-    .hint{
-      position:absolute;
-      left:50%;
-      bottom:18px;
-      transform:translateX(-50%);
-      color:rgba(255,255,255,0.75);
-      font-size:0.88rem;
-      letter-spacing:0.2px;
-      text-align:center;
-      pointer-events:none;
-      white-space:nowrap;
-    }
+.hint{
+position:absolute;
+left:50%;
+bottom:18px;
+transform:translateX(-50%);
+color:rgba(255,255,255,0.75);
+font-size:0.88rem;
+letter-spacing:0.2px;
+text-align:center;
+pointer-events:none;
+white-space:nowrap;
+}
 
-    @media (max-width: 900px){
-      body{
-        flex-direction:column;
-        overflow:auto;
-      }
+@media (max-width: 900px){
+body{
+flex-direction:column;
+overflow:auto;
+}
 
-      .text-area,
-      .viewer-shell{
-        width:100%;
-      }
+.text-area,
+.viewer-shell{
+width:100%;
+}
 
-      .text-area{
-        padding:20px;
-        margin-top:0;
-      }
+.text-area{
+padding:20px;
+margin-top:0;
+}
 
-      .viewer-shell{
-        min-height:72vh;
-        padding:18px;
-      }
+.viewer-shell{
+min-height:72vh;
+padding:18px;
+}
 
-      .spread-view{
-        gap:10px;
-      }
+.spread-view{
+gap:10px;
+}
 
-      .hint{
-        white-space:normal;
-        width:calc(100% - 24px);
-        bottom:10px;
-      }
-    }
-  </style>
+.hint{
+white-space:normal;
+width:calc(100% - 24px);
+bottom:10px;
+}
+}
+</style>
 </head>
 <body>
 
-  <div class="text-area">
-    <a href="index.html" class="back">← Back</a>
-    <h1>Ambuland Land 2025</h1>
-    <p><strong>Jacob Kelly</strong></p>
-  </div>
-
-  <div class="viewer-shell">
-    <div class="book-stage" id="bookStage">
-      <div class="loading">Loading PDF…</div>
-    </div>
-    <div class="hint" id="hint"></div>
-  </div>
-
-  <script type="module">
-    import * as pdfjsLib from "https://cdn.jsdelivr.net/npm/pdfjs-dist@5.5.207/build/pdf.min.mjs";
-
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-      "https://cdn.jsdelivr.net/npm/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs";
-
-    const PDF_URL = "https://phfinal.s3.eu-west-2.amazonaws.com/ambulancelweb.pdf";
-
-    const TOTAL_LOGICAL_PAGES = 16;
-
-    const PAGE_PIXEL_WIDTH = 1746;
-    const PAGE_PIXEL_HEIGHT = 2478;
-    const PIXELS_PER_PAGE = PAGE_PIXEL_WIDTH * PAGE_PIXEL_HEIGHT;
-    const TOTAL_PIXELS = TOTAL_LOGICAL_PAGES * PIXELS_PER_PAGE;
-
-    const START_DATE = new Date("2026-03-20T00:00:00Z");
-    const END_DATE   = new Date("2036-03-20T00:00:00Z");
-
-    const SEED = 2097152;
-
-    const DEMO_DURATION_MS = 60000;
-    let demoMode = false;
-    let demoStartTime = 0;
-    let demoRAF = null;
-    let aKeyDown = false;
-
-    const stage = document.getElementById("bookStage");
-    const hint = document.getElementById("hint");
-
-    let pdfDoc = null;
-    const pageBaseImageDataCache = new Map();
-
-    let mode = "cover";
-    let currentLeftPage = 2;
-
-    function setHint(text){
-      hint.textContent = text || "";
-    }
-
-    function clamp(n, min, max){
-      return Math.max(min, Math.min(max, n));
-    }
-
-    function totalHours(){
-      return Math.floor((END_DATE - START_DATE) / 3600000);
-    }
-
-    function elapsedHours(){
-      const now = Date.now();
-      if (now <= START_DATE.getTime()) return 0;
-      if (now >= END_DATE.getTime()) return totalHours();
-      return Math.floor((now - START_DATE.getTime()) / 3600000);
-    }
-
-    function artworkPixelsToBlackNow(){
-      const hours = elapsedHours();
-      const total = totalHours();
-      if (hours <= 0) return 0;
-      if (hours >= total) return TOTAL_PIXELS;
-      return Math.floor((hours / total) * TOTAL_PIXELS);
-    }
-
-    function easeInQuint(t){
-      return t * t * t * t * t;
-    }
-
-    function demoPixelsToBlackNow(){
-      if (!demoMode) return 0;
-      const elapsed = performance.now() - demoStartTime;
-      const progress = clamp(elapsed / DEMO_DURATION_MS, 0, 1);
-
-      // Secret demo starts extremely gently, then accelerates
-      const eased = easeInQuint(progress);
-
-      return Math.floor(eased * TOTAL_PIXELS);
-    }
-
-    function activePixelsToBlackNow(){
-      if (demoMode) {
-        return Math.max(artworkPixelsToBlackNow(), demoPixelsToBlackNow());
-      }
-      return artworkPixelsToBlackNow();
-    }
-
-    function activeThresholdNow(){
-      return activePixelsToBlackNow() / TOTAL_PIXELS;
-    }
-
-    function logicalToPdfPage(logicalPage){
-      return (TOTAL_LOGICAL_PAGES - logicalPage) + 1;
-    }
-
-    function getPageDisplaySize(singlePage){
-      const shell = document.querySelector(".viewer-shell");
-      const availW = shell.clientWidth - 40;
-      const availH = shell.clientHeight - 90;
-      const aspect = PAGE_PIXEL_WIDTH / PAGE_PIXEL_HEIGHT;
-
-      if (singlePage){
-        const maxW = availW * 0.72;
-        const maxH = availH * 0.92;
-        let w = maxW;
-        let h = w / aspect;
-
-        if (h > maxH) {
-          h = maxH;
-          w = h * aspect;
-        }
-
-        return { w, h };
-      }
-
-      const gap = window.innerWidth <= 900 ? 10 : 18;
-      const maxWPerPage = (availW - gap) / 2;
-      const maxHPerPage = availH * 0.92;
-
-      let w = maxWPerPage;
-      let h = w / aspect;
-
-      if (h > maxHPerPage){
-        h = maxHPerPage;
-        w = h * aspect;
-      }
-
-      return { w, h };
-    }
-
-    function hash01(globalIndex){
-      let x = (globalIndex ^ SEED) >>> 0;
-      x ^= x >>> 16;
-      x = Math.imul(x, 0x7feb352d);
-      x ^= x >>> 15;
-      x = Math.imul(x, 0x846ca68b);
-      x ^= x >>> 16;
-      return x / 4294967296;
-    }
-
-    async function getBasePageImageData(logicalPage){
-      if (pageBaseImageDataCache.has(logicalPage)) {
-        return pageBaseImageDataCache.get(logicalPage);
-      }
-
-      const pdfPageNumber = logicalToPdfPage(logicalPage);
-      const page = await pdfDoc.getPage(pdfPageNumber);
-
-      const viewport = page.getViewport({ scale: 1 });
-
-      const renderScale = Math.max(
-        PAGE_PIXEL_WIDTH / viewport.width,
-        PAGE_PIXEL_HEIGHT / viewport.height
-      );
-
-      const renderViewport = page.getViewport({ scale: renderScale });
-
-      const tempCanvas = document.createElement("canvas");
-      tempCanvas.width = Math.ceil(renderViewport.width);
-      tempCanvas.height = Math.ceil(renderViewport.height);
-
-      const tempCtx = tempCanvas.getContext("2d", { willReadFrequently: true });
-
-      await page.render({
-        canvasContext: tempCtx,
-        viewport: renderViewport
-      }).promise;
-
-      const baseCanvas = document.createElement("canvas");
-      baseCanvas.width = PAGE_PIXEL_WIDTH;
-      baseCanvas.height = PAGE_PIXEL_HEIGHT;
-
-      const baseCtx = baseCanvas.getContext("2d", { willReadFrequently: true });
-      baseCtx.drawImage(tempCanvas, 0, 0, PAGE_PIXEL_WIDTH, PAGE_PIXEL_HEIGHT);
-
-      const imageData = baseCtx.getImageData(0, 0, PAGE_PIXEL_WIDTH, PAGE_PIXEL_HEIGHT);
-      pageBaseImageDataCache.set(logicalPage, imageData);
-      return imageData;
-    }
-
-    function applyDecayToImageData(sourceImageData, logicalPage, threshold){
-      const output = new ImageData(
-        new Uint8ClampedArray(sourceImageData.data),
-        sourceImageData.width,
-        sourceImageData.height
-      );
-
-      if (threshold <= 0) {
-        return output;
-      }
-
-      if (threshold >= 1) {
-        const d = output.data;
-        for (let i = 0; i < d.length; i += 4) {
-          d[i] = 0;
-          d[i + 1] = 0;
-          d[i + 2] = 0;
-          d[i + 3] = 255;
-        }
-        return output;
-      }
-
-      const data = output.data;
-      const pageOffset = (logicalPage - 1) * PIXELS_PER_PAGE;
-
-      for (let y = 0; y < PAGE_PIXEL_HEIGHT; y++) {
-        const rowBase = y * PAGE_PIXEL_WIDTH;
-
-        for (let x = 0; x < PAGE_PIXEL_WIDTH; x++) {
-          const pagePixelIndex = rowBase + x;
-          const globalIndex = pageOffset + pagePixelIndex;
-          const score = hash01(globalIndex);
-
-          if (score < threshold) {
-            const i = pagePixelIndex * 4;
-            data[i] = 0;
-            data[i + 1] = 0;
-            data[i + 2] = 0;
-            data[i + 3] = 255;
-          }
-        }
-      }
-
-      return output;
-    }
-
-    async function renderLogicalPageIntoCanvas(logicalPage, visibleCanvas){
-      const baseImageData = await getBasePageImageData(logicalPage);
-      const finalImageData = applyDecayToImageData(baseImageData, logicalPage, activeThresholdNow());
-
-      visibleCanvas.width = PAGE_PIXEL_WIDTH;
-      visibleCanvas.height = PAGE_PIXEL_HEIGHT;
-
-      const ctx = visibleCanvas.getContext("2d", { willReadFrequently: true });
-      ctx.putImageData(finalImageData, 0, 0);
-    }
-
-    async function makePageWrap(logicalPage, className, displayW, displayH){
-      const wrap = document.createElement("div");
-      wrap.className = `page-wrap ${className}`;
-      wrap.style.width = `${Math.round(displayW)}px`;
-      wrap.style.height = `${Math.round(displayH)}px`;
-
-      const canvas = document.createElement("canvas");
-      canvas.className = "page-canvas";
-      wrap.appendChild(canvas);
-
-      await renderLogicalPageIntoCanvas(logicalPage, canvas);
-
-      wrap.dataset.logicalPage = logicalPage;
-      wrap._canvas = canvas;
-      return wrap;
-    }
-
-    async function refreshVisibleCanvases(){
-      const wraps = stage.querySelectorAll(".page-wrap");
-      const tasks = [];
-
-      wraps.forEach((wrap) => {
-        if (!wrap._canvas) return;
-        const logicalPage = Number(wrap.dataset.logicalPage);
-        tasks.push(renderLogicalPageIntoCanvas(logicalPage, wrap._canvas));
-      });
-
-      await Promise.all(tasks);
-    }
-
-    async function renderCover(){
-      stage.innerHTML = "";
-      const view = document.createElement("div");
-      view.className = "cover-view";
-
-      const size = getPageDisplaySize(true);
-      const pageWrap = await makePageWrap(1, "cover", size.w, size.h);
-
-      pageWrap.addEventListener("dblclick", () => {
-        mode = "spread";
-        currentLeftPage = 2;
-        renderBook();
-      });
-
-      view.appendChild(pageWrap);
-      stage.appendChild(view);
-      setHint("Double click to open");
-    }
-
-    async function renderBackCover(){
-      stage.innerHTML = "";
-      const view = document.createElement("div");
-      view.className = "back-view";
-
-      const size = getPageDisplaySize(true);
-      const pageWrap = await makePageWrap(16, "backcover", size.w, size.h);
-
-      pageWrap.addEventListener("dblclick", () => {
-        mode = "spread";
-        currentLeftPage = 14;
-        renderBook();
-      });
-
-      view.appendChild(pageWrap);
-      stage.appendChild(view);
-      setHint("Double click to return inside");
-    }
-
-    async function renderSpread(){
-      stage.innerHTML = "";
-      const view = document.createElement("div");
-      view.className = "spread-view";
-
-      const size = getPageDisplaySize(false);
-
-      const leftWrap = await makePageWrap(currentLeftPage, "left", size.w, size.h);
-      const rightWrap = await makePageWrap(currentLeftPage + 1, "right", size.w, size.h);
-
-      leftWrap.addEventListener("dblclick", () => {
-        if (currentLeftPage <= 2) {
-          mode = "cover";
-        } else {
-          currentLeftPage -= 2;
-        }
-        renderBook();
-      });
-
-      rightWrap.addEventListener("dblclick", () => {
-        if (currentLeftPage >= 14) {
-          mode = "backcover";
-        } else {
-          currentLeftPage += 2;
-        }
-        renderBook();
-      });
-
-      view.appendChild(leftWrap);
-      view.appendChild(rightWrap);
-      stage.appendChild(view);
-
-      if (currentLeftPage <= 2) {
-        setHint("Double click left page for cover • Double click right page to go forward");
-      } else if (currentLeftPage >= 14) {
-        setHint("Double click left page to go back • Double click right page for back cover");
-      } else {
-        setHint("Double click left page to go back • Double click right page to go forward");
-      }
-    }
-
-    async function renderBook(){
-      if (!pdfDoc) return;
-
-      stage.innerHTML = '<div class="loading">Rendering…</div>';
-
-      try {
-        if (mode === "cover") {
-          await renderCover();
-        } else if (mode === "backcover") {
-          await renderBackCover();
-        } else {
-          await renderSpread();
-        }
-      } catch (err) {
-        console.error(err);
-        stage.innerHTML = `
-          <div class="error">
-            Could not render the PDF.<br><br>
-            Check the URL and S3 CORS settings.
-          </div>
-        `;
-      }
-    }
-
-    async function loadPDF(){
-      try {
-        const task = pdfjsLib.getDocument(PDF_URL);
-        pdfDoc = await task.promise;
-        await renderBook();
-      } catch (err) {
-        console.error(err);
-        stage.innerHTML = `
-          <div class="error">
-            Failed to load the PDF.<br><br>
-            Check the file URL and CORS configuration on S3.
-          </div>
-        `;
-      }
-    }
-
-    function startDemoMode(){
-      if (demoMode) return;
-      demoMode = true;
-      demoStartTime = performance.now();
-      tickDemo();
-    }
-
-    function stopDemoMode(){
-      demoMode = false;
-      if (demoRAF) {
-        cancelAnimationFrame(demoRAF);
-        demoRAF = null;
-      }
-      refreshVisibleCanvases();
-    }
-
-    function tickDemo(){
-      if (!demoMode) return;
-
-      refreshVisibleCanvases().finally(() => {
-        const elapsed = performance.now() - demoStartTime;
-
-        if (!demoMode || elapsed >= DEMO_DURATION_MS) {
-          demoMode = false;
-          demoRAF = null;
-          refreshVisibleCanvases();
-          return;
-        }
-
-        demoRAF = requestAnimationFrame(tickDemo);
-      });
-    }
-
-    window.addEventListener("resize", () => {
-      if (pdfDoc) renderBook();
-    });
-
-    window.addEventListener("keydown", (e) => {
-      if (!pdfDoc) return;
-
-      if ((e.key === "a" || e.key === "A") && !aKeyDown) {
-        aKeyDown = true;
-        startDemoMode();
-      }
-
-      if (mode === "cover") {
-        if (e.key === "ArrowRight" || e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          mode = "spread";
-          currentLeftPage = 2;
-          renderBook();
-        }
-        return;
-      }
-
-      if (mode === "backcover") {
-        if (e.key === "ArrowLeft") {
-          mode = "spread";
-          currentLeftPage = 14;
-          renderBook();
-        }
-        return;
-      }
-
-      if (e.key === "ArrowLeft") {
-        if (currentLeftPage <= 2) {
-          mode = "cover";
-        } else {
-          currentLeftPage -= 2;
-        }
-        renderBook();
-      } else if (e.key === "ArrowRight") {
-        if (currentLeftPage >= 14) {
-          mode = "backcover";
-        } else {
-          currentLeftPage += 2;
-        }
-        renderBook();
-      }
-    });
-
-    window.addEventListener("keyup", (e) => {
-      if (e.key === "a" || e.key === "A") {
-        aKeyDown = false;
-        stopDemoMode();
-      }
-    });
-
-    window.addEventListener("blur", () => {
-      aKeyDown = false;
-      stopDemoMode();
-    });
-
-    loadPDF();
-  </script>
+<div class="text-area">
+<a href="index.html" class="back">← Back</a>
+<h1>Ambuland Land 2025</h1>
+<p><strong>Jacob Kelly</strong></p>
+</div>
+
+<div class="viewer-shell">
+<div class="book-stage" id="bookStage">
+<div class="loading">Loading PDF…</div>
+</div>
+<div class="hint" id="hint"></div>
+</div>
+
+<script type="module">
+import * as pdfjsLib from "https://cdn.jsdelivr.net/npm/pdfjs-dist@5.5.207/build/pdf.min.mjs";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+"https://cdn.jsdelivr.net/npm/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs";
+
+const PDF_URL = "https://phfinal.s3.eu-west-2.amazonaws.com/ambulancelweb.pdf";
+
+const TOTAL_LOGICAL_PAGES = 16;
+
+const PAGE_PIXEL_WIDTH = 1746;
+const PAGE_PIXEL_HEIGHT = 2478;
+const PIXELS_PER_PAGE = PAGE_PIXEL_WIDTH * PAGE_PIXEL_HEIGHT;
+const TOTAL_PIXELS = TOTAL_LOGICAL_PAGES * PIXELS_PER_PAGE;
+
+// Reset to now
+const START_DATE = new Date("2026-03-20T00:00:00Z");
+const END_DATE = new Date("2036-03-20T00:00:00Z");
+
+const SEED = 2097152;
+
+const DEMO_DURATION_MS = 60000;
+let demoMode = false;
+let demoStartTime = 0;
+let demoRAF = null;
+let aKeyDown = false;
+
+const stage = document.getElementById("bookStage");
+const hint = document.getElementById("hint");
+
+let pdfDoc = null;
+const pageBaseImageDataCache = new Map();
+
+let mode = "cover";
+let currentLeftPage = 2;
+
+function setHint(text){
+hint.textContent = text || "";
+}
+
+function clamp(n, min, max){
+return Math.max(min, Math.min(max, n));
+}
+
+function lerp(a, b, t){
+return a + (b - a) * t;
+}
+
+function smoothstep(t){
+return t * t * (3 - 2 * t);
+}
+
+function easeInCubic(t){
+return t * t * t;
+}
+
+function easeInSeptic(t){
+return t * t * t * t * t * t * t;
+}
+
+function totalHours(){
+return Math.floor((END_DATE - START_DATE) / 3600000);
+}
+
+function elapsedHours(){
+const now = Date.now();
+if (now <= START_DATE.getTime()) return 0;
+if (now >= END_DATE.getTime()) return totalHours();
+return Math.floor((now - START_DATE.getTime()) / 3600000);
+}
+
+function artworkPixelsToBlackNow(){
+const hours = elapsedHours();
+const total = totalHours();
+if (hours <= 0) return 0;
+if (hours >= total) return TOTAL_PIXELS;
+
+const progress = hours / total;
+const eased = easeInCubic(progress);
+
+return Math.floor(eased * TOTAL_PIXELS);
+}
+
+function demoPixelsToBlackNow(){
+if (!demoMode) return 0;
+
+const elapsed = performance.now() - demoStartTime;
+const progress = clamp(elapsed / DEMO_DURATION_MS, 0, 1);
+
+// much slower start for the demo
+const eased = easeInSeptic(progress);
+
+return Math.floor(eased * TOTAL_PIXELS);
+}
+
+function activePixelsToBlackNow(){
+if (demoMode) {
+return Math.max(artworkPixelsToBlackNow(), demoPixelsToBlackNow());
+}
+return artworkPixelsToBlackNow();
+}
+
+function activeThresholdNow(){
+return activePixelsToBlackNow() / TOTAL_PIXELS;
+}
+
+function logicalToPdfPage(logicalPage){
+return (TOTAL_LOGICAL_PAGES - logicalPage) + 1;
+}
+
+function getPageDisplaySize(singlePage){
+const shell = document.querySelector(".viewer-shell");
+const availW = shell.clientWidth - 40;
+const availH = shell.clientHeight - 90;
+const aspect = PAGE_PIXEL_WIDTH / PAGE_PIXEL_HEIGHT;
+
+if (singlePage){
+const maxW = availW * 0.72;
+const maxH = availH * 0.92;
+let w = maxW;
+let h = w / aspect;
+
+if (h > maxH) {
+h = maxH;
+w = h * aspect;
+}
+
+return { w, h };
+}
+
+const gap = window.innerWidth <= 900 ? 10 : 18;
+const maxWPerPage = (availW - gap) / 2;
+const maxHPerPage = availH * 0.92;
+
+let w = maxWPerPage;
+let h = w / aspect;
+
+if (h > maxHPerPage){
+h = maxHPerPage;
+w = h * aspect;
+}
+
+return { w, h };
+}
+
+function hash01(n){
+let x = n >>> 0;
+x ^= x >>> 16;
+x = Math.imul(x, 0x7feb352d);
+x ^= x >>> 15;
+x = Math.imul(x, 0x846ca68b);
+x ^= x >>> 16;
+return x / 4294967296;
+}
+
+function hash2D(ix, iy, seed){
+let n = (Math.imul(ix, 374761393) ^ Math.imul(iy, 668265263) ^ Math.imul(seed, 1446647)) >>> 0;
+return hash01(n);
+}
+
+function valueNoise2D(x, y, seed){
+const x0 = Math.floor(x);
+const y0 = Math.floor(y);
+const x1 = x0 + 1;
+const y1 = y0 + 1;
+
+const tx = smoothstep(x - x0);
+const ty = smoothstep(y - y0);
+
+const v00 = hash2D(x0, y0, seed);
+const v10 = hash2D(x1, y0, seed);
+const v01 = hash2D(x0, y1, seed);
+const v11 = hash2D(x1, y1, seed);
+
+const a = lerp(v00, v10, tx);
+const b = lerp(v01, v11, tx);
+return lerp(a, b, ty);
+}
+
+function organicScore(x, y, logicalPage){
+const pageSeed = SEED + logicalPage * 977;
+
+const warpA = valueNoise2D(x / 260, y / 260, pageSeed + 11);
+const warpB = valueNoise2D(x / 110, y / 110, pageSeed + 23);
+
+const wx = x + (warpA - 0.5) * 180 + (warpB - 0.5) * 60;
+const wy = y + (valueNoise2D(x / 240, y / 240, pageSeed + 37) - 0.5) * 180
++ (valueNoise2D(x / 95, y / 95, pageSeed + 41) - 0.5) * 60;
+
+const large = valueNoise2D(wx / 320, wy / 320, pageSeed + 101);
+const medium = valueNoise2D(wx / 120, wy / 120, pageSeed + 211);
+const small = valueNoise2D(wx / 42, wy / 42, pageSeed + 307);
+
+const pageOffset = (logicalPage - 1) * PIXELS_PER_PAGE;
+const pixelIndex = y * PAGE_PIXEL_WIDTH + x;
+const fine = hash01(pageOffset + pixelIndex + pageSeed * 13);
+
+// weighted mix: fine random + clustered fields
+return clamp(
+fine * 0.45 +
+small * 0.20 +
+medium * 0.22 +
+large * 0.13,
+0,
+1
+);
+}
+
+async function getBasePageImageData(logicalPage){
+if (pageBaseImageDataCache.has(logicalPage)) {
+return pageBaseImageDataCache.get(logicalPage);
+}
+
+const pdfPageNumber = logicalToPdfPage(logicalPage);
+const page = await pdfDoc.getPage(pdfPageNumber);
+
+const viewport = page.getViewport({ scale: 1 });
+
+const renderScale = Math.max(
+PAGE_PIXEL_WIDTH / viewport.width,
+PAGE_PIXEL_HEIGHT / viewport.height
+);
+
+const renderViewport = page.getViewport({ scale: renderScale });
+
+const tempCanvas = document.createElement("canvas");
+tempCanvas.width = Math.ceil(renderViewport.width);
+tempCanvas.height = Math.ceil(renderViewport.height);
+
+const tempCtx = tempCanvas.getContext("2d", { willReadFrequently: true });
+
+await page.render({
+canvasContext: tempCtx,
+viewport: renderViewport
+}).promise;
+
+const baseCanvas = document.createElement("canvas");
+baseCanvas.width = PAGE_PIXEL_WIDTH;
+baseCanvas.height = PAGE_PIXEL_HEIGHT;
+
+const baseCtx = baseCanvas.getContext("2d", { willReadFrequently: true });
+baseCtx.drawImage(tempCanvas, 0, 0, PAGE_PIXEL_WIDTH, PAGE_PIXEL_HEIGHT);
+
+const imageData = baseCtx.getImageData(0, 0, PAGE_PIXEL_WIDTH, PAGE_PIXEL_HEIGHT);
+pageBaseImageDataCache.set(logicalPage, imageData);
+return imageData;
+}
+
+function applyDecayToImageData(sourceImageData, logicalPage, threshold){
+const output = new ImageData(
+new Uint8ClampedArray(sourceImageData.data),
+sourceImageData.width,
+sourceImageData.height
+);
+
+if (threshold <= 0) {
+return output;
+}
+
+if (threshold >= 1) {
+const d = output.data;
+for (let i = 0; i < d.length; i += 4) {
+d[i] = 0;
+d[i + 1] = 0;
+d[i + 2] = 0;
+d[i + 3] = 255;
+}
+return output;
+}
+
+const data = output.data;
+
+for (let y = 0; y < PAGE_PIXEL_HEIGHT; y++) {
+const rowBase = y * PAGE_PIXEL_WIDTH;
+
+for (let x = 0; x < PAGE_PIXEL_WIDTH; x++) {
+const pagePixelIndex = rowBase + x;
+const score = organicScore(x, y, logicalPage);
+
+if (score < threshold) {
+const i = pagePixelIndex * 4;
+data[i] = 0;
+data[i + 1] = 0;
+data[i + 2] = 0;
+data[i + 3] = 255;
+}
+}
+}
+
+return output;
+}
+
+async function renderLogicalPageIntoCanvas(logicalPage, visibleCanvas){
+const baseImageData = await getBasePageImageData(logicalPage);
+const finalImageData = applyDecayToImageData(baseImageData, logicalPage, activeThresholdNow());
+
+visibleCanvas.width = PAGE_PIXEL_WIDTH;
+visibleCanvas.height = PAGE_PIXEL_HEIGHT;
+
+const ctx = visibleCanvas.getContext("2d", { willReadFrequently: true });
+ctx.putImageData(finalImageData, 0, 0);
+}
+
+async function makePageWrap(logicalPage, className, displayW, displayH){
+const wrap = document.createElement("div");
+wrap.className = `page-wrap ${className}`;
+wrap.style.width = `${Math.round(displayW)}px`;
+wrap.style.height = `${Math.round(displayH)}px`;
+
+const canvas = document.createElement("canvas");
+canvas.className = "page-canvas";
+wrap.appendChild(canvas);
+
+await renderLogicalPageIntoCanvas(logicalPage, canvas);
+
+wrap.dataset.logicalPage = logicalPage;
+wrap._canvas = canvas;
+return wrap;
+}
+
+async function refreshVisibleCanvases(){
+const wraps = stage.querySelectorAll(".page-wrap");
+const tasks = [];
+
+wraps.forEach((wrap) => {
+if (!wrap._canvas) return;
+const logicalPage = Number(wrap.dataset.logicalPage);
+tasks.push(renderLogicalPageIntoCanvas(logicalPage, wrap._canvas));
+});
+
+await Promise.all(tasks);
+}
+
+async function renderCover(){
+stage.innerHTML = "";
+const view = document.createElement("div");
+view.className = "cover-view";
+
+const size = getPageDisplaySize(true);
+const pageWrap = await makePageWrap(1, "cover", size.w, size.h);
+
+pageWrap.addEventListener("dblclick", () => {
+mode = "spread";
+currentLeftPage = 2;
+renderBook();
+});
+
+view.appendChild(pageWrap);
+stage.appendChild(view);
+setHint("Double click to open");
+}
+
+async function renderBackCover(){
+stage.innerHTML = "";
+const view = document.createElement("div");
+view.className = "back-view";
+
+const size = getPageDisplaySize(true);
+const pageWrap = await makePageWrap(16, "backcover", size.w, size.h);
+
+pageWrap.addEventListener("dblclick", () => {
+mode = "spread";
+currentLeftPage = 14;
+renderBook();
+});
+
+view.appendChild(pageWrap);
+stage.appendChild(view);
+setHint("Double click to return inside");
+}
+
+async function renderSpread(){
+stage.innerHTML = "";
+const view = document.createElement("div");
+view.className = "spread-view";
+
+const size = getPageDisplaySize(false);
+
+const leftWrap = await makePageWrap(currentLeftPage, "left", size.w, size.h);
+const rightWrap = await makePageWrap(currentLeftPage + 1, "right", size.w, size.h);
+
+leftWrap.addEventListener("dblclick", () => {
+if (currentLeftPage <= 2) {
+mode = "cover";
+} else {
+currentLeftPage -= 2;
+}
+renderBook();
+});
+
+rightWrap.addEventListener("dblclick", () => {
+if (currentLeftPage >= 14) {
+mode = "backcover";
+} else {
+currentLeftPage += 2;
+}
+renderBook();
+});
+
+view.appendChild(leftWrap);
+view.appendChild(rightWrap);
+stage.appendChild(view);
+
+if (currentLeftPage <= 2) {
+setHint("Double click left page for cover • Double click right page to go forward");
+} else if (currentLeftPage >= 14) {
+setHint("Double click left page to go back • Double click right page for back cover");
+} else {
+setHint("Double click left page to go back • Double click right page to go forward");
+}
+}
+
+async function renderBook(){
+if (!pdfDoc) return;
+
+stage.innerHTML = '<div class="loading">Rendering…</div>';
+
+try {
+if (mode === "cover") {
+await renderCover();
+} else if (mode === "backcover") {
+await renderBackCover();
+} else {
+await renderSpread();
+}
+} catch (err) {
+console.error(err);
+stage.innerHTML = `
+<div class="error">
+Could not render the PDF.<br><br>
+Check the URL and S3 CORS settings.
+</div>
+`;
+}
+}
+
+async function loadPDF(){
+try {
+const task = pdfjsLib.getDocument(PDF_URL);
+pdfDoc = await task.promise;
+await renderBook();
+} catch (err) {
+console.error(err);
+stage.innerHTML = `
+<div class="error">
+Failed to load the PDF.<br><br>
+Check the file URL and CORS configuration on S3.
+</div>
+`;
+}
+}
+
+function startDemoMode(){
+if (demoMode) return;
+demoMode = true;
+demoStartTime = performance.now();
+tickDemo();
+}
+
+function stopDemoMode(){
+demoMode = false;
+if (demoRAF) {
+cancelAnimationFrame(demoRAF);
+demoRAF = null;
+}
+refreshVisibleCanvases();
+}
+
+function tickDemo(){
+if (!demoMode) return;
+
+refreshVisibleCanvases().finally(() => {
+const elapsed = performance.now() - demoStartTime;
+
+if (!demoMode || elapsed >= DEMO_DURATION_MS) {
+demoMode = false;
+demoRAF = null;
+refreshVisibleCanvases();
+return;
+}
+
+demoRAF = requestAnimationFrame(tickDemo);
+});
+}
+
+window.addEventListener("resize", () => {
+if (pdfDoc) renderBook();
+});
+
+window.addEventListener("keydown", (e) => {
+if (!pdfDoc) return;
+
+if ((e.key === "a" || e.key === "A") && !aKeyDown) {
+aKeyDown = true;
+startDemoMode();
+}
+
+if (mode === "cover") {
+if (e.key === "ArrowRight" || e.key === "Enter" || e.key === " ") {
+e.preventDefault();
+mode = "spread";
+currentLeftPage = 2;
+renderBook();
+}
+return;
+}
+
+if (mode === "backcover") {
+if (e.key === "ArrowLeft") {
+mode = "spread";
+currentLeftPage = 14;
+renderBook();
+}
+return;
+}
+
+if (e.key === "ArrowLeft") {
+if (currentLeftPage <= 2) {
+mode = "cover";
+} else {
+currentLeftPage -= 2;
+}
+renderBook();
+} else if (e.key === "ArrowRight") {
+if (currentLeftPage >= 14) {
+mode = "backcover";
+} else {
+currentLeftPage += 2;
+}
+renderBook();
+}
+});
+
+window.addEventListener("keyup", (e) => {
+if (e.key === "a" || e.key === "A") {
+aKeyDown = false;
+stopDemoMode();
+}
+});
+
+window.addEventListener("blur", () => {
+aKeyDown = false;
+stopDemoMode();
+});
+
+loadPDF();
+</script>
 </body>
 </html>
