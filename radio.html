@@ -614,6 +614,9 @@ const AMBULANCE_WINDOW_END = 19 * 60;
 const AMBULANCE_WINDOW_FADE = 42;
 const AMBULANCE_REST_MS = 11 * 60 * 1000;
 
+const BASE_OUTPUT_LEVEL = 0.95;
+const FINE_TUNE_MAX_VOLUME_BOOST = 0.15;
+
 const DIGIT_MAP = {
   '0': ['a','b','c','d','e','f'],
   '1': ['b','c'],
@@ -649,6 +652,7 @@ let mainSource = null;
 let textureSource = null;
 
 let masterGain = null;
+let outputGain = null;
 let mainGain = null;
 let textureGain = null;
 let noiseGain = null;
@@ -757,14 +761,43 @@ function currentStationState(){
   return stationStates[currentChannel];
 }
 
-function getFineTuneAmount(){
+function getFineTuneMix(){
   if(cleanOverride) return 0;
-  if(!fineTuneUntil || nowMs() >= fineTuneUntil) return 0;
+  if(!fineTuneUntil || nowMs() >= fineTuneUntil || fineTuneDecayMs <= 0) return 0;
 
   const elapsed = nowMs() - fineTuneStartAt;
   const progress = clamp(elapsed / fineTuneDecayMs, 0, 1);
-  const eased = Math.pow(1 - progress, 1.35);
-  return fineTunePeak * eased;
+  return Math.pow(1 - progress, 1.35);
+}
+
+function getFineTuneAmount(){
+  if(cleanOverride) return 0;
+  return fineTunePeak * getFineTuneMix();
+}
+
+function getFineTuneVolumeBoost(){
+  return FINE_TUNE_MAX_VOLUME_BOOST * getFineTuneMix();
+}
+
+function getTargetOutputLevel(){
+  if(muted) return 0.0001;
+  return BASE_OUTPUT_LEVEL * (1 + getFineTuneVolumeBoost());
+}
+
+function updateOutputLevel(immediate = false){
+  if(!audioCtx || !outputGain) return;
+
+  const now = audioCtx.currentTime;
+  const target = getTargetOutputLevel();
+
+  outputGain.gain.cancelScheduledValues(now);
+
+  if(immediate){
+    outputGain.gain.setValueAtTime(target, now);
+  } else {
+    outputGain.gain.setValueAtTime(outputGain.gain.value, now);
+    outputGain.gain.setTargetAtTime(target, now, muted ? 0.06 : 0.28);
+  }
 }
 
 function beginFineTune(){
@@ -776,9 +809,10 @@ function beginFineTune(){
 
   if(audioCtx){
     synthesizeTuningSound(rand(0.45, 0.9), 0.28);
+    updateOutputLevel(false);
   }
 
-  log(`Fine tune engaged (${Math.round(fineTuneDecayMs / 1000)}s settle)`);
+  log(`Fine tune engaged (${Math.round(fineTuneDecayMs / 1000)}s settle, +${Math.round(FINE_TUNE_MAX_VOLUME_BOOST * 100)}% max volume assist)`);
   updateProcessing(false);
   updateTelemetry();
 }
@@ -803,21 +837,7 @@ function syncLiveState(){
 
 function setMuted(nextMuted, immediate = false){
   muted = !!nextMuted;
-
-  if(audioCtx && masterGain){
-    const now = audioCtx.currentTime;
-    const target = muted ? 0.0001 : 0.95;
-
-    masterGain.gain.cancelScheduledValues(now);
-
-    if(immediate){
-      masterGain.gain.setValueAtTime(target, now);
-    } else {
-      masterGain.gain.setValueAtTime(masterGain.gain.value, now);
-      masterGain.gain.linearRampToValueAtTime(target, now + (muted ? 0.08 : 0.25));
-    }
-  }
-
+  updateOutputLevel(immediate);
   syncLiveState();
   updateTelemetry();
 }
@@ -881,9 +901,10 @@ function updateTelemetry(){
   const station = currentStationState();
   const stationTrack = station && station.phase === 'track' && station.currentTrack ? station.currentTrack.title : '—';
   const fine = getFineTuneAmount();
+  const fineBoost = getFineTuneVolumeBoost();
 
   const fxText = audioCtx
-    ? `m ${mainGain ? mainGain.gain.value.toFixed(2) : '0.00'} / t ${textureGain ? textureGain.gain.value.toFixed(2) : '0.00'} / n ${noiseGain ? noiseGain.gain.value.toFixed(2) : '0.00'} / a ${ambientGain ? ambientGain.gain.value.toFixed(2) : '0.00'}${cleanOverride ? ' / clean' : fine > 0.02 ? ` / ft ${fine.toFixed(2)}` : ''}`
+    ? `m ${mainGain ? mainGain.gain.value.toFixed(2) : '0.00'} / t ${textureGain ? textureGain.gain.value.toFixed(2) : '0.00'} / n ${noiseGain ? noiseGain.gain.value.toFixed(2) : '0.00'} / a ${ambientGain ? ambientGain.gain.value.toFixed(2) : '0.00'} / out ${outputGain ? outputGain.gain.value.toFixed(2) : '0.00'}${cleanOverride ? ' / clean' : fine > 0.02 ? ` / ft ${fine.toFixed(2)} / +${Math.round(fineBoost * 100)}%` : ''}`
     : '—';
 
   els.telemetryLeft.textContent =
@@ -934,6 +955,7 @@ async function ensureAudio(){
     textureSource = audioCtx.createMediaElementSource(els.texture);
 
     masterGain = audioCtx.createGain();
+    outputGain = audioCtx.createGain();
     mainGain = audioCtx.createGain();
     textureGain = audioCtx.createGain();
     noiseGain = audioCtx.createGain();
@@ -970,7 +992,8 @@ async function ensureAudio(){
     ambientFeedback = audioCtx.createGain();
     ambientWet = audioCtx.createGain();
 
-    masterGain.gain.value = 0.95;
+    masterGain.gain.value = 1;
+    outputGain.gain.value = BASE_OUTPUT_LEVEL;
     mainGain.gain.value = 0;
     textureGain.gain.value = 0;
     noiseGain.gain.value = 0;
@@ -1013,7 +1036,8 @@ async function ensureAudio(){
 
     noiseGain.connect(masterGain);
     humGain.connect(masterGain);
-    masterGain.connect(audioCtx.destination);
+    masterGain.connect(outputGain);
+    outputGain.connect(audioCtx.destination);
 
     log(`AudioContext created (${audioCtx.state})`);
   }
@@ -1023,6 +1047,7 @@ async function ensureAudio(){
     log(`AudioContext resumed (${audioCtx.state})`);
   }
 
+  updateOutputLevel(true);
   updateTelemetry();
 }
 
@@ -1089,6 +1114,8 @@ function updateProcessing(forceGhost = false){
   const ambient = station ? station.ambience : 0.35;
   const t = instability();
   const fine = getFineTuneAmount();
+
+  updateOutputLevel(false);
 
   if(cleanOverride){
     mainDrive.curve = makeDistortionCurve(0);
@@ -2036,6 +2063,8 @@ setInterval(() => {
 
   if(running && !pausedByKey){
     updateProcessing(false);
+  } else if(audioCtx && outputGain){
+    updateOutputLevel(false);
   }
 
   if(nowMs() - lastTelemetryBeat > 1000){
