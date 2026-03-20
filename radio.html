@@ -1,889 +1,949 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shop - Jacob Samuel Kelly</title>
-
-<style>
-/* RESET */
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
-
-/* BASE */
-
-html,body{
-width:100%;
-font-family:Helvetica,Arial,sans-serif;
-background:#fff;
-color:#111;
-text-align:center;
-}
-
-body{
-display:flex;
-flex-direction:column;
-min-height:100vh;
-}
-
-/* HEADER */
-
-header{
-position:relative;
-padding:2vh 20px 1vh 20px;
-line-height:1.2;
-}
-
-header h1{
-font-size:4vh;
-margin-bottom:1vh;
-font-weight:normal;
-}
-
-header p{
-font-size:1.8vh;
-color:#555;
-}
-
-.controls-line{
-position:absolute;
-top:2vh;
-left:20px;
-margin-top:0;
-}
-
-.controls-line a,
-.controls-line button,
-.controls-line span{
-font-size:0.85rem;
-color:#111;
-text-decoration:none;
-margin:0 4px;
-}
-
-.controls-line a:hover{
-text-decoration:underline;
-}
-
-/* TOP NAV */
-
-.shop-nav{
-margin-top:10px;
-margin-bottom:22px;
-line-height:1.5;
-}
-
-.shop-toggle{
-appearance:none;
-background:none;
-border:none;
-font-family:Helvetica,Arial,sans-serif;
-font-size:0.85rem;
-color:#111;
-cursor:pointer;
-padding:0;
-}
-
-.shop-toggle:hover{
-text-decoration:underline;
-}
-
-.shop-toggle.active{
-text-decoration:underline;
-}
-
-.shop-separator{
-font-size:0.85rem;
-color:#111;
-margin:0 5px;
-}
-
-/* HERO */
-
-.hero{
-display:flex;
-justify-content:center;
-align-items:center;
-margin:60px 0;
-}
-
-.blur-box{
-width:300px;
-height:300px;
-position:relative;
-overflow:hidden;
-background:#fff;
-}
-
-.blur-box img{
-position:absolute;
-width:150%;
-height:150%;
-left:50%;
-top:50%;
-transform:translate(-50%,-50%) scale(1.2);
-object-fit:cover;
-opacity:0;
-will-change:opacity,transform,filter;
-pointer-events:none;
-}
-
-.loading-message{
-position:absolute;
-left:50%;
-top:50%;
-transform:translate(-50%,-50%);
-font-size:0.78rem;
-color:#555;
-letter-spacing:0.02em;
-opacity:0;
-transition:opacity 0.25s ease;
-pointer-events:none;
-z-index:3;
-white-space:nowrap;
-}
-
-.loading-message.show{
-opacity:1;
-}
-
-/* MAIN AREA */
-
-.shop-shell{
-width:100%;
-}
-
-/* DROPDOWN PANELS */
-
-.shop-panel{
-display:none;
-max-width:90vw;
-margin:0 auto 28px auto;
-}
-
-.shop-panel.show{
-display:block;
-}
-
-/* GALLERY */
-
-.gallery{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:1.5vh;
-max-width:72vw;
-margin:0 auto;
-justify-content:center;
-}
-
-.product{
-display:flex;
-flex-direction:column;
-align-items:center;
-}
-
-.product-card{
-width:80%;
-display:flex;
-flex-direction:column;
-align-items:center;
-text-decoration:none;
-color:inherit;
-}
-
-.product-image-frame{
-width:100%;
-aspect-ratio:1/1;
-background:#f5f5f5;
-overflow:hidden;
-position:relative;
-}
-
-.product-track{
-display:flex;
-width:100%;
-height:100%;
-transition:transform 0.3s ease;
-}
-
-.product-slide{
-flex:0 0 100%;
-width:100%;
-height:100%;
-}
-
-.product-slide img{
-width:100%;
-height:100%;
-object-fit:cover;
-object-position:bottom center;
-display:block;
-cursor:pointer;
-user-select:none;
--webkit-user-drag:none;
-}
-
-.carousel-controls{
-margin-top:8px;
-display:flex;
-justify-content:center;
-align-items:center;
-gap:6px;
-min-height:18px;
-}
-
-.carousel-dot{
-width:8px;
-height:8px;
-border-radius:50%;
-border:1px solid #111;
-background:#fff;
-}
-
-.carousel-dot.active{
-background:#111;
-}
-
-.carousel-controls.hidden{
-visibility:hidden;
-}
-
-.product-info{
-width:100%;
-padding-top:10px;
-line-height:1.3;
-min-height:82px;
-}
-
-.product-title{
-font-size:0.95rem;
-font-weight:normal;
-}
-
-.product-price{
-font-size:0.85rem;
-color:#555;
-margin-top:4px;
-}
-
-.product-type{
-font-size:0.8rem;
-color:#777;
-margin-top:3px;
-}
-
-.square-wrap{
-margin:10px auto 0 auto;
-}
-
-.square-button{
-display:inline-flex;
-align-items:center;
-justify-content:center;
-text-decoration:none;
-font-family:Helvetica,Arial,sans-serif;
-transition:opacity 0.25s ease;
-background:#000;
-color:#fff;
-border:none;
-border-radius:0;
-box-shadow:none;
-min-width:auto;
-height:auto;
-padding:7px 14px 6px 14px;
-font-size:11px;
-line-height:1;
-letter-spacing:0.14em;
-text-transform:uppercase;
-}
-
-.square-button:hover{
-opacity:0.82;
-}
-
-.square-button.disabled{
-opacity:0.35;
-pointer-events:none;
-}
-
-.product-note{
-font-size:0.74rem;
-color:#777;
-margin-top:8px;
-line-height:1.3;
-opacity:0;
-transition:opacity 0.2s ease;
-min-height:1.1em;
-pointer-events:none;
-}
-
-.product-card:hover .product-note,
-.product-card:focus .product-note,
-.product:hover .product-note{
-opacity:1;
-}
-
-/* PLACEHOLDERS */
-
-.placeholder .product-image-frame{
-background:#f2f2f2;
-display:flex;
-align-items:center;
-justify-content:center;
-}
-
-.placeholder-thumb{
-width:100%;
-height:100%;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:0.78rem;
-color:#777;
-letter-spacing:0.02em;
-}
-
-.placeholder .product-info{
-min-height:62px;
-}
-
-.placeholder .product-title{
-font-size:0.9rem;
-color:#444;
-}
-
-.placeholder .product-price,
-.placeholder .product-type{
-color:#888;
-}
-
-/* FOOTER */
-
-footer{
-font-size:0.8rem;
-color:#777;
-padding:1vh 0 2vh 0;
-margin-top:auto;
-line-height:1.4;
-}
-
-footer a{
-color:#777;
-text-decoration:none;
-display:inline-block;
-margin-bottom:2px;
-}
-
-/* MOBILE */
-
-@media(max-width:768px){
-
-header{
-padding-top:20px;
-}
-
-header h1{
-font-size:28px;
-}
-
-header p{
-font-size:14px;
-}
-
-.controls-line{
-position:static;
-text-align:left;
-margin-bottom:10px;
-}
-
-.shop-nav{
-padding:0 14px;
-line-height:1.8;
-}
-
-.hero{
-margin:44px 0;
-}
-
-.blur-box{
-width:260px;
-height:260px;
-}
-
-.loading-message{
-font-size:0.74rem;
-}
-
-.shop-panel{
-max-width:92vw;
-}
-
-.gallery{
-grid-template-columns:1fr;
-gap:2vh;
-max-width:92vw;
-}
-
-.product-card{
-width:86%;
-}
-
-}
-
-/* DESKTOP */
-
-@media(min-width:769px){
-
-.gallery .product:nth-child(4){
-grid-column:1;
-}
-
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>radio</title>
+  <style>
+    :root{
+      --bg:#000;
+      --fg:#fff;
+      --muted:rgba(255,255,255,.62);
+      --line:rgba(255,255,255,.14);
+      --green:#86ff8a;
+      --red:#ff2a2a;
+      --gold:#f4d35e;
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{
+      width:100%;
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      background:var(--bg);
+      color:var(--fg);
+      font-family:Arial,Helvetica,sans-serif;
+    }
+
+    .back-link{
+      position:fixed;
+      top:18px;
+      left:18px;
+      z-index:10;
+      color:rgba(255,255,255,.68);
+      text-decoration:none;
+      font-size:13px;
+      letter-spacing:.04em;
+      line-height:1;
+      transition:color .18s ease, opacity .18s ease;
+    }
+
+    .back-link:hover{
+      color:#fff;
+      opacity:1;
+    }
+
+    .page-title{
+      position:fixed;
+      top:16px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:9;
+      color:#fff;
+      font-size:clamp(24px,4vw,42px);
+      letter-spacing:.08em;
+      text-transform:lowercase;
+      font-weight:700;
+      user-select:none;
+      pointer-events:none;
+      line-height:1;
+      white-space:nowrap;
+      writing-mode:horizontal-tb;
+      text-orientation:mixed;
+      width:auto;
+      max-width:calc(100vw - 140px);
+      overflow:hidden;
+      text-overflow:ellipsis;
+      text-align:center;
+    }
+
+    .weather-pop{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background:rgba(0,0,0,.62);
+      z-index:30;
+      padding:20px;
+    }
+
+    .weather-pop.open{
+      display:flex;
+    }
+
+    .weather-card{
+      width:min(430px, calc(100vw - 40px));
+      border:1px solid var(--line);
+      background:#000;
+      padding:18px;
+      display:grid;
+      gap:12px;
+      box-shadow:0 0 0 1px rgba(255,255,255,.03) inset;
+    }
+
+    .weather-card h3{
+      margin:0;
+      font-size:16px;
+      font-weight:700;
+      letter-spacing:.04em;
+      text-transform:lowercase;
+    }
+
+    .weather-copy{
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.45;
+      white-space:pre-wrap;
+    }
+
+    .weather-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .wrap{
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:72px 24px 24px;
+      overflow:hidden;
+    }
+
+    .radio{
+      width:min(1080px, calc(100vw - 48px));
+      max-width:1080px;
+      border:1px solid var(--line);
+      background:#000;
+      padding:22px;
+      display:grid;
+      gap:18px;
+      max-height:calc(100vh - 96px);
+      overflow:hidden;
+      box-shadow:0 0 0 1px rgba(255,255,255,.03) inset;
+    }
+
+    .top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      flex:0 0 auto;
+    }
+
+    .live{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:11px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.15em;
+    }
+
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:#320000;
+      transition:.2s;
+    }
+
+    .dot.on{
+      background:var(--red);
+      box-shadow:0 0 12px rgba(255,0,0,.7);
+    }
+
+    .clock{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+      min-height:64px;
+      padding:0;
+      border:none;
+      background:none;
+      box-shadow:none;
+      flex:0 0 auto;
+    }
+
+    .clock .digit{
+      position:relative;
+      width:30px;
+      height:52px;
+      filter:
+        drop-shadow(0 0 6px rgba(134,255,138,.3))
+        drop-shadow(0 0 18px rgba(134,255,138,.14));
+    }
+
+    .clock .colon{
+      position:relative;
+      width:10px;
+      height:52px;
+      margin:0 2px;
+    }
+
+    .clock .colon::before,
+    .clock .colon::after{
+      content:"";
+      position:absolute;
+      left:1px;
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:rgba(134,255,138,.92);
+      box-shadow:
+        0 0 10px rgba(134,255,138,.45),
+        0 0 22px rgba(134,255,138,.18);
+    }
+
+    .clock .colon::before{ top:12px; }
+    .clock .colon::after{ bottom:12px; }
+
+    .seg{
+      position:absolute;
+      background:rgba(134,255,138,.08);
+      transition:background .12s ease, box-shadow .12s ease, opacity .12s ease;
+      opacity:.2;
+    }
+
+    .seg.on{
+      background:rgba(134,255,138,.96);
+      opacity:1;
+      box-shadow:
+        0 0 10px rgba(134,255,138,.55),
+        0 0 22px rgba(134,255,138,.2);
+    }
+
+    .seg.a,.seg.d,.seg.g{
+      left:7px;
+      width:16px;
+      height:5px;
+      clip-path:polygon(12% 0,88% 0,100% 50%,88% 100%,12% 100%,0 50%);
+    }
+    .seg.a{ top:0; }
+    .seg.g{ top:23px; }
+    .seg.d{ bottom:0; }
+
+    .seg.b,.seg.c,.seg.e,.seg.f{
+      width:5px;
+      height:18px;
+      clip-path:polygon(0 12%,50% 0,100% 12%,100% 88%,50% 100%,0 88%);
+    }
+    .seg.f{ left:0; top:3px; }
+    .seg.b{ right:0; top:3px; }
+    .seg.e{ left:0; bottom:3px; }
+    .seg.c{ right:0; bottom:3px; }
+
+    .channels{
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:8px;
+      flex:0 0 auto;
+    }
+
+    .channels button{
+      min-width:0;
+    }
+
+    .channels button.active{
+      border-color:var(--green);
+      color:var(--green);
+      box-shadow:inset 0 0 0 1px rgba(134,255,138,.1), 0 0 14px rgba(134,255,138,.05);
+    }
+
+    .screen{
+      border:1px solid var(--line);
+      padding:16px;
+      display:grid;
+      gap:12px;
+      min-height:0;
+      align-content:start;
+      flex:0 0 auto;
+    }
+
+    .stateRow{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+    }
+
+    .stateBlock{
+      min-width:0;
+      flex:1 1 auto;
+    }
+
+    .controlsRow{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
+      flex:0 0 auto;
+    }
+
+    .label{
+      font-size:11px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      margin-bottom:6px;
+    }
+
+    .value{
+      font-size:clamp(20px,3vw,30px);
+      word-break:break-word;
+      line-height:1.2;
+      min-height:1.2em;
+    }
+
+    .radioCtl{
+      flex:0 0 auto;
+      min-width:96px;
+      text-transform:lowercase;
+      letter-spacing:.03em;
+    }
+
+    .radioCtl.active{
+      border-color:var(--green);
+      color:var(--green);
+      box-shadow:
+        inset 0 0 0 1px rgba(134,255,138,.1),
+        0 0 14px rgba(134,255,138,.06);
+    }
+
+    .recBtn.recording{
+      border-color:var(--red);
+      color:#fff;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,42,42,.12),
+        0 0 14px rgba(255,42,42,.12);
+    }
+
+    .recBadge{
+      display:inline-block;
+      width:9px;
+      height:9px;
+      border-radius:50%;
+      background:#2f0202;
+      margin-right:8px;
+      vertical-align:middle;
+      transition:background .15s ease, box-shadow .15s ease;
+    }
+
+    .recBtn.recording .recBadge{
+      background:var(--red);
+      box-shadow:0 0 10px rgba(255,42,42,.65);
+    }
+
+    .telemetry{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px 16px;
+      font-family:monospace;
+      font-size:12px;
+      color:var(--muted);
+      border-top:1px solid var(--line);
+      padding-top:12px;
+    }
+
+    .telemetry div{
+      white-space:pre-wrap;
+      word-break:break-word;
+      min-height:7.25em;
+      line-height:1.32;
+    }
+
+    .gold-egg{
+      display:inline-block;
+      width:10px;
+      height:13px;
+      margin-left:6px;
+      vertical-align:middle;
+      border-radius:50% 50% 46% 46% / 56% 56% 42% 42%;
+      background:
+        radial-gradient(circle at 35% 28%, rgba(255,255,255,.9), rgba(255,255,255,0) 35%),
+        radial-gradient(circle at 50% 40%, rgba(255,228,140,.9), rgba(232,182,52,.94) 58%, rgba(140,92,10,.92) 100%);
+      box-shadow:
+        0 0 8px rgba(244,211,94,.1),
+        0 0 18px rgba(244,211,94,.06);
+      opacity:0;
+      transform:scale(.92);
+      pointer-events:none;
+      transition:opacity 1.25s ease, transform 1.25s ease, box-shadow 1.25s ease;
+    }
+
+    .gold-egg.on{
+      opacity:1;
+      transform:scale(1);
+      animation:eggBreath 2.8s ease-in-out infinite;
+      box-shadow:
+        0 0 10px rgba(244,211,94,.34),
+        0 0 20px rgba(244,211,94,.16),
+        0 0 34px rgba(244,211,94,.07);
+    }
+
+    @keyframes eggBreath{
+      0%,100%{ transform:scale(1); filter:brightness(1); }
+      50%{ transform:scale(1.08); filter:brightness(1.15); }
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      flex:0 0 auto;
+      align-items:center;
+    }
+
+    button{
+      background:transparent;
+      color:var(--fg);
+      border:1px solid var(--line);
+      padding:10px 14px;
+      cursor:pointer;
+      font-size:14px;
+    }
+
+    button:hover{
+      border-color:#fff;
+    }
+
+    .log{
+      border-top:1px solid var(--line);
+      padding-top:12px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.42;
+      height:8.9em;
+      overflow:hidden;
+      white-space:pre-wrap;
+      flex:0 0 auto;
+      font-family:monospace;
+    }
+
+    @media(max-width:820px){
+      html,body{
+        height:auto;
+        min-height:100%;
+        overflow:auto;
+      }
+
+      .back-link{
+        top:16px;
+        left:14px;
+        font-size:12px;
+      }
+
+      .page-title{
+        top:16px;
+        left:50%;
+        transform:translateX(-50%);
+        font-size:28px;
+        max-width:calc(100vw - 120px);
+        white-space:nowrap;
+        writing-mode:horizontal-tb;
+        text-orientation:mixed;
+        line-height:1;
+      }
+
+      .wrap{
+        position:relative;
+        inset:auto;
+        min-height:100vh;
+        align-items:flex-start;
+        justify-content:center;
+        padding:72px 16px 24px;
+        overflow:visible;
+      }
+
+      .radio{
+        width:100%;
+        max-width:none;
+        max-height:none;
+        overflow:visible;
+        padding:16px;
+        gap:14px;
+      }
+
+      .top{
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:12px;
+      }
+
+      .clock{
+        min-height:56px;
+        padding:0;
+        gap:6px;
+      }
+
+      .clock .digit{
+        width:24px;
+        height:42px;
+      }
+
+      .clock .colon{
+        height:42px;
+      }
+
+      .clock .colon::before,
+      .clock .colon::after{
+        width:6px;
+        height:6px;
+      }
+
+      .clock .colon::before{ top:10px; }
+      .clock .colon::after{ bottom:10px; }
+
+      .seg.a,.seg.d,.seg.g{
+        left:5px;
+        width:14px;
+        height:4px;
+      }
+
+      .seg.g{ top:19px; }
+
+      .seg.b,.seg.c,.seg.e,.seg.f{
+        width:4px;
+        height:14px;
+      }
+
+      .seg.f,.seg.b{ top:3px; }
+      .seg.e,.seg.c{ bottom:3px; }
+
+      .channels{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+      }
+
+      .channels button:last-child{
+        grid-column:2;
+      }
+
+      .telemetry{
+        grid-template-columns:1fr;
+        gap:8px;
+      }
+
+      .telemetry div{
+        min-height:auto;
+      }
+
+      .actions{
+        display:grid;
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:8px;
+      }
+
+      .actions button{
+        width:100%;
+        min-width:0;
+      }
+
+      .log{
+        height:10.5em;
+      }
+
+      .stateRow{
+        gap:10px;
+        align-items:flex-start;
+        flex-direction:column;
+      }
+
+      .controlsRow{
+        width:100%;
+        justify-content:flex-start;
+      }
+
+      .radioCtl{
+        min-width:0;
+        padding:10px 12px;
+        font-size:13px;
+      }
+    }
+  </style>
 </head>
 <body>
+<a href="index.html" class="back-link">back</a>
+<div class="page-title">radio</div>
 
-<header>
-
-<div class="controls-line">
-  <a href="index.html">back</a>
-</div>
-
-<h1>Shop</h1>
-
-<p>The Fruit That Ate Itself</p>
-
-<div class="shop-nav">
-  <button class="shop-toggle" data-target="printsPanel">Prints</button>
-  <span class="shop-separator">-</span>
-  <button class="shop-toggle" data-target="apparelPanel">Apparel</button>
-  <span class="shop-separator">-</span>
-  <button class="shop-toggle" data-target="booksPanel">Books</button>
-  <span class="shop-separator">-</span>
-  <button class="shop-toggle" data-target="originalPanel">Original Works</button>
-</div>
-
-</header>
-
-<section class="hero" id="hero">
-  <div class="blur-box">
-    <div class="loading-message" id="loadingMessage">one moment...</div>
-    <img id="imgA" alt="">
-    <img id="imgB" alt="">
+<div id="weatherPop" class="weather-pop" aria-hidden="true">
+  <div class="weather-card">
+    <h3>weather</h3>
+    <div id="weatherCopy" class="weather-copy">Use local weather to steer the radio atmosphere.
+It will ask for location permission and refresh every 15 minutes.</div>
+    <div class="weather-actions">
+      <button id="weatherEnableBtn" type="button">Use my location</button>
+      <button id="weatherRetryBtn" type="button">Try again</button>
+      <button id="weatherCloseBtn" type="button">Close</button>
+    </div>
   </div>
-</section>
+</div>
 
-<main class="shop-shell">
+<div class="wrap">
+  <div class="radio">
+    <div class="top">
+      <div class="clock" id="clock" aria-label="clock"></div>
 
-  <!-- PRINTS -->
-  <section class="shop-panel" id="printsPanel">
-    <div class="gallery">
-
-      <div class="product">
-        <div class="product-card">
-          <div class="product-image-frame">
-            <div class="product-track" data-full-link="layer11.html">
-              <div class="product-slide">
-                <img src="images/thumbman.jpg" alt="Le Samouraï">
-              </div>
-            </div>
-          </div>
-
-          <div class="carousel-controls hidden">
-            <span class="carousel-dot active"></span>
-          </div>
-
-          <div class="product-info">
-            <p class="product-title">Le Samouraï</p>
-            <p class="product-price">£15</p>
-            <p class="product-type">Postcard-sized giclée print</p>
-            <div class="square-wrap">
-              <a target="_blank" href="https://square.link/u/a9w7yysf?src=embed" class="square-button">BUY</a>
-            </div>
-          </div>
-
-          <p class="product-note">Double click for full-size artwork.</p>
-        </div>
+      <div class="live">
+        <div class="dot" id="dot"></div>
+        <div id="liveText">standby</div>
       </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Print 02</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Print 03</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Print 04</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Print 05</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Print 06</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Print 07</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Print 08</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Print 09</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
     </div>
-  </section>
 
-  <!-- APPAREL -->
-  <section class="shop-panel" id="apparelPanel">
-    <div class="gallery">
-
-      <div class="product">
-        <div class="product-card">
-          <div class="product-image-frame">
-            <div class="product-track" data-full-link="layer4.html">
-              <div class="product-slide">
-                <img src="images/eggsblack.png" alt="Black T, Nearly Six Eggs">
-              </div>
-              <div class="product-slide">
-                <img src="images/thumbnailegg.jpg" alt="Black T, Nearly Six Eggs">
-              </div>
-              <div class="product-slide">
-                <img src="images/eggsblack2.png" alt="Black T, Nearly Six Eggs">
-              </div>
-            </div>
-          </div>
-
-          <div class="carousel-controls">
-            <span class="carousel-dot active"></span>
-            <span class="carousel-dot"></span>
-            <span class="carousel-dot"></span>
-          </div>
-
-          <div class="product-info">
-            <p class="product-title">Black T, ‘Nearly Six Eggs’</p>
-            <p class="product-price">£28</p>
-            <p class="product-type">T-shirt</p>
-            <div class="square-wrap">
-              <a target="_blank" href="https://square.link/u/4zO8jeLV?src=embed" class="square-button">BUY</a>
-            </div>
-          </div>
-
-          <p class="product-note">Double click for full-size artwork.</p>
-        </div>
-      </div>
-
-      <div class="product">
-        <div class="product-card">
-          <div class="product-image-frame">
-            <div class="product-track" data-full-link="layer5.html">
-              <div class="product-slide">
-                <img src="images/mercury1.png" alt="Mercury">
-              </div>
-              <div class="product-slide">
-                <img src="images/mercury2.png" alt="Mercury">
-              </div>
-              <div class="product-slide">
-                <img src="images/mercury3.png" alt="Mercury">
-              </div>
-            </div>
-          </div>
-
-          <div class="carousel-controls">
-            <span class="carousel-dot active"></span>
-            <span class="carousel-dot"></span>
-            <span class="carousel-dot"></span>
-          </div>
-
-          <div class="product-info">
-            <p class="product-title">Black T, 'Mercury'</p>
-            <p class="product-price">£28</p>
-            <p class="product-type">T-shirt</p>
-            <div class="square-wrap">
-              <a target="_blank" href="https://square.link/u/aE57OiEg" class="square-button">BUY</a>
-            </div>
-          </div>
-
-          <p class="product-note">Double click for full-size artwork.</p>
-        </div>
-      </div>
-
+    <div class="channels">
+      <button class="active" id="ch1Btn" type="button">Channel 1</button>
+      <button id="ch2Btn" type="button">Channel 2</button>
+      <button id="ch3Btn" type="button">Channel 3</button>
+      <button id="ch4Btn" type="button">Channel 4</button>
+      <button id="ch5Btn" type="button">Channel 5</button>
     </div>
-  </section>
 
-  <!-- BOOKS -->
-  <section class="shop-panel" id="booksPanel">
-    <div class="gallery">
+    <div class="screen">
+      <div class="stateRow">
+        <div class="stateBlock">
+          <div class="label">State</div>
+          <div class="value" id="status">Stopped</div>
+        </div>
 
-      <div class="product">
-        <div class="product-card">
-          <div class="product-image-frame">
-            <div class="product-track" data-full-link="layer12.html">
-              <div class="product-slide">
-                <img src="images/ambulancelandthumb.jpg" alt="Ambuland Land 2025">
-              </div>
-            </div>
-          </div>
-
-          <div class="carousel-controls hidden">
-            <span class="carousel-dot active"></span>
-          </div>
-
-          <div class="product-info">
-            <p class="product-title">Ambuland Land 2025</p>
-            <p class="product-price">£10</p>
-            <p class="product-type">Book</p>
-            <div class="square-wrap">
-              <a target="_blank" href="https://square.link/u/CTTCC0xE" class="square-button">BUY</a>
-            </div>
-          </div>
-
-          <p class="product-note">Double click for full-size artwork.</p>
+        <div class="controlsRow">
+          <button id="recPlayBtn" class="radioCtl recBtn" type="button"><span class="recBadge"></span>rec/play</button>
+          <button id="weatherBtn" class="radioCtl" type="button">weather</button>
+          <button id="fineTuneBtn" class="radioCtl" type="button">Fine Tune</button>
         </div>
       </div>
 
+      <div class="telemetry">
+        <div id="telemetryLeft">ENG: offline
+CH: 1
+MODE: idle
+AUDIO: standby
+ELAPSED: 0:00
+WEATHER: emenating
+SIG: 1.00
+PEACE: 0.00
+REWARD: 0.00</div>
+        <div id="telemetryRight">MAIN: —
+INST: 0.00
+AMB: 0.00
+FX: —
+MIC: off
+PITCH: —
+CLR/STRM: 0.00 / 0.00
+EGG: <span id="eggSlot"></span></div>
+      </div>
     </div>
-  </section>
 
-  <!-- ORIGINAL WORKS -->
-  <section class="shop-panel" id="originalPanel">
-    <div class="gallery">
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 01</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 02</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 03</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 04</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 05</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 06</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 07</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 08</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 09</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
+    <div class="actions">
+      <button id="startBtn" type="button">Start</button>
+      <button id="stopBtn" type="button">Stop</button>
+      <button id="clearBtn" type="button">Clear Log</button>
     </div>
-  </section>
 
-</main>
+    <div class="log" id="log"></div>
+  </div>
+</div>
 
-<footer>
-  <p>
-    <a href="https://www.instagram.com/the_fruit_that_ate_itself" target="_blank" rel="noopener noreferrer">@the_fruit_that_ate_itself</a><br>
-    53.4808° N, -2.2426° W
-  </p>
-</footer>
+<audio id="music" crossorigin="anonymous" preload="auto"></audio>
+<audio id="texture" crossorigin="anonymous" preload="auto"></audio>
 
 <script>
-const toggleButtons = document.querySelectorAll(".shop-toggle");
-const panels = document.querySelectorAll(".shop-panel");
-const hero = document.getElementById("hero");
+const CHANNELS = {
+  1: {
+    name: 'Channel 1',
+    enabled: true,
+    mode: 'main',
+    centrepieces: [
+      { title:'bānhūs', src:'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3', soft:true },
+      { title:'The Red House', src:'https://peachradio.s3.eu-west-2.amazonaws.com/redhouse.mp3', soft:true },
+      { title:'Slime Demo', src:'https://peachradio.s3.eu-west-2.amazonaws.com/slimedemo.mp3' },
+      { title:'Funeral March', src:'https://peachradio.s3.eu-west-2.amazonaws.com/funeral+march.mp3', soft:true },
+      { title:'Big Black Pearl', src:'https://peachradio.s3.eu-west-2.amazonaws.com/bigblackpearl.mp3' },
+      { title:'Hypnagogia', src:'https://peachradio.s3.eu-west-2.amazonaws.com/hypna.mp3', soft:true },
+      { title:'Xenopus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/xenopus.mp3' },
+      { title:'Ambulance Land', src:'https://peachradio.s3.eu-west-2.amazonaws.com/ambulance.mp3', soft:true },
+      { title:'Samantha', src:'https://peachradio.s3.eu-west-2.amazonaws.com/samantha.mp3', soft:true },
+      { title:'The Agalma', src:'https://peachradio.s3.eu-west-2.amazonaws.com/agalma.mp3' }
+    ],
+    textures: [
+      { title:'Joiner', src:'https://peachradio.s3.eu-west-2.amazonaws.com/joiner.mp3' },
+      { title:'pseudoryx nghetinhensis', src:'https://peachradio.s3.eu-west-2.amazonaws.com/unicorn.mp3' },
+      { title:'Fuckoffalypse', src:'https://peachradio.s3.eu-west-2.amazonaws.com/fuckoffalypse.mp3' },
+      { title:'Tabret Tabret', src:'https://peachradio.s3.eu-west-2.amazonaws.com/tabrettabret.mp3' },
+      { title:'Kibo', src:'https://peachradio.s3.eu-west-2.amazonaws.com/kibo.mp3' },
+      { title:'Oumuamua', src:'https://peachradio.s3.eu-west-2.amazonaws.com/oumuamua.mp3' },
+      { title:'Rusholme', src:'https://peachradio.s3.eu-west-2.amazonaws.com/rusholme.mp3' },
+      { title:'Kilimanjaro', src:'https://peachradio.s3.eu-west-2.amazonaws.com/kilimanjaro.mp3' },
+      { title:'Untitled', src:'https://peachradio.s3.eu-west-2.amazonaws.com/untitled.mp3' }
+    ]
+  },
 
-function closeAllPanels(){
-  panels.forEach(panel => panel.classList.remove("show"));
-  toggleButtons.forEach(button => button.classList.remove("active"));
+  2: {
+    name: 'Channel 2',
+    enabled: true,
+    mode: 'textures-only',
+    centrepieces: [],
+    textures: [
+      { title:'Joiner', src:'https://peachradio.s3.eu-west-2.amazonaws.com/joiner.mp3' },
+      { title:'Unicorn', src:'https://peachradio.s3.eu-west-2.amazonaws.com/unicorn.mp3' },
+      { title:'Fuckoffalypse', src:'https://peachradio.s3.eu-west-2.amazonaws.com/fuckoffalypse.mp3' },
+      { title:'Tabrettabret', src:'https://peachradio.s3.eu-west-2.amazonaws.com/tabrettabret.mp3' },
+      { title:'Kibo', src:'https://peachradio.s3.eu-west-2.amazonaws.com/kibo.mp3' },
+      { title:'Oumuamua', src:'https://peachradio.s3.eu-west-2.amazonaws.com/oumuamua.mp3' },
+      { title:'Rusholme', src:'https://peachradio.s3.eu-west-2.amazonaws.com/rusholme.mp3' },
+      { title:'Kilimanjaro', src:'https://peachradio.s3.eu-west-2.amazonaws.com/kilimanjaro.mp3' },
+      { title:'Untitled', src:'https://peachradio.s3.eu-west-2.amazonaws.com/untitled.mp3' }
+    ]
+  },
+
+  3: {
+    name: 'Channel 3',
+    enabled: true,
+    mode: 'centrepieces-only',
+    centrepieces: [
+      { title:'Banhus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3', soft:true },
+      { title:'Redhouse', src:'https://peachradio.s3.eu-west-2.amazonaws.com/redhouse.mp3', soft:true },
+      { title:'Slimedemo', src:'https://peachradio.s3.eu-west-2.amazonaws.com/slimedemo.mp3' },
+      { title:'Funeral March', src:'https://peachradio.s3.eu-west-2.amazonaws.com/funeral+march.mp3', soft:true },
+      { title:'Bigblackpearl', src:'https://peachradio.s3.eu-west-2.amazonaws.com/bigblackpearl.mp3' },
+      { title:'Hypna', src:'https://peachradio.s3.eu-west-2.amazonaws.com/hypna.mp3', soft:true },
+      { title:'Xenopus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/xenopus.mp3' },
+      { title:'Ambulance Land', src:'https://peachradio.s3.eu-west-2.amazonaws.com/ambulance.mp3', soft:true },
+      { title:'Samantha', src:'https://peachradio.s3.eu-west-2.amazonaws.com/samantha.mp3', soft:true },
+      { title:'Agalma', src:'https://peachradio.s3.eu-west-2.amazonaws.com/agalma.mp3' }
+    ],
+    textures: []
+  },
+
+  4: {
+    name: 'Channel 4',
+    enabled: true,
+    mode: 'all-clean',
+    centrepieces: [
+      { title:'Banhus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3', soft:true },
+      { title:'Redhouse', src:'https://peachradio.s3.eu-west-2.amazonaws.com/redhouse.mp3', soft:true },
+      { title:'Slimedemo', src:'https://peachradio.s3.eu-west-2.amazonaws.com/slimedemo.mp3' },
+      { title:'Funeral March', src:'https://peachradio.s3.eu-west-2.amazonaws.com/funeral+march.mp3', soft:true },
+      { title:'Bigblackpearl', src:'https://peachradio.s3.eu-west-2.amazonaws.com/bigblackpearl.mp3' },
+      { title:'Hypna', src:'https://peachradio.s3.eu-west-2.amazonaws.com/hypna.mp3', soft:true },
+      { title:'Xenopus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/xenopus.mp3' },
+      { title:'Ambulance Land', src:'https://peachradio.s3.eu-west-2.amazonaws.com/ambulance.mp3', soft:true },
+      { title:'Samantha', src:'https://peachradio.s3.eu-west-2.amazonaws.com/samantha.mp3', soft:true },
+      { title:'Agalma', src:'https://peachradio.s3.eu-west-2.amazonaws.com/agalma.mp3' },
+      { title:'Joiner', src:'https://peachradio.s3.eu-west-2.amazonaws.com/joiner.mp3' },
+      { title:'Unicorn', src:'https://peachradio.s3.eu-west-2.amazonaws.com/unicorn.mp3' },
+      { title:'Fuckoffalypse', src:'https://peachradio.s3.eu-west-2.amazonaws.com/fuckoffalypse.mp3' },
+      { title:'Tabrettabret', src:'https://peachradio.s3.eu-west-2.amazonaws.com/tabrettabret.mp3' },
+      { title:'Kibo', src:'https://peachradio.s3.eu-west-2.amazonaws.com/kibo.mp3' },
+      { title:'Oumuamua', src:'https://peachradio.s3.eu-west-2.amazonaws.com/oumuamua.mp3' },
+      { title:'Rusholme', src:'https://peachradio.s3.eu-west-2.amazonaws.com/rusholme.mp3' },
+      { title:'Kilimanjaro', src:'https://peachradio.s3.eu-west-2.amazonaws.com/kilimanjaro.mp3' },
+      { title:'Untitled', src:'https://peachradio.s3.eu-west-2.amazonaws.com/untitled.mp3' }
+    ],
+    textures: []
+  },
+
+  5: {
+    name: 'Channel 5',
+    enabled: true,
+    mode: 'dead-air',
+    centrepieces: [],
+    textures: []
+  }
+};
+
+const AMBULANCE_SRC = 'https://peachradio.s3.eu-west-2.amazonaws.com/ambulance.mp3';
+const AMBULANCE_WINDOW_START = 5 * 60;
+const AMBULANCE_WINDOW_END = 19 * 60;
+const AMBULANCE_WINDOW_FADE = 42;
+const AMBULANCE_REST_MS = 11 * 60 * 1000;
+
+const BASE_OUTPUT_LEVEL = 0.92;
+const PERCEIVED_CLEAN_BOOST = 0.36;
+const PERCEIVED_FINE_BOOST = 0.34;
+const FX_PEACE_WINDOW_SEC = 60;
+const WEATHER_REFRESH_MS = 15 * 60 * 1000;
+const MAX_EXTRA_NOISE_REWARD_SEC = 3 * 60 * 60;
+const HEARTBEAT_INTERVAL_MS = 400;
+const TICK_LOG_EVERY = 15;
+const POETIC_LOG_EVERY = 55;
+
+const DIGIT_MAP = {
+  '0': ['a','b','c','d','e','f'],
+  '1': ['b','c'],
+  '2': ['a','b','d','e','g'],
+  '3': ['a','b','c','d','g'],
+  '4': ['b','c','f','g'],
+  '5': ['a','c','d','f','g'],
+  '6': ['a','c','d','e','f','g'],
+  '7': ['a','b','c'],
+  '8': ['a','b','c','d','e','f','g'],
+  '9': ['a','b','c','d','f','g']
+};
+
+const els = {
+  music: document.getElementById('music'),
+  texture: document.getElementById('texture'),
+  dot: document.getElementById('dot'),
+  liveText: document.getElementById('liveText'),
+  status: document.getElementById('status'),
+  log: document.getElementById('log'),
+  clock: document.getElementById('clock'),
+  telemetryLeft: document.getElementById('telemetryLeft'),
+  telemetryRight: document.getElementById('telemetryRight'),
+  startBtn: document.getElementById('startBtn'),
+  stopBtn: document.getElementById('stopBtn'),
+  clearBtn: document.getElementById('clearBtn'),
+  fineTuneBtn: document.getElementById('fineTuneBtn'),
+  weatherBtn: document.getElementById('weatherBtn'),
+  recPlayBtn: document.getElementById('recPlayBtn'),
+  channelButtons: [1,2,3,4,5].map(i => document.getElementById(`ch${i}Btn`)),
+  weatherPop: document.getElementById('weatherPop'),
+  weatherCopy: document.getElementById('weatherCopy'),
+  weatherEnableBtn: document.getElementById('weatherEnableBtn'),
+  weatherRetryBtn: document.getElementById('weatherRetryBtn'),
+  weatherCloseBtn: document.getElementById('weatherCloseBtn')
+};
+
+let audioCtx = null;
+let mainSource = null;
+let textureSource = null;
+
+let masterGain = null;
+let outputGain = null;
+let autoLevelGain = null;
+let mainGain = null;
+let textureGain = null;
+let noiseGain = null;
+let humGain = null;
+let ambientGain = null;
+let micLiveGain = null;
+let micLoopGain = null;
+
+let mainDrive = null;
+let mainFilter = null;
+let textureFilter = null;
+let textureDrive = null;
+
+let mainSend = null;
+let mainDelay = null;
+let mainFeedback = null;
+let mainWet = null;
+let ambientLP = null;
+let ambientDelay = null;
+let ambientFeedback = null;
+let ambientWet = null;
+
+let masterComp = null;
+let safetyLimiter = null;
+let outputAnalyser = null;
+let pitchAnalyser = null;
+let micAnalyser = null;
+let micPitchAnalyser = null;
+
+let micSource = null;
+let micGate = null;
+let micBand = null;
+let micRecorderDest = null;
+let micRecorder = null;
+let micChunks = [];
+let micLoopBuffer = null;
+let micLoopSource = null;
+let micLoopFilter = null;
+let micLoopDelay = null;
+let micLoopFeedback = null;
+
+let running = false;
+let muted = false;
+let pausedByKey = false;
+let cleanOverride = false;
+let currentChannel = 1;
+let currentTrack = null;
+let currentTexture = null;
+let currentMode = 'idle';
+let sessionStart = 0;
+let channelStart = 0;
+
+let fullLog = [];
+let logSeq = 0;
+
+let activeNodeStops = [];
+let selectedStationTimer = null;
+let selectedFadeTimer = null;
+let heartbeatCounter = 0;
+let lastTelemetryBeat = 0;
+let globalAmbulanceLastAt = 0;
+let weatherRefreshTimer = null;
+
+let fineTuneStartAt = 0;
+let fineTuneUntil = 0;
+let fineTunePeak = 0;
+let fineTuneDecayMs = 0;
+
+let autoGainTarget = 1;
+let levelPeakSuppression = 0;
+let detectedPitchHz = 0;
+let eggHoldUntil = 0;
+
+let weatherState = {
+  enabled: false,
+  status: 'emenating',
+  label: 'emenating',
+  tempC: null,
+  windKmh: null,
+  cloud: null,
+  weatherCode: null,
+  isDay: null,
+  intensity: 0.24,
+  clarityBias: 0.18,
+  stormBias: 0.06,
+  lastUpdated: 0
+};
+
+let micState = {
+  permission: 'unknown',
+  active: false,
+  recording: false,
+  loopPlaying: false,
+  stream: null
+};
+
+let POETRY_LINES = [];
+const stationStates = {};
+
+function log(message){
+  const stamp = new Date().toLocaleTimeString();
+  const line = `[${String(++logSeq).padStart(5,'0')} ${stamp}] ${message}`;
+  fullLog.push(line);
+  if(fullLog.length > 300) fullLog = fullLog.slice(-300);
+  renderVisibleLog();
+  console.log(message);
 }
 
-toggleButtons.forEach(button => {
-  button.addEventListener("click", () => {
-    const targetId = button.getAttribute("data-target");
-    const targetPanel = document.getElementById(targetId);
-    const isOpen = targetPanel.classList.contains("show");
+function renderVisibleLog(){
+  const visible = fullLog.slice(-6);
+  els.log.textContent = visible.join('\n');
+  els.log.scrollTop = els.log.scrollHeight;
+}
 
-    closeAllPanels();
-
-    if(!isOpen){
-      targetPanel.classList.add("show");
-      button.classList.add("active");
-      hero.style.display = "none";
-    }else{
-      hero.style.display = "flex";
-    }
-  });
-});
-
-document.querySelectorAll('#printsPanel .product, #apparelPanel .product, #booksPanel .product').forEach(product => {
-  const track = product.querySelector('.product-track');
-  if(!track){ return; }
-
-  const slides = product.querySelectorAll('.product-slide');
-  const dotsWrap = product.querySelector('.carousel-controls');
-  const dots = product.querySelectorAll('.carousel-dot');
-  const fullLink = track.getAttribute('data-full-link');
-  let current = 0;
-  let clickTimer = null;
-
-  if (slides.length > 1) {
-    dotsWrap.classList.remove('hidden');
-  }
-
-  function updateCarousel(index){
-    current = index;
-    track.style.transform = `translateX(-${index * 100}%)`;
-    dots.forEach((dot, i) => {
-      dot.classList.toggle('active', i === index);
-    });
-  }
-
-  function nextSlide(){
-    if (slides.length < 2) return;
-    const next = (current + 1) % slides.length;
-    updateCarousel(next);
-  }
-
-  track.querySelectorAll('img').forEach(img => {
-    img.addEventListener('click', () => {
-      if (clickTimer) return;
-
-      clickTimer = setTimeout(() => {
-        nextSlide();
-        clickTimer = null;
-      }, 250);
-    });
-
-    img.addEventListener('dblclick', (e) => {
-      e.preventDefault();
-      clearTimeout(clickTimer);
-      clickTimer = null;
-      window.location.href = fullLink;
-    });
-  });
-});
-
-/* HERO SLIDESHOW */
-
-const imgA = document.getElementById("imgA");
-const imgB = document.getElementById("imgB");
-const loadingMessage = document.getElementById("loadingMessage");
-
-const images = [
-  "images/mantisthumb.png",
-  "images/thumbring.png",
-  "images/knotthumb.png",
-  "images/thumbnailegg.jpg",
-  "images/eggsblack.png",
-  "images/eggsblack2.png",
-  "images/mercurythumbnail.png",
-  "images/mercury1.png",
-  "images/mercury2.png",
-  "images/mercury3.png",
-  "images/dreamthumb.jpg",
-  "images/midtripthumb.jpg",
-  "images/thumbnut.jpg",
-  "images/etrthumb.jpg",
-  "images/cthumb.png",
-  "images/thumbman.jpg",
-  "images/ambulancelandthumb.jpg",
-  "images/t1.jpg",
-  "images/t2.jpg",
-  "images/t3.jpg",
-  "images/t4.jpg",
-  "images/t5.jpg"
-];
-
-function rand(min,max){
+function rand(min, max){
   return Math.random() * (max - min) + min;
 }
 
@@ -891,229 +951,1798 @@ function chance(n){
   return Math.random() < n;
 }
 
-function easeInOut(t){
-  return 0.5 - Math.cos(Math.PI * t) / 2;
+function clamp(v, min, max){
+  return Math.max(min, Math.min(max, v));
 }
 
-let loadingTimer = null;
-
-function scheduleLoadingMessage(){
-  clearTimeout(loadingTimer);
-  loadingTimer = setTimeout(() => {
-    loadingMessage.classList.add("show");
-  }, 350);
+function lerp(a,b,t){
+  return a + (b - a) * t;
 }
 
-function hideLoadingMessage(){
-  clearTimeout(loadingTimer);
-  loadingMessage.classList.remove("show");
+function nowMs(){
+  return Date.now();
 }
 
-let bag = [];
-let lastImage = "";
+function formatTime(sec){
+  sec = Math.max(0, Math.floor(sec));
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  if(h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
 
-function refillBag(){
-  bag = images.slice();
+function elapsedSec(){
+  return running ? (Date.now() - sessionStart) / 1000 : 0;
+}
 
-  for(let i = bag.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [bag[i], bag[j]] = [bag[j], bag[i]];
+function channelElapsedSec(){
+  return running ? (Date.now() - channelStart) / 1000 : 0;
+}
+
+function instability(){
+  return clamp(elapsedSec() / (6 * 60 * 60), 0, 1.35);
+}
+
+function activeStationMeta(){
+  return CHANNELS[currentChannel];
+}
+
+function currentStationState(){
+  return stationStates[currentChannel];
+}
+
+function getPeaceCurve(){
+  if(!running || !sessionStart) return 0;
+  const t = clamp(elapsedSec() / FX_PEACE_WINDOW_SEC, 0, 1);
+  return t * t * (3 - 2 * t);
+}
+
+function getLongListenReward(){
+  return clamp((elapsedSec() - 14 * 60) / MAX_EXTRA_NOISE_REWARD_SEC, 0, 1);
+}
+
+function getFineTuneMix(){
+  if(!fineTuneUntil || nowMs() >= fineTuneUntil || fineTuneDecayMs <= 0) return 0;
+  const elapsed = nowMs() - fineTuneStartAt;
+  const progress = clamp(elapsed / fineTuneDecayMs, 0, 1);
+  return Math.pow(1 - progress, 1.35);
+}
+
+function getFineTuneAmount(){
+  if(cleanOverride) return 0;
+  return fineTunePeak * getFineTuneMix();
+}
+
+function getFineTuneBoost(){
+  return getFineTuneMix() * PERCEIVED_FINE_BOOST;
+}
+
+function getCleanBoost(){
+  return cleanOverride ? PERCEIVED_CLEAN_BOOST : 0;
+}
+
+function getTargetOutputLevel(){
+  if(muted) return 0.0001;
+  const fineBoost = getFineTuneBoost();
+  const cleanBoost = getCleanBoost();
+  const dynamicCompensation = Math.max(0, 1 - levelPeakSuppression * 0.8);
+  const weatherSoft = clamp(weatherState.clarityBias * 0.08, 0, 0.08);
+  const target = BASE_OUTPUT_LEVEL * (1 + fineBoost + cleanBoost + weatherSoft) * dynamicCompensation;
+  return clamp(target, 0.0001, 1.9);
+}
+
+function updateOutputLevel(immediate = false){
+  if(!audioCtx || !outputGain) return;
+  const now = audioCtx.currentTime;
+  const target = getTargetOutputLevel();
+  outputGain.gain.cancelScheduledValues(now);
+  if(immediate){
+    outputGain.gain.setValueAtTime(target, now);
+  } else {
+    outputGain.gain.setValueAtTime(outputGain.gain.value, now);
+    outputGain.gain.setTargetAtTime(target, now, muted ? 0.05 : 0.22);
   }
+}
 
-  if(bag.length > 1 && bag[0] === lastImage){
-    [bag[0], bag[1]] = [bag[1], bag[0]];
+function beginFineTune(){
+  fineTuneStartAt = nowMs();
+  fineTuneDecayMs = rand(60_000, 300_000);
+  fineTuneUntil = fineTuneStartAt + fineTuneDecayMs;
+  fineTunePeak = rand(0.76, 0.94);
+  els.fineTuneBtn.classList.add('active');
+  if(audioCtx){
+    synthesizeTuningSound(rand(0.45, 0.9), 0.28);
+    updateOutputLevel(false);
+  }
+  log(`Fine tune engaged (${Math.round(fineTuneDecayMs / 1000)}s settle)`);
+  updateProcessing(false);
+  updateTelemetry();
+}
+
+function syncFineTuneButton(){
+  els.fineTuneBtn.classList.toggle('active', getFineTuneAmount() > 0.02);
+}
+
+function syncMicButton(){
+  els.recPlayBtn.classList.toggle('recording', micState.recording);
+  if(micState.recording){
+    els.recPlayBtn.innerHTML = '<span class="recBadge"></span>recording';
+  } else if(micState.loopPlaying){
+    els.recPlayBtn.innerHTML = '<span class="recBadge"></span>playing';
+  } else {
+    els.recPlayBtn.innerHTML = '<span class="recBadge"></span>rec/play';
   }
 }
 
-function nextImage(){
-  if(bag.length === 0){
-    refillBag();
-  }
-  const src = bag.shift();
-  lastImage = src;
-  return src;
+function syncWeatherButton(){
+  els.weatherBtn.classList.toggle('active', weatherState.enabled || weatherState.status === 'emenating');
 }
 
-const stateMap = new Map();
+function syncLiveState(){
+  els.dot.classList.toggle('on', running && !muted && !pausedByKey);
+  if(!running) els.liveText.textContent = 'standby';
+  else if(pausedByKey) els.liveText.textContent = 'paused';
+  else if(muted) els.liveText.textContent = 'muted';
+  else els.liveText.textContent = 'live';
+}
 
-function newState(){
-  const now = performance.now();
+function setMuted(nextMuted, immediate = false){
+  muted = !!nextMuted;
+  updateOutputLevel(immediate);
+  syncLiveState();
+  updateTelemetry();
+}
 
-  const baseScale = rand(1.08,1.46);
-  const pulseTarget = Math.max(1.06, Math.min(1.5, baseScale + rand(-0.06,0.06)));
+function setLive(on){
+  running = !!on;
+  syncLiveState();
+}
 
-  const moveRangeFrom = Math.max(0, (baseScale - 1) * 30);
-  const moveRangeTo = Math.max(0, (pulseTarget - 1) * 30);
+function createDigit(){
+  const digit = document.createElement('div');
+  digit.className = 'digit';
+  ['a','b','c','d','e','f','g'].forEach(name => {
+    const seg = document.createElement('div');
+    seg.className = `seg ${name}`;
+    digit.appendChild(seg);
+  });
+  return digit;
+}
 
+function renderClock(text){
+  els.clock.innerHTML = '';
+  for(const ch of text){
+    if(ch === ':'){
+      const colon = document.createElement('div');
+      colon.className = 'colon';
+      els.clock.appendChild(colon);
+      continue;
+    }
+    const digit = createDigit();
+    const active = DIGIT_MAP[ch] || [];
+    active.forEach(name => {
+      const seg = digit.querySelector(`.${name}`);
+      if(seg) seg.classList.add('on');
+    });
+    els.clock.appendChild(digit);
+  }
+}
+
+function updateClock(){
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  renderClock(`${hh}:${mm}`);
+}
+
+function setStatusTuning(){
+  els.status.textContent = 'Tuning';
+}
+
+function stationPhaseLabel(station){
+  if(!station) return 'idle';
+  if(station.phase === 'track') return station.mode === 'all-clean' ? 'clean transmission' : 'broadcast';
+  if(station.phase === 'dead-air') return 'dead air';
+  if(station.phase === 'tuning') return 'tuning';
+  return 'idle';
+}
+
+function describeWeatherCode(code){
+  const map = {
+    0:'clear', 1:'mostly clear', 2:'partly cloudy', 3:'overcast',
+    45:'fog', 48:'rime fog', 51:'light drizzle', 53:'drizzle',
+    55:'dense drizzle', 56:'freezing drizzle', 57:'freezing drizzle',
+    61:'light rain', 63:'rain', 65:'heavy rain', 66:'freezing rain',
+    67:'freezing rain', 71:'light snow', 73:'snow', 75:'heavy snow',
+    77:'snow grains', 80:'showers', 81:'rain showers', 82:'violent showers',
+    85:'snow showers', 86:'heavy snow showers', 95:'thunderstorm',
+    96:'storm hail', 99:'heavy storm hail'
+  };
+  return map[code] || 'unknown';
+}
+
+function computeWeatherMood(data){
+  const tempC = data.tempC ?? 14;
+  const windKmh = data.windKmh ?? 10;
+  const cloud = data.cloud ?? 45;
+  const isDay = !!data.isDay;
+  const code = data.weatherCode ?? 1;
+  const storm = [95,96,99].includes(code) ? 1 : [61,63,65,80,81,82].includes(code) ? 0.55 : 0;
+  const rain = [51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code) ? 0.35 : 0;
+  let clarityBias = 0;
+  if(isDay) clarityBias += 0.22;
+  if(cloud <= 20) clarityBias += 0.28;
+  if(tempC >= 17 && tempC <= 28) clarityBias += 0.16;
+  if(windKmh < 18) clarityBias += 0.08;
+  let intensity = 0;
+  intensity += clamp(windKmh / 75, 0, 0.35);
+  intensity += clamp(cloud / 100, 0, 0.22);
+  intensity += storm * 0.6 + rain * 0.18;
+  if(!isDay) intensity += 0.12;
+  if(!isDay && storm > 0) intensity += 0.22;
   return {
-    blurFrom: rand(26,42),
-    blurTo: rand(30,52),
-    blurStart: now,
-    blurDuration: rand(9000,18000),
-
-    xFrom: rand(-moveRangeFrom,moveRangeFrom),
-    yFrom: rand(-moveRangeFrom,moveRangeFrom),
-    xTo: rand(-moveRangeTo,moveRangeTo),
-    yTo: rand(-moveRangeTo,moveRangeTo),
-    moveStart: now,
-    moveDuration: rand(9000,18000),
-
-    scaleFrom: baseScale,
-    scaleTo: pulseTarget,
-    scaleStart: now,
-    scaleDuration: rand(14000,26000)
+    intensity: clamp(intensity, 0, 1),
+    clarityBias: clamp(clarityBias - storm * 0.2 - rain * 0.08, 0, 0.7),
+    stormBias: clamp(storm + rain + (!isDay ? 0.12 : 0), 0, 1)
   };
 }
 
-function resetMotion(img){
-  stateMap.set(img,newState());
+function updateWeatherPanelText(extra = ''){
+  const base = (weatherState.enabled || weatherState.status === 'emenating')
+    ? `Weather linked.
+${weatherState.label}
+Temp ${weatherState.tempC != null ? weatherState.tempC.toFixed(1) + '°C' : '—'} | Wind ${weatherState.windKmh != null ? Math.round(weatherState.windKmh) + ' km/h' : '—'} | Cloud ${weatherState.cloud != null ? Math.round(weatherState.cloud) + '%' : '—'}
+Mood: clarity ${weatherState.clarityBias.toFixed(2)} / intensity ${weatherState.intensity.toFixed(2)}`
+    : 'Use local weather to steer the radio atmosphere.\nIt will ask for location permission and refresh every 15 minutes.';
+  els.weatherCopy.textContent = extra ? `${base}\n\n${extra}` : base;
 }
 
-function animateLayer(img,now){
-  const s = stateMap.get(img);
-  if(!s){ return; }
-
-  let blurT = (now - s.blurStart) / s.blurDuration;
-  if(blurT >= 1){
-    s.blurFrom = s.blurTo;
-    s.blurTo = rand(30,52);
-    s.blurStart = now;
-    s.blurDuration = rand(9000,18000);
-    blurT = 0;
-  }
-  const blurEase = easeInOut(Math.max(0,Math.min(1,blurT)));
-  const blurValue = s.blurFrom + (s.blurTo - s.blurFrom) * blurEase;
-
-  let scaleT = (now - s.scaleStart) / s.scaleDuration;
-  if(scaleT >= 1){
-    s.scaleFrom = s.scaleTo;
-    s.scaleTo = Math.max(1.06, Math.min(1.5, s.scaleFrom + rand(-0.06,0.06)));
-    s.scaleStart = now;
-    s.scaleDuration = rand(14000,26000);
-    scaleT = 0;
-  }
-  const scaleEase = easeInOut(Math.max(0,Math.min(1,scaleT)));
-  const scale = s.scaleFrom + (s.scaleTo - s.scaleFrom) * scaleEase;
-
-  let moveT = (now - s.moveStart) / s.moveDuration;
-  if(moveT >= 1){
-    s.xFrom = s.xTo;
-    s.yFrom = s.yTo;
-
-    const currentRange = Math.max(0, (scale - 1) * 30);
-
-    s.xTo = rand(-currentRange,currentRange);
-    s.yTo = rand(-currentRange,currentRange);
-
-    s.moveStart = now;
-    s.moveDuration = rand(9000,18000);
-    moveT = 0;
-  }
-  const moveEase = easeInOut(Math.max(0,Math.min(1,moveT)));
-  const x = s.xFrom + (s.xTo - s.xFrom) * moveEase;
-  const y = s.yFrom + (s.yTo - s.yFrom) * moveEase;
-
-  img.style.filter = "blur(" + blurValue + "px)";
-  img.style.transform =
-    "translate(calc(-50% + " + x + "%), calc(-50% + " + y + "%)) scale(" + scale + ")";
+function getPoeticFragment(){
+  if(!POETRY_LINES.length) return 'signal weak / emenating';
+  const base = POETRY_LINES[Math.floor(Math.random() * POETRY_LINES.length)];
+  const chaos = clamp(instability() * 0.45 + weatherState.intensity * 0.35, 0, 1);
+  return base.split('').map(c => {
+    if(Math.random() < chaos * 0.12) return ['#','~','/','\\','…'][Math.floor(Math.random() * 5)];
+    if(Math.random() < chaos * 0.06) return '';
+    return c;
+  }).join('').slice(0, 105);
 }
 
-function animate(now){
-  animateLayer(imgA,now);
-  animateLayer(imgB,now);
-  requestAnimationFrame(animate);
+function updateTelemetry(){
+  const ctxState = audioCtx ? audioCtx.state : 'none';
+  const station = currentStationState();
+  const stationTrack = station && station.phase === 'track' && station.currentTrack ? station.currentTrack.title : '—';
+  const fine = getFineTuneAmount();
+  const weatherTag = weatherState.enabled ? weatherState.label : 'emenating';
+
+  const fxText = audioCtx
+    ? `m ${mainGain ? mainGain.gain.value.toFixed(2) : '0.00'} / n ${noiseGain ? noiseGain.gain.value.toFixed(2) : '0.00'} / out ${outputGain ? outputGain.gain.value.toFixed(2) : '0.00'}${cleanOverride ? ' / clean' : fine > 0.02 ? ` / ft ${fine.toFixed(2)}` : ''}`
+    : '—';
+
+  els.telemetryLeft.textContent =
+`ENG: ${ctxState}
+CH: ${currentChannel}
+MODE: ${currentMode}
+AUDIO: ${running ? (pausedByKey ? 'paused' : (muted ? 'muted' : 'live')) : 'standby'}
+ELAPSED: ${formatTime(elapsedSec())}
+WEATHER: ${weatherTag}
+SIG: ${(1 - levelPeakSuppression).toFixed(2)}
+PEACE: ${getPeaceCurve().toFixed(2)}
+REWARD: ${getLongListenReward().toFixed(2)}`;
+
+  els.telemetryRight.textContent =
+`MAIN: ${currentTrack ? currentTrack.title : stationTrack}
+INST: ${instability().toFixed(2)}
+AMB: ${station ? station.ambience.toFixed(2) : '0.00'}
+FX: ${fxText}
+MIC: ${micState.recording ? 'recording' : micState.loopPlaying ? 'looping' : micState.permission === 'granted' ? 'ready' : 'off'}
+PITCH: ${detectedPitchHz ? detectedPitchHz.toFixed(1) + 'Hz' : '—'}
+CLR/STRM: ${weatherState.clarityBias.toFixed(2)} / ${weatherState.stormBias.toFixed(2)}
+EGG: `;
+  mountEggInTelemetry();
+  syncFineTuneButton();
+  syncMicButton();
+  syncWeatherButton();
 }
 
-let active = imgA;
-let hidden = imgB;
-let switchTimer = null;
+function mountEggInTelemetry(){
+  const slot = document.getElementById('eggSlot');
+  if(!slot) return;
+  let egg = document.getElementById('goldEgg');
+  if(!egg){
+    egg = document.createElement('span');
+    egg.id = 'goldEgg';
+    egg.className = 'gold-egg';
+    egg.setAttribute('aria-hidden', 'true');
+  }
+  if(!slot.contains(egg)) slot.appendChild(egg);
+}
 
-function nextDelayMs(){
-  if(chance(0.8)){
-    return rand(14000,24000);
-  }else{
-    return rand(24000,36000);
+function shuffle(array){
+  const copy = array.slice();
+  for(let i = copy.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function makeDistortionCurve(amount = 0){
+  const samples = 44100;
+  const curve = new Float32Array(samples);
+  const k = Math.max(0, amount);
+  for(let i = 0; i < samples; i++){
+    const x = i * 2 / samples - 1;
+    curve[i] = ((3 + k) * x * 20 * Math.PI / 180) / (Math.PI + k * Math.abs(x));
+  }
+  return curve;
+}
+
+async function loadPoetry(){
+  try{
+    const res = await fetch('images/poetry.rtf');
+    const text = await res.text();
+    const cleaned = text
+      .replace(/\\par[d]?/g, '\n')
+      .replace(/\\'[0-9a-f]{2}/gi, '')
+      .replace(/\\[a-z]+\d* ?/gi, '')
+      .replace(/[{}]/g, '');
+    POETRY_LINES = cleaned.split('\n').map(l => l.trim()).filter(l => l.length > 6);
+    log(`Poetry loaded (${POETRY_LINES.length} lines)`);
+  } catch(err){
+    log('Poetry failed to load');
   }
 }
 
-function nextFadeSeconds(){
-  if(chance(0.8)){
-    return rand(8,14);
-  }else{
-    return rand(14,20);
+async function ensureAudio(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    mainSource = audioCtx.createMediaElementSource(els.music);
+    textureSource = audioCtx.createMediaElementSource(els.texture);
+
+    masterGain = audioCtx.createGain();
+    outputGain = audioCtx.createGain();
+    autoLevelGain = audioCtx.createGain();
+    mainGain = audioCtx.createGain();
+    textureGain = audioCtx.createGain();
+    noiseGain = audioCtx.createGain();
+    humGain = audioCtx.createGain();
+    ambientGain = audioCtx.createGain();
+    micLiveGain = audioCtx.createGain();
+    micLoopGain = audioCtx.createGain();
+
+    mainDrive = audioCtx.createWaveShaper();
+    mainDrive.curve = makeDistortionCurve(0);
+    mainDrive.oversample = '2x';
+
+    mainFilter = audioCtx.createBiquadFilter();
+    mainFilter.type = 'lowpass';
+    mainFilter.frequency.value = 18500;
+
+    textureDrive = audioCtx.createWaveShaper();
+    textureDrive.curve = makeDistortionCurve(40);
+    textureDrive.oversample = '2x';
+
+    textureFilter = audioCtx.createBiquadFilter();
+    textureFilter.type = 'bandpass';
+    textureFilter.frequency.value = 1200;
+    textureFilter.Q.value = 0.92;
+
+    mainSend = audioCtx.createGain();
+    mainDelay = audioCtx.createDelay(4.0);
+    mainFeedback = audioCtx.createGain();
+    mainWet = audioCtx.createGain();
+
+    ambientLP = audioCtx.createBiquadFilter();
+    ambientLP.type = 'lowpass';
+    ambientLP.frequency.value = 2600;
+
+    ambientDelay = audioCtx.createDelay(8.0);
+    ambientFeedback = audioCtx.createGain();
+    ambientWet = audioCtx.createGain();
+
+    masterComp = audioCtx.createDynamicsCompressor();
+    masterComp.threshold.value = -18;
+    masterComp.knee.value = 20;
+    masterComp.ratio.value = 2.5;
+    masterComp.attack.value = 0.02;
+    masterComp.release.value = 0.28;
+
+    safetyLimiter = audioCtx.createDynamicsCompressor();
+    safetyLimiter.threshold.value = -6;
+    safetyLimiter.knee.value = 0;
+    safetyLimiter.ratio.value = 16;
+    safetyLimiter.attack.value = 0.003;
+    safetyLimiter.release.value = 0.1;
+
+    outputAnalyser = audioCtx.createAnalyser();
+    outputAnalyser.fftSize = 2048;
+    pitchAnalyser = audioCtx.createAnalyser();
+    pitchAnalyser.fftSize = 4096;
+
+    masterGain.gain.value = 1;
+    outputGain.gain.value = BASE_OUTPUT_LEVEL;
+    autoLevelGain.gain.value = 1;
+    mainGain.gain.value = 0;
+    textureGain.gain.value = 0;
+    noiseGain.gain.value = 0;
+    humGain.gain.value = 0;
+    ambientGain.gain.value = 1;
+    micLiveGain.gain.value = 0;
+    micLoopGain.gain.value = 0;
+
+    mainSend.gain.value = 0.08;
+    mainDelay.delayTime.value = 0.20;
+    mainFeedback.gain.value = 0.18;
+    mainWet.gain.value = 0.12;
+
+    ambientDelay.delayTime.value = 1.5;
+    ambientFeedback.gain.value = 0.42;
+    ambientWet.gain.value = 0.1;
+
+    mainSource.connect(mainDrive);
+    mainDrive.connect(mainFilter);
+    mainFilter.connect(mainGain);
+    mainGain.connect(masterGain);
+
+    textureSource.connect(textureDrive);
+    textureDrive.connect(textureFilter);
+    textureFilter.connect(textureGain);
+    textureGain.connect(masterGain);
+
+    mainFilter.connect(mainSend);
+    mainSend.connect(mainDelay);
+    mainDelay.connect(mainWet);
+    mainWet.connect(masterGain);
+    mainDelay.connect(mainFeedback);
+    mainFeedback.connect(mainDelay);
+
+    mainFilter.connect(ambientLP);
+    ambientLP.connect(ambientDelay);
+    ambientDelay.connect(ambientWet);
+    ambientWet.connect(ambientGain);
+    ambientGain.connect(masterGain);
+    ambientDelay.connect(ambientFeedback);
+    ambientFeedback.connect(ambientDelay);
+
+    noiseGain.connect(masterGain);
+    humGain.connect(masterGain);
+    micLiveGain.connect(masterGain);
+    micLoopGain.connect(masterGain);
+
+    masterGain.connect(masterComp);
+    masterComp.connect(autoLevelGain);
+    autoLevelGain.connect(outputGain);
+    outputGain.connect(safetyLimiter);
+    safetyLimiter.connect(outputAnalyser);
+    outputAnalyser.connect(pitchAnalyser);
+    pitchAnalyser.connect(audioCtx.destination);
+
+    log(`AudioContext created (${audioCtx.state})`);
+  }
+
+  if(audioCtx.state === 'suspended'){
+    await audioCtx.resume();
+    log(`AudioContext resumed (${audioCtx.state})`);
+  }
+
+  updateOutputLevel(true);
+  updateTelemetry();
+}
+
+function fadeGain(gainNode, target, seconds){
+  if(!audioCtx || !gainNode) return;
+  const now = audioCtx.currentTime;
+  gainNode.gain.cancelScheduledValues(now);
+  gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+  gainNode.gain.linearRampToValueAtTime(target, now + seconds);
+}
+
+function clearSelectedTimers(){
+  if(selectedStationTimer){ clearTimeout(selectedStationTimer); selectedStationTimer = null; }
+  if(selectedFadeTimer){ clearTimeout(selectedFadeTimer); selectedFadeTimer = null; }
+}
+
+function stopOneShotNodes(){
+  activeNodeStops.forEach(fn => { try{ fn(); }catch(e){} });
+  activeNodeStops = [];
+}
+
+function stopMicLoopPlayback(){
+  if(micLoopSource){ try{ micLoopSource.stop(); }catch(e){} try{ micLoopSource.disconnect(); }catch(e){} micLoopSource = null; }
+  if(micLoopFilter){ try{ micLoopFilter.disconnect(); }catch(e){} micLoopFilter = null; }
+  if(micLoopDelay){ try{ micLoopDelay.disconnect(); }catch(e){} micLoopDelay = null; }
+  if(micLoopFeedback){ try{ micLoopFeedback.disconnect(); }catch(e){} micLoopFeedback = null; }
+  if(audioCtx && micLoopGain) fadeGain(micLoopGain, 0.0001, 0.4);
+  micState.loopPlaying = false;
+}
+
+function stopAllFX(){
+  stopOneShotNodes();
+  try{ els.texture.pause(); }catch(e){}
+  els.texture.removeAttribute('src');
+  els.texture.load();
+  if(audioCtx){
+    fadeGain(textureGain, 0, 0.15);
+    fadeGain(noiseGain, 0, 0.15);
+    fadeGain(humGain, 0, 0.15);
+  }
+  currentTexture = null;
+  updateTelemetry();
+}
+
+function stationAmbience(mode, station){
+  const t = clamp((nowMs() - station.createdAt) / (6 * 60 * 60 * 1000), 0, 1.3);
+  const tide = (Math.sin((nowMs() - station.createdAt) / 90000) + 1) * 0.5;
+  if(cleanOverride) return 1;
+  if(mode === 'all-clean') return clamp(0.62 + tide * 0.14, 0, 1);
+  if(mode === 'dead-air') return clamp(0.58 + tide * 0.14, 0, 1);
+  if(mode === 'textures-only') return clamp(0.4 + tide * 0.2 + t * 0.06, 0, 1);
+  if(mode === 'centrepieces-only') return clamp(0.34 + tide * 0.16 + t * 0.05, 0, 1);
+  return clamp(0.38 + tide * 0.2 + t * 0.08, 0, 1);
+}
+
+function getTrackSoftness(track){
+  if(!track) return 0;
+  if(track.soft) return 0.38;
+  if(track.src === AMBULANCE_SRC) return 0.42;
+  return 0;
+}
+
+function updateAutoLevelAndPeakControl(){
+  if(!audioCtx || !outputAnalyser || !autoLevelGain) return;
+  const data = new Uint8Array(outputAnalyser.fftSize);
+  outputAnalyser.getByteTimeDomainData(data);
+
+  let peak = 0;
+  let sum = 0;
+  for(let i = 0; i < data.length; i++){
+    const v = (data[i] - 128) / 128;
+    const a = Math.abs(v);
+    if(a > peak) peak = a;
+    sum += v * v;
+  }
+  const rms = Math.sqrt(sum / data.length);
+  let target = 1;
+  if(rms < 0.08) target = 1.18;
+  else if(rms < 0.12) target = 1.08;
+  else if(rms < 0.17) target = 1.0;
+  else target = lerp(1.0, 0.82, clamp((rms - 0.17) / 0.18, 0, 1));
+
+  if(peak > 0.93) levelPeakSuppression = clamp(levelPeakSuppression + 0.08, 0, 1);
+  else if(peak > 0.85) levelPeakSuppression = clamp(levelPeakSuppression + 0.03, 0, 1);
+  else levelPeakSuppression = clamp(levelPeakSuppression - 0.02, 0, 1);
+
+  target *= (1 - levelPeakSuppression * 0.28);
+  autoGainTarget = clamp(target, 0.74, 1.2);
+
+  const now = audioCtx.currentTime;
+  autoLevelGain.gain.cancelScheduledValues(now);
+  autoLevelGain.gain.setValueAtTime(autoLevelGain.gain.value, now);
+  autoLevelGain.gain.setTargetAtTime(autoGainTarget, now, 0.22);
+  updateOutputLevel(false);
+}
+
+function updateMicModulation(){
+  if(!audioCtx || !micAnalyser || !mainFilter || !micState.active) return;
+  const data = new Uint8Array(micAnalyser.fftSize);
+  micAnalyser.getByteTimeDomainData(data);
+
+  let sum = 0;
+  for(let i = 0; i < data.length; i++){
+    const v = (data[i] - 128) / 128;
+    sum += v * v;
+  }
+  const rms = Math.sqrt(sum / data.length);
+  const envelope = clamp((rms - 0.015) / 0.14, 0, 1);
+
+  const baseCut = mainFilter.frequency.value;
+  const motion = 320 + envelope * 3400;
+  mainFilter.frequency.setTargetAtTime(clamp(baseCut + motion * 0.16, 500, 19000), audioCtx.currentTime, 0.06);
+
+  if(mainDelay){
+    mainDelay.delayTime.setTargetAtTime(clamp(mainDelay.delayTime.value + envelope * 0.016, 0.07, 0.42), audioCtx.currentTime, 0.06);
+  }
+  if(mainWet){
+    mainWet.gain.setTargetAtTime(clamp(mainWet.gain.value + envelope * 0.012, 0, 0.28), audioCtx.currentTime, 0.06);
+  }
+  if(micLiveGain){
+    micLiveGain.gain.setTargetAtTime(envelope * 0.1, audioCtx.currentTime, 0.05);
+  }
+
+  const micPitch = detectPitchFromAnalyser(micPitchAnalyser, audioCtx.sampleRate);
+  if(micPitch && currentTrack && running && textureFilter){
+    const colorShift = clamp((micPitch - 120) / 600, -1, 1);
+    textureFilter.frequency.setTargetAtTime(clamp(1100 + colorShift * 700, 300, 3200), audioCtx.currentTime, 0.07);
   }
 }
 
-function showNextImage(){
-  const nextSrc = nextImage();
-  const preload = new Image();
+function updatePitchEgg(){
+  if(!audioCtx || !pitchAnalyser) return;
+  const hz = detectPitchFromAnalyser(pitchAnalyser, audioCtx.sampleRate);
+  detectedPitchHz = hz || 0;
+  if(isFSharp(hz)) eggHoldUntil = nowMs() + 1800;
+  const egg = document.getElementById('goldEgg');
+  if(egg) egg.classList.toggle('on', nowMs() < eggHoldUntil);
+}
 
-  preload.onload = function(){
-    const fade = nextFadeSeconds();
+function isFSharp(freq){
+  if(!freq || !Number.isFinite(freq)) return false;
+  const midi = Math.round(69 + 12 * Math.log2(freq / 440));
+  const pitchClass = ((midi % 12) + 12) % 12;
+  return pitchClass === 6;
+}
 
-    hidden.src = nextSrc;
-    resetMotion(hidden);
+function detectPitchFromAnalyser(analyser, sampleRate){
+  if(!analyser) return 0;
+  const buf = new Float32Array(analyser.fftSize);
+  analyser.getFloatTimeDomainData(buf);
+  return autoCorrelate(buf, sampleRate);
+}
 
-    hidden.style.transition = "none";
-    hidden.style.opacity = 0;
+function autoCorrelate(buf, sampleRate){
+  let rms = 0;
+  for(let i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
+  rms = Math.sqrt(rms / buf.length);
+  if(rms < 0.015) return 0;
 
-    hidden.offsetHeight;
+  let r1 = 0;
+  let r2 = buf.length - 1;
+  const thres = 0.2;
+  for(let i = 0; i < buf.length / 2; i++){
+    if(Math.abs(buf[i]) < thres){ r1 = i; break; }
+  }
+  for(let i = 1; i < buf.length / 2; i++){
+    if(Math.abs(buf[buf.length - i]) < thres){ r2 = buf.length - i; break; }
+  }
+  const trimmed = buf.slice(r1, r2);
+  const c = new Array(trimmed.length).fill(0);
 
-    hidden.style.transition = "opacity " + fade + "s linear";
-    active.style.transition = "opacity " + fade + "s linear";
+  for(let i = 0; i < trimmed.length; i++){
+    for(let j = 0; j < trimmed.length - i; j++){
+      c[i] += trimmed[j] * trimmed[j + i];
+    }
+  }
 
-    hidden.style.opacity = 1;
-    active.style.opacity = 0;
+  let d = 0;
+  while(c[d] > c[d + 1]) d++;
+  let maxpos = -1;
+  let maxval = -1;
+  for(let i = d; i < c.length; i++){
+    if(c[i] > maxval){ maxval = c[i]; maxpos = i; }
+  }
+  if(maxpos <= 0) return 0;
 
-    const temp = active;
-    active = hidden;
-    hidden = temp;
+  let T0 = maxpos;
+  const x1 = c[T0 - 1] || c[T0];
+  const x2 = c[T0];
+  const x3 = c[T0 + 1] || c[T0];
+  const a = (x1 + x3 - 2 * x2) / 2;
+  const b = (x3 - x1) / 2;
+  if(a) T0 = T0 - b / (2 * a);
 
-    switchTimer = setTimeout(showNextImage, nextDelayMs());
+  const freq = sampleRate / T0;
+  if(freq < 55 || freq > 2000) return 0;
+  return freq;
+}
+
+function updateProcessing(forceGhost = false){
+  if(!audioCtx) return;
+
+  const station = currentStationState();
+  const meta = activeStationMeta();
+  const ambient = station ? station.ambience : 0.35;
+  const t = instability();
+  const fine = getFineTuneAmount();
+  const peace = getPeaceCurve();
+  const reward = getLongListenReward();
+  const trackSoft = getTrackSoftness(currentTrack || (station ? station.currentTrack : null));
+  const weatherHeavy = weatherState.enabled || weatherState.status === 'emenating' ? weatherState.intensity : 0;
+  const weatherClear = weatherState.enabled || weatherState.status === 'emenating' ? weatherState.clarityBias : 0;
+  const stormBias = weatherState.enabled || weatherState.status === 'emenating' ? weatherState.stormBias : 0;
+
+  updateOutputLevel(false);
+
+  if(cleanOverride){
+    mainDrive.curve = makeDistortionCurve(0);
+    textureDrive.curve = makeDistortionCurve(0);
+    mainFilter.frequency.setTargetAtTime(19500, audioCtx.currentTime, 0.22);
+    textureFilter.frequency.setTargetAtTime(1700, audioCtx.currentTime, 0.22);
+    mainSend.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.22);
+    mainDelay.delayTime.setTargetAtTime(0.11, audioCtx.currentTime, 0.22);
+    mainFeedback.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.22);
+    mainWet.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.22);
+    ambientLP.frequency.setTargetAtTime(6800, audioCtx.currentTime, 0.22);
+    ambientDelay.delayTime.setTargetAtTime(0.18, audioCtx.currentTime, 0.22);
+    ambientFeedback.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.22);
+    ambientWet.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.22);
+    noiseGain.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.12);
+    humGain.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.12);
+    updateTelemetry();
+    return;
+  }
+
+  if(forceGhost){
+    const ghostClean = fine * 0.65;
+    mainDrive.curve = makeDistortionCurve((meta.mode === 'all-clean' ? 10 : 70) * (1 - ghostClean));
+    mainFilter.frequency.setTargetAtTime((meta.mode === 'all-clean' ? 2600 : 1600) + ghostClean * 5600, audioCtx.currentTime, 0.08);
+    mainSend.gain.setTargetAtTime(0.008 * (1 - ghostClean), audioCtx.currentTime, 0.08);
+    mainFeedback.gain.setTargetAtTime(0.06 * (1 - ghostClean), audioCtx.currentTime, 0.08);
+    mainWet.gain.setTargetAtTime(0.025 * (1 - ghostClean), audioCtx.currentTime, 0.08);
+    ambientWet.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.08);
+    noiseGain.gain.setTargetAtTime(0.02 * (1 - fine), audioCtx.currentTime, 0.08);
+    humGain.gain.setTargetAtTime(0.012 * (1 - fine), audioCtx.currentTime, 0.08);
+    return;
+  }
+
+  const clean = meta.mode === 'all-clean';
+  const deadAir = meta.mode === 'dead-air';
+  const texturesOnly = meta.mode === 'textures-only';
+  const centreOnly = meta.mode === 'centrepieces-only';
+
+  const weatherClarityLift = weatherClear * 0.5;
+  const effectiveAmbient = clamp(ambient + fine * 0.55 + weatherClarityLift - stormBias * 0.1, 0, 1);
+  const delayedEffects = peace;
+  const intensityRise = clamp(t * 0.72 + reward * 0.38 + weatherHeavy * 0.48, 0, 1.6);
+  const softness = clamp(trackSoft + weatherClear * 0.26 + (1 - delayedEffects) * 0.55, 0, 0.95);
+
+  let mainAmount = deadAir ? 0 : clamp((clean ? 4 : 24) + (1 - effectiveAmbient) * (clean ? 7 : 58) + intensityRise * (clean ? 4 : 34), 0, 165);
+  let textureAmount = clean ? 0 : clamp(10 + (1 - effectiveAmbient) * (texturesOnly ? 70 : 44) + intensityRise * 24, 0, 165);
+
+  mainAmount *= delayedEffects;
+  textureAmount *= delayedEffects;
+  mainAmount *= (1 - softness * 0.82);
+  textureAmount *= (1 - softness * 0.86);
+  mainAmount *= (1 - fine * 0.88);
+  textureAmount *= (1 - fine * 0.96);
+  mainAmount *= (1 - levelPeakSuppression * 0.35);
+  textureAmount *= (1 - levelPeakSuppression * 0.38);
+
+  mainDrive.curve = makeDistortionCurve(mainAmount);
+  textureDrive.curve = makeDistortionCurve(textureAmount);
+
+  const mainCut = clean
+    ? 18400 - effectiveAmbient * 2200
+    : deadAir
+      ? 7800 - effectiveAmbient * 1400
+      : 18600 - (1 - effectiveAmbient) * 4600 - intensityRise * 2400 + fine * 6800 + softness * 3400;
+
+  const textureBand = clean ? 1700 : 740 + effectiveAmbient * 520 + Math.random() * 380 + fine * 540 + weatherHeavy * 120;
+
+  mainFilter.frequency.setTargetAtTime(Math.max(850, mainCut), audioCtx.currentTime, 0.52);
+  textureFilter.frequency.setTargetAtTime(textureBand, audioCtx.currentTime, 0.52);
+
+  const sendBase = delayedEffects * (deadAir ? 0.025 : (clean ? 0.03 : 0.04 + (1 - effectiveAmbient) * 0.05 + weatherHeavy * 0.02));
+  const delayBase = clean ? 0.16 : 0.12 + delayedEffects * (1 - effectiveAmbient) * 0.15 + weatherHeavy * 0.03;
+  const feedbackBase = clean ? 0.07 : 0.1 + delayedEffects * (1 - effectiveAmbient) * 0.11 + reward * 0.06;
+  const wetBase = clean ? 0.05 : 0.06 + delayedEffects * (1 - effectiveAmbient) * 0.06 + reward * 0.04;
+
+  mainSend.gain.setTargetAtTime(sendBase * (1 - fine * 0.94) * (1 - softness * 0.65), audioCtx.currentTime, 0.48);
+  mainDelay.delayTime.setTargetAtTime(Math.max(0.08, delayBase * (1 - fine * 0.4)), audioCtx.currentTime, 0.48);
+  mainFeedback.gain.setTargetAtTime(feedbackBase * (1 - fine * 0.96) * (1 - levelPeakSuppression * 0.25), audioCtx.currentTime, 0.48);
+  mainWet.gain.setTargetAtTime(wetBase * (1 - fine * 0.96) * (1 - softness * 0.62), audioCtx.currentTime, 0.48);
+
+  ambientLP.frequency.setTargetAtTime((clean ? 5200 : 2100 + effectiveAmbient * 2200) + fine * 2000 + weatherClear * 1200, audioCtx.currentTime, 0.7);
+  ambientDelay.delayTime.setTargetAtTime(Math.max(0.14, (deadAir ? 1.8 : 0.6 + effectiveAmbient * 2.1 + reward * 0.7) * (1 - fine * 0.78)), audioCtx.currentTime, 0.7);
+  ambientFeedback.gain.setTargetAtTime((clean ? 0.28 : deadAir ? 0.4 : 0.22 + effectiveAmbient * 0.18 + reward * 0.08) * (1 - fine * 0.92), audioCtx.currentTime, 0.7);
+  ambientWet.gain.setTargetAtTime((clean ? 0.05 : deadAir ? 0.1 : 0.05 + effectiveAmbient * 0.1 + reward * 0.05) * (1 - fine * 0.92) * delayedEffects, audioCtx.currentTime, 0.7);
+
+  const rareNoiseReward = reward * 0.03 + weatherHeavy * 0.01;
+  noiseGain.gain.setTargetAtTime((deadAir ? 0.034 : 0.015 + rareNoiseReward) * delayedEffects * (1 - fine * 0.92) * (1 - softness * 0.5), audioCtx.currentTime, 0.24);
+  humGain.gain.setTargetAtTime((deadAir ? 0.018 : 0.009 + reward * 0.006) * delayedEffects * (1 - fine * 0.92), audioCtx.currentTime, 0.24);
+
+  if(texturesOnly){
+    mainSend.gain.setTargetAtTime(0.018 * delayedEffects * (1 - fine * 0.9), audioCtx.currentTime, 0.45);
+  }
+  if(centreOnly){
+    textureGain.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.15);
+  }
+  if(mainGain){
+    const baseMainGain = deadAir ? 0.65 : 1.0;
+    mainGain.gain.setTargetAtTime(baseMainGain, audioCtx.currentTime, 0.2);
+  }
+
+  updateTelemetry();
+}
+
+function makeFilteredNoise(durationSec, config = {}){
+  if(!audioCtx || cleanOverride) return;
+  const now = audioCtx.currentTime;
+  const buffer = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * durationSec), audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for(let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (config.noiseLevel || 0.22);
+
+  const src = audioCtx.createBufferSource();
+  src.buffer = buffer;
+  const pre = audioCtx.createBiquadFilter();
+  pre.type = config.preType || 'lowpass';
+  pre.frequency.value = config.preFreq || 1200;
+  const band = audioCtx.createBiquadFilter();
+  band.type = config.bandType || 'bandpass';
+  band.frequency.value = config.bandFreq || 900;
+  band.Q.value = config.bandQ || 0.7;
+  const gain = audioCtx.createGain();
+  gain.gain.value = 0.0001;
+
+  src.connect(pre); pre.connect(band); band.connect(gain); gain.connect(noiseGain);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(config.peak || 0.05, now + (config.attack || 0.7));
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+
+  src.start(now);
+  src.stop(now + durationSec + 0.05);
+
+  const stop = () => {
+    try{ src.stop(); }catch(e){}
+    [src, pre, band, gain].forEach(node => { try{ node.disconnect(); }catch(e){} });
+  };
+  activeNodeStops.push(stop);
+  return stop;
+}
+
+function makeHumCluster(durationSec, peak = 0.02){
+  if(!audioCtx || cleanOverride) return;
+  const now = audioCtx.currentTime;
+  const base = chance(0.5) ? 50 : 60;
+
+  const osc1 = audioCtx.createOscillator();
+  const osc2 = audioCtx.createOscillator();
+  const osc3 = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc1.type = 'sine';
+  osc2.type = 'sine';
+  osc3.type = 'triangle';
+
+  osc1.frequency.value = base;
+  osc2.frequency.value = base * 2;
+  osc3.frequency.value = base * 0.5;
+  gain.gain.value = 0.0001;
+
+  osc1.connect(gain); osc2.connect(gain); osc3.connect(gain); gain.connect(humGain);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(peak, now + 0.5);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+
+  osc1.start(now); osc2.start(now); osc3.start(now);
+  osc1.stop(now + durationSec + 0.05);
+  osc2.stop(now + durationSec + 0.05);
+  osc3.stop(now + durationSec + 0.05);
+
+  activeNodeStops.push(() => {
+    try{ osc1.stop(); }catch(e){}
+    try{ osc2.stop(); }catch(e){}
+    try{ osc3.stop(); }catch(e){}
+    [osc1, osc2, osc3, gain].forEach(node => { try{ node.disconnect(); }catch(e){} });
+  });
+}
+
+function synthesizeTuningSound(durationSec = 1.8, intensity = 0.8){
+  if(!audioCtx || cleanOverride) return;
+  const now = audioCtx.currentTime;
+  const hissBuffer = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * durationSec), audioCtx.sampleRate);
+  const hissData = hissBuffer.getChannelData(0);
+  for(let i = 0; i < hissData.length; i++) hissData[i] = (Math.random() * 2 - 1) * 0.25 * intensity;
+
+  const hiss = audioCtx.createBufferSource();
+  hiss.buffer = hissBuffer;
+  const hp = audioCtx.createBiquadFilter();
+  hp.type = 'highpass';
+  hp.frequency.value = 320;
+  const bp = audioCtx.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.frequency.setValueAtTime(rand(900, 2200), now);
+  bp.frequency.exponentialRampToValueAtTime(rand(450, 2800), now + durationSec);
+  bp.Q.value = 0.8;
+  const hissGain = audioCtx.createGain();
+  hissGain.gain.value = 0.0001;
+
+  hiss.connect(hp); hp.connect(bp); bp.connect(hissGain); hissGain.connect(noiseGain);
+  hissGain.gain.setValueAtTime(0.0001, now);
+  hissGain.gain.exponentialRampToValueAtTime(0.05 * intensity, now + 0.08);
+  hissGain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+
+  const toneA = audioCtx.createOscillator();
+  const toneB = audioCtx.createOscillator();
+  const toneFilter = audioCtx.createBiquadFilter();
+  const toneGain = audioCtx.createGain();
+
+  toneA.type = 'sine';
+  toneB.type = 'sine';
+  toneA.frequency.setValueAtTime(rand(350, 900), now);
+  toneB.frequency.setValueAtTime(rand(354, 908), now);
+  toneA.frequency.exponentialRampToValueAtTime(rand(130, 380), now + durationSec);
+  toneB.frequency.exponentialRampToValueAtTime(rand(134, 388), now + durationSec);
+
+  toneFilter.type = 'bandpass';
+  toneFilter.frequency.value = rand(950, 2100);
+  toneFilter.Q.value = 2;
+  toneGain.gain.value = 0.0001;
+
+  toneA.connect(toneFilter); toneB.connect(toneFilter); toneFilter.connect(toneGain); toneGain.connect(noiseGain);
+  toneGain.gain.setValueAtTime(0.0001, now);
+  toneGain.gain.exponentialRampToValueAtTime(0.02 * intensity, now + 0.04);
+  toneGain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec * 0.82);
+
+  hiss.start(now); hiss.stop(now + durationSec + 0.05);
+  toneA.start(now); toneB.start(now);
+  toneA.stop(now + durationSec + 0.05);
+  toneB.stop(now + durationSec + 0.05);
+
+  activeNodeStops.push(() => {
+    try{ hiss.stop(); }catch(e){}
+    try{ toneA.stop(); }catch(e){}
+    try{ toneB.stop(); }catch(e){}
+    [hiss, hp, bp, hissGain, toneA, toneB, toneFilter, toneGain].forEach(node => { try{ node.disconnect(); }catch(e){} });
+  });
+}
+
+async function ensureMic(){
+  await ensureAudio();
+  if(micState.stream) return;
+
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+    micState.stream = stream;
+    micState.permission = 'granted';
+
+    micSource = audioCtx.createMediaStreamSource(stream);
+    micAnalyser = audioCtx.createAnalyser();
+    micAnalyser.fftSize = 1024;
+    micPitchAnalyser = audioCtx.createAnalyser();
+    micPitchAnalyser.fftSize = 2048;
+    micGate = audioCtx.createGain();
+    micBand = audioCtx.createBiquadFilter();
+    micRecorderDest = audioCtx.createMediaStreamDestination();
+
+    micBand.type = 'bandpass';
+    micBand.frequency.value = 1200;
+    micBand.Q.value = 1.2;
+    micGate.gain.value = 0.0001;
+
+    micSource.connect(micAnalyser);
+    micSource.connect(micPitchAnalyser);
+    micSource.connect(micBand);
+    micBand.connect(micGate);
+    micGate.connect(micLiveGain);
+    micBand.connect(micRecorderDest);
+
+    micRecorder = new MediaRecorder(micRecorderDest.stream);
+    micRecorder.addEventListener('dataavailable', e => {
+      if(e.data && e.data.size > 0) micChunks.push(e.data);
+    });
+    micRecorder.addEventListener('stop', async () => {
+      try{
+        const blob = new Blob(micChunks, { type: micRecorder.mimeType || 'audio/webm' });
+        micChunks = [];
+        const arr = await blob.arrayBuffer();
+        micLoopBuffer = await audioCtx.decodeAudioData(arr.slice(0));
+        startMicLoopPlayback();
+        log(`Mic phrase captured (${(micLoopBuffer.duration || 0).toFixed(1)}s)`);
+      } catch(err){
+        log(`Mic phrase decode failed: ${err.message || err}`);
+      } finally {
+        micState.recording = false;
+        micState.active = true;
+        syncMicButton();
+        updateTelemetry();
+      }
+    });
+
+    log('Microphone ready');
+  } catch(err){
+    micState.permission = 'denied';
+    log(`Microphone unavailable: ${err.message || err}`);
+    throw err;
+  }
+}
+
+function startMicLive(){
+  if(!audioCtx || !micGate) return;
+  micState.active = true;
+  micState.recording = true;
+  stopMicLoopPlayback();
+  const now = audioCtx.currentTime;
+  micGate.gain.cancelScheduledValues(now);
+  micGate.gain.setValueAtTime(micGate.gain.value, now);
+  micGate.gain.setTargetAtTime(0.9, now, 0.08);
+  micLiveGain.gain.setTargetAtTime(0.0, now, 0.08);
+  micChunks = [];
+  if(micRecorder && micRecorder.state !== 'recording') micRecorder.start();
+  log('Mic live capture started');
+  syncMicButton();
+  updateTelemetry();
+}
+
+function stopMicLiveAndLoop(){
+  if(!audioCtx || !micGate) return;
+  micState.recording = false;
+  const now = audioCtx.currentTime;
+  micGate.gain.cancelScheduledValues(now);
+  micGate.gain.setValueAtTime(micGate.gain.value, now);
+  micGate.gain.setTargetAtTime(0.0001, now, 0.12);
+  if(micRecorder && micRecorder.state === 'recording') micRecorder.stop();
+  log('Mic capture stopped, preparing loop');
+  syncMicButton();
+  updateTelemetry();
+}
+
+function startMicLoopPlayback(){
+  if(!audioCtx || !micLoopBuffer) return;
+  stopMicLoopPlayback();
+
+  micLoopSource = audioCtx.createBufferSource();
+  micLoopSource.buffer = micLoopBuffer;
+  micLoopSource.loop = true;
+
+  micLoopFilter = audioCtx.createBiquadFilter();
+  micLoopFilter.type = 'lowpass';
+  micLoopFilter.frequency.value = 1650;
+
+  micLoopDelay = audioCtx.createDelay(4.0);
+  micLoopDelay.delayTime.value = 0.34;
+
+  micLoopFeedback = audioCtx.createGain();
+  micLoopFeedback.gain.value = 0.38;
+
+  micLoopSource.connect(micLoopFilter);
+  micLoopFilter.connect(micLoopGain);
+  micLoopFilter.connect(micLoopDelay);
+  micLoopDelay.connect(micLoopGain);
+  micLoopDelay.connect(micLoopFeedback);
+  micLoopFeedback.connect(micLoopDelay);
+
+  micLoopGain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+  micLoopGain.gain.setTargetAtTime(0.18, audioCtx.currentTime, 0.32);
+
+  micLoopSource.start();
+  micState.loopPlaying = true;
+  syncMicButton();
+  updateTelemetry();
+}
+
+function initStation(channel){
+  const meta = CHANNELS[channel];
+  const allTracks = [...meta.centrepieces, ...meta.textures];
+  stationStates[channel] = {
+    channel,
+    name: meta.name,
+    mode: meta.mode,
+    createdAt: nowMs() - Math.floor(rand(0, 25 * 60 * 1000)),
+    ambience: 0.3,
+    phase: 'idle',
+    phaseStartedAt: 0,
+    phaseEndsAt: 0,
+    currentTrack: null,
+    preparedTrack: null,
+    preparedPreviewOffset: 0,
+    playOffsetAtPhaseStart: 0,
+    lastTrackSrc: null,
+    lastAmbulanceAt: 0,
+    firstTrackStartsMidway: true,
+    trackEntryMode: 'start',
+    bags: {
+      centrepieces: shuffle(meta.centrepieces),
+      textures: shuffle(meta.textures),
+      all: shuffle(allTracks)
+    }
+  };
+}
+
+function refillBag(station, key){
+  const meta = CHANNELS[station.channel];
+  if(key === 'centrepieces') station.bags.centrepieces = shuffle(meta.centrepieces);
+  if(key === 'textures') station.bags.textures = shuffle(meta.textures);
+  if(key === 'all') station.bags.all = shuffle([...meta.centrepieces, ...meta.textures]);
+}
+
+function pullFromBag(station, key, excludeSrc = null){
+  if(!station.bags[key] || station.bags[key].length === 0) refillBag(station, key);
+  let pool = station.bags[key];
+  let idx = pool.findIndex(track => !excludeSrc || track.src !== excludeSrc);
+  if(idx < 0){
+    refillBag(station, key);
+    pool = station.bags[key];
+    idx = pool.findIndex(track => !excludeSrc || track.src !== excludeSrc);
+  }
+  if(idx < 0) idx = 0;
+  return pool.splice(idx, 1)[0] || null;
+}
+
+function shouldPrioritizeAmbulance(station){
+  if(station.channel === 5) return false;
+  const t = nowMs();
+  const restedGlobally = (t - globalAmbulanceLastAt) > AMBULANCE_REST_MS;
+  const restedLocally = (t - station.lastAmbulanceAt) > AMBULANCE_REST_MS;
+  if(!restedGlobally || !restedLocally) return false;
+  return chance(station.mode === 'all-clean' ? 0.42 : 0.56);
+}
+
+function makeAmbulanceWindowTrack(){
+  const playStart = rand(AMBULANCE_WINDOW_START, AMBULANCE_WINDOW_END - 130);
+  return {
+    title: 'Ambulance Land',
+    src: AMBULANCE_SRC,
+    durationHint: AMBULANCE_WINDOW_END - playStart,
+    forcedWindow: true,
+    windowStart: playStart,
+    windowEnd: AMBULANCE_WINDOW_END,
+    soft: true
+  };
+}
+
+function chooseTrackForStation(station){
+  if(shouldPrioritizeAmbulance(station)){
+    station.lastAmbulanceAt = nowMs();
+    globalAmbulanceLastAt = nowMs();
+    return makeAmbulanceWindowTrack();
+  }
+
+  let picked = null;
+  if(station.mode === 'textures-only') picked = pullFromBag(station, 'textures', station.lastTrackSrc);
+  else if(station.mode === 'centrepieces-only') picked = pullFromBag(station, 'centrepieces', station.lastTrackSrc);
+  else if(station.mode === 'all-clean') picked = pullFromBag(station, 'all', station.lastTrackSrc);
+  else if(station.mode === 'main'){
+    picked = pullFromBag(station, 'centrepieces', station.lastTrackSrc);
+    if(!picked && chance(0.22)) picked = pullFromBag(station, 'textures', station.lastTrackSrc);
+  }
+
+  if(!picked && station.mode !== 'dead-air') picked = pullFromBag(station, 'all', station.lastTrackSrc);
+  if(!picked) return null;
+
+  if(picked.src === AMBULANCE_SRC && chance(0.5) && (nowMs() - globalAmbulanceLastAt) > 5 * 60 * 1000){
+    station.lastAmbulanceAt = nowMs();
+    globalAmbulanceLastAt = nowMs();
+  }
+
+  return { title: picked.title, src: picked.src, soft: !!picked.soft };
+}
+
+function tuningDurationFor(station){
+  if(station.mode === 'all-clean') return rand(1200, 2600);
+  if(station.mode === 'dead-air') return rand(2400, 5000);
+  return rand(1800, 4200);
+}
+
+function deadAirDurationFor(){
+  return rand(12000, 28000);
+}
+
+function chooseRandomTrackStart(duration, station){
+  if(!Number.isFinite(duration) || duration < 8) return 0;
+  if(station.currentTrack && station.currentTrack.forcedWindow) return station.currentTrack.windowStart;
+  const minPct = station.mode === 'all-clean' ? 0.16 : 0.1;
+  const maxPct = station.mode === 'all-clean' ? 0.82 : 0.88;
+  const endBuffer = station.mode === 'all-clean' ? 15 : 10;
+  const minStart = Math.max(2, duration * minPct);
+  const maxStart = Math.max(minStart + 1, Math.min(duration - endBuffer, duration * maxPct));
+  return maxStart > minStart ? rand(minStart, maxStart) : minStart;
+}
+
+function chooseRareShortenStart(duration){
+  if(!Number.isFinite(duration) || duration < 40) return 0;
+  return rand(duration * 0.04, duration * 0.22);
+}
+
+function enterTuning(station, at, preparedTrack = null){
+  station.phase = 'tuning';
+  station.phaseStartedAt = at;
+  station.phaseEndsAt = at + tuningDurationFor(station);
+  station.currentTrack = null;
+  station.preparedTrack = preparedTrack;
+  station.preparedPreviewOffset = preparedTrack ? (preparedTrack.forcedWindow ? preparedTrack.windowStart : rand(12, 90)) : 0;
+  station.playOffsetAtPhaseStart = 0;
+  station.ambience = stationAmbience(station.mode, station);
+}
+
+function enterDeadAir(station, at){
+  station.phase = 'dead-air';
+  station.phaseStartedAt = at;
+  station.phaseEndsAt = at + deadAirDurationFor();
+  station.currentTrack = null;
+  station.preparedTrack = null;
+  station.preparedPreviewOffset = 0;
+  station.playOffsetAtPhaseStart = 0;
+  station.ambience = stationAmbience(station.mode, station);
+}
+
+function enterTrack(station, at){
+  const picked = station.preparedTrack || chooseTrackForStation(station);
+  station.preparedTrack = null;
+  station.preparedPreviewOffset = 0;
+  if(!picked){
+    enterTuning(station, at);
+    return;
+  }
+  station.currentTrack = picked;
+  station.lastTrackSrc = picked.src;
+
+  let entryMode = 'start';
+  if(picked.forcedWindow) entryMode = 'window';
+  else if(station.firstTrackStartsMidway) entryMode = 'mid';
+  else if(chance(0.06)) entryMode = 'short';
+
+  station.trackEntryMode = entryMode;
+  station.firstTrackStartsMidway = false;
+
+  const fallbackDuration = picked.forcedWindow ? (picked.windowEnd - picked.windowStart) : entryMode === 'start' ? 300 : entryMode === 'short' ? 230 : 220;
+  station.phase = 'track';
+  station.phaseStartedAt = at;
+  station.playOffsetAtPhaseStart = entryMode === 'window' ? picked.windowStart : 0;
+  station.phaseEndsAt = at + (fallbackDuration * 1000);
+  station.ambience = stationAmbience(station.mode, station);
+}
+
+function bootStation(station){
+  const bootAt = station.createdAt;
+  if(station.mode === 'dead-air'){
+    enterTuning(station, bootAt);
+    return;
+  }
+  const picked = chooseTrackForStation(station);
+  enterTuning(station, bootAt - tuningDurationFor(station), picked);
+  enterTrack(station, bootAt);
+}
+
+function advanceStationToNow(station, t = nowMs()){
+  if(station.phase === 'idle') bootStation(station);
+  let safety = 0;
+  while(station.phaseEndsAt <= t && safety < 120){
+    const edge = station.phaseEndsAt;
+    if(station.mode === 'dead-air'){
+      if(station.phase === 'tuning') enterDeadAir(station, edge);
+      else enterTuning(station, edge);
+    } else {
+      if(station.phase === 'track'){
+        const nextTrack = chooseTrackForStation(station);
+        enterTuning(station, edge, nextTrack);
+      } else {
+        enterTrack(station, edge);
+      }
+    }
+    safety += 1;
+  }
+  station.ambience = stationAmbience(station.mode, station);
+  return station;
+}
+
+async function getTrackDurationCached(src){
+  return new Promise((resolve) => {
+    const a = new Audio();
+    a.preload = 'metadata';
+    a.crossOrigin = 'anonymous';
+    a.src = src;
+    const done = (dur) => {
+      a.removeAttribute('src');
+      a.load();
+      resolve(Number.isFinite(dur) ? dur : null);
+    };
+    a.addEventListener('loadedmetadata', () => done(a.duration), { once:true });
+    a.addEventListener('error', () => done(null), { once:true });
+  });
+}
+
+async function stabilizeStationDurations(station){
+  if(station.phase !== 'track' || !station.currentTrack) return;
+  const track = station.currentTrack;
+
+  if(track.forcedWindow){
+    station.playOffsetAtPhaseStart = track.windowStart;
+    station.phaseEndsAt = station.phaseStartedAt + ((track.windowEnd - track.windowStart) * 1000);
+    return;
+  }
+
+  const dur = track.fullDuration || await getTrackDurationCached(track.src);
+  if(!dur) return;
+  track.fullDuration = dur;
+
+  let startOffset = 0;
+  if(station.trackEntryMode === 'mid') startOffset = chooseRandomTrackStart(dur, station);
+  else if(station.trackEntryMode === 'short') startOffset = chooseRareShortenStart(dur);
+
+  station.playOffsetAtPhaseStart = startOffset;
+  station.phaseEndsAt = station.phaseStartedAt + ((dur - startOffset) * 1000);
+}
+
+function stationTrackOffsetNow(station, t = nowMs()){
+  if(!station || station.phase !== 'track' || !station.currentTrack) return 0;
+  return Math.max(0, station.playOffsetAtPhaseStart + ((t - station.phaseStartedAt) / 1000));
+}
+
+async function prepareTrackPlayback(track, offset){
+  return new Promise((resolve, reject) => {
+    const currentSrc = els.music.currentSrc || els.music.src || '';
+    const srcChanged = currentSrc !== track.src;
+
+    const onError = () => {
+      els.music.removeEventListener('loadedmetadata', onMeta);
+      els.music.removeEventListener('error', onError);
+      reject(new Error('metadata load failed'));
+    };
+
+    const onMeta = async () => {
+      try{
+        const maxOffset = Number.isFinite(els.music.duration) ? Math.max(0, els.music.duration - 0.35) : offset;
+        els.music.currentTime = Math.min(offset, maxOffset);
+        resolve();
+      } catch(err){
+        reject(err);
+      } finally {
+        els.music.removeEventListener('loadedmetadata', onMeta);
+        els.music.removeEventListener('error', onError);
+      }
+    };
+
+    if(srcChanged){
+      els.music.pause();
+      els.music.src = track.src;
+      els.music.load();
+      els.music.addEventListener('loadedmetadata', onMeta, { once:true });
+      els.music.addEventListener('error', onError, { once:true });
+    } else {
+      try{
+        if(Number.isFinite(els.music.duration)){
+          const maxOffset = Math.max(0, els.music.duration - 0.35);
+          els.music.currentTime = Math.min(offset, maxOffset);
+          resolve();
+        } else {
+          els.music.addEventListener('loadedmetadata', onMeta, { once:true });
+          els.music.addEventListener('error', onError, { once:true });
+        }
+      } catch(err){
+        reject(err);
+      }
+    }
+  });
+}
+
+function playTuningBurstFor(meta){
+  if(meta.mode === 'all-clean'){
+    synthesizeTuningSound(rand(0.7, 1.2), 0.28);
+  } else if(meta.mode === 'dead-air'){
+    synthesizeTuningSound(rand(1.1, 2.0), 0.7);
+    makeFilteredNoise(rand(1.4, 2.6), {
+      preType:'highpass', preFreq:340, bandType:'bandpass', bandFreq:900, bandQ:0.6, peak:0.03, attack:0.18, noiseLevel:0.18
+    });
+    makeHumCluster(rand(1.6, 2.6), 0.009);
+  } else {
+    synthesizeTuningSound(rand(0.9, 1.4), 0.56);
+    makeFilteredNoise(rand(1.0, 2.0), {
+      preType:'highpass', preFreq:580, bandType:'bandpass', bandFreq:1100, bandQ:0.7, peak:0.03, attack:0.12, noiseLevel:0.14
+    });
+  }
+}
+
+function scheduleSelectedStationRefresh(delayMs){
+  clearSelectedTimers();
+  selectedStationTimer = setTimeout(() => {
+    if(!running || pausedByKey) return;
+    renderSelectedStation(false);
+  }, Math.max(40, delayMs));
+}
+
+function scheduleAmbulanceFadeIfNeeded(station){
+  if(!audioCtx || !station || station.phase !== 'track' || !station.currentTrack) return;
+  if(!station.currentTrack.forcedWindow) return;
+  clearTimeout(selectedFadeTimer);
+
+  const remainingSec = (station.phaseEndsAt - nowMs()) / 1000;
+  if(remainingSec <= 0) return;
+
+  const msToFade = Math.max(0, (remainingSec - AMBULANCE_WINDOW_FADE) * 1000);
+  selectedFadeTimer = setTimeout(() => {
+    if(!running || currentChannel !== station.channel || !station.currentTrack || !station.currentTrack.forcedWindow) return;
+    fadeGain(mainGain, 0.0001, Math.min(AMBULANCE_WINDOW_FADE, remainingSec));
+    log('Ambulance Land slow fade');
+  }, msToFade);
+}
+
+async function playGhostSignal(track, offset, meta){
+  if(!track || !audioCtx) return;
+  try{
+    await prepareTrackPlayback(track, offset);
+    updateProcessing(true);
+    currentTrack = null;
+    currentMode = 'tuning';
+    setStatusTuning();
+    fadeGain(mainGain, meta.mode === 'all-clean' ? 0.08 : 0.06, 0.12);
+    await els.music.play().catch(() => {});
+  } catch(err){
+    log(`Ghost signal skip: ${err.message || err}`);
+  }
+}
+
+async function renderSelectedStation(fromRetune = false){
+  const station = advanceStationToNow(currentStationState());
+  const meta = CHANNELS[currentChannel];
+  currentMode = stationPhaseLabel(station);
+
+  if(station.phase === 'track' && station.currentTrack){
+    await stabilizeStationDurations(station);
+    const actualOffset = stationTrackOffsetNow(station);
+    try{
+      await prepareTrackPlayback(station.currentTrack, actualOffset);
+      currentTrack = station.currentTrack;
+      updateProcessing(false);
+      fadeGain(mainGain, 1, fromRetune ? 0.7 : 0.35);
+      await els.music.play().catch(() => {});
+      els.status.textContent = station.currentTrack.title;
+      currentMode = meta.mode === 'all-clean' ? 'clean transmission' : 'broadcast';
+      scheduleAmbulanceFadeIfNeeded(station);
+      scheduleSelectedStationRefresh(station.phaseEndsAt - nowMs() + 40);
+      log(`Locked to ${meta.name} / ${station.currentTrack.title} @ ${formatTime(actualOffset)}`);
+    } catch(err){
+      setStatusTuning();
+      log(`Playback fail on ${meta.name}: ${err.message || err}`);
+      scheduleSelectedStationRefresh(900);
+    }
+  } else {
+    currentTrack = null;
+    if(station.phase === 'tuning' && station.preparedTrack){
+      await playGhostSignal(station.preparedTrack, station.preparedPreviewOffset, meta);
+    } else {
+      try{ els.music.pause(); }catch(e){}
+      fadeGain(mainGain, 0.0001, 0.14);
+    }
+    setStatusTuning();
+    scheduleSelectedStationRefresh(station.phaseEndsAt - nowMs() + 40);
+    log(`Listening to ${meta.name} / ${station.phase}`);
+  }
+
+  updateTelemetry();
+}
+
+async function tuneToChannel(channel){
+  await ensureAudio();
+
+  currentChannel = channel;
+  channelStart = nowMs();
+  pausedByKey = false;
+
+  els.channelButtons.forEach((btn, idx) => {
+    btn.classList.toggle('active', idx + 1 === channel);
+  });
+
+  const meta = CHANNELS[channel];
+  const station = advanceStationToNow(stationStates[channel]);
+
+  setLive(true);
+  if(!sessionStart) sessionStart = nowMs();
+  setMuted(false, true);
+  stopAllFX();
+  clearSelectedTimers();
+
+  currentMode = 'tuning';
+  setStatusTuning();
+  syncLiveState();
+  updateTelemetry();
+
+  playTuningBurstFor(meta);
+
+  if(station.phase === 'track' && station.currentTrack){
+    await stabilizeStationDurations(station);
+    const offset = stationTrackOffsetNow(station);
+    await playGhostSignal(station.currentTrack, offset, meta);
+  } else if(station.phase === 'tuning' && station.preparedTrack){
+    await playGhostSignal(station.preparedTrack, station.preparedPreviewOffset, meta);
+  }
+
+  const lockDelay = meta.mode === 'all-clean'
+    ? rand(700, 1200)
+    : meta.mode === 'dead-air'
+      ? rand(1000, 1800)
+      : rand(900, 1500);
+
+  scheduleSelectedStationRefresh(lockDelay);
+}
+
+function clearVisibleLog(){
+  fullLog.push(`[${String(++logSeq).padStart(5,'0')} ${new Date().toLocaleTimeString()}] --- visible log cleared marker ---`);
+  renderVisibleLog();
+}
+
+function toggleSecretPause(){
+  if(!running) return;
+  pausedByKey = !pausedByKey;
+  if(pausedByKey){
+    try{ els.music.pause(); }catch(e){}
+    try{ els.texture.pause(); }catch(e){}
+    currentMode = 'paused';
+    log('Secret pause engaged');
+  } else {
+    renderSelectedStation(false);
+    log('Secret pause released');
+  }
+  syncLiveState();
+  updateTelemetry();
+}
+
+function toggleCleanMode(){
+  cleanOverride = !cleanOverride;
+  log(cleanOverride ? 'Clean mode on' : 'Clean mode off');
+  updateOutputLevel(false);
+  updateProcessing(false);
+  updateTelemetry();
+}
+
+function openWeatherPanel(){
+  els.weatherPop.classList.add('open');
+  els.weatherPop.setAttribute('aria-hidden', 'false');
+  updateWeatherPanelText();
+}
+
+function closeWeatherPanel(){
+  els.weatherPop.classList.remove('open');
+  els.weatherPop.setAttribute('aria-hidden', 'true');
+}
+
+async function fetchWeatherForPosition(lat, lon){
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&current=temperature_2m,weather_code,cloud_cover,wind_speed_10m,is_day&timezone=auto`;
+  const res = await fetch(url);
+  if(!res.ok) throw new Error(`weather request failed: ${res.status}`);
+  const json = await res.json();
+  const c = json.current || {};
+
+  const next = {
+    enabled: true,
+    status: 'ready',
+    tempC: Number.isFinite(c.temperature_2m) ? c.temperature_2m : null,
+    windKmh: Number.isFinite(c.wind_speed_10m) ? c.wind_speed_10m : null,
+    cloud: Number.isFinite(c.cloud_cover) ? c.cloud_cover : null,
+    weatherCode: Number.isFinite(c.weather_code) ? c.weather_code : 0,
+    isDay: !!c.is_day,
+    lastUpdated: nowMs()
   };
 
-  preload.onerror = function(){
-    switchTimer = setTimeout(showNextImage, 8000);
-  };
-
-  preload.src = nextSrc;
+  const mood = computeWeatherMood(next);
+  Object.assign(weatherState, next, mood);
+  weatherState.label = `${describeWeatherCode(weatherState.weatherCode)}${weatherState.isDay ? ' / day' : ' / night'}`;
+  updateWeatherPanelText('Weather now steering the effects.');
+  updateTelemetry();
+  log(`Weather linked: ${weatherState.label}`);
 }
 
-const firstSrc = nextImage();
-const firstPreload = new Image();
+function fallbackWeather(reason = 'signal weak'){
+  const hour = new Date().getHours();
+  const dayFactor = (hour >= 6 && hour <= 18) ? 1 : 0;
+  weatherState.enabled = false;
+  weatherState.status = 'emenating';
+  weatherState.tempC = 10 + Math.sin(hour / 24 * Math.PI * 2) * 8;
+  weatherState.windKmh = 5 + Math.random() * 20;
+  weatherState.cloud = Math.random() * 100;
+  weatherState.weatherCode = dayFactor ? (Math.random() < 0.6 ? 1 : 2) : (Math.random() < 0.5 ? 3 : 45);
+  weatherState.isDay = !!dayFactor;
+  Object.assign(weatherState, computeWeatherMood(weatherState));
+  weatherState.label = 'emenating';
+  updateWeatherPanelText(`Weather ${reason} → emenating`);
+  updateTelemetry();
+  log('Weather fallback engaged (emenating)');
+}
 
-scheduleLoadingMessage();
+function scheduleWeatherRefresh(lat = null, lon = null){
+  if(weatherRefreshTimer){
+    clearInterval(weatherRefreshTimer);
+    weatherRefreshTimer = null;
+  }
+  weatherRefreshTimer = setInterval(() => {
+    if(lat != null && lon != null){
+      fetchWeatherForPosition(lat, lon).catch(() => fallbackWeather('refresh drift'));
+    } else {
+      fallbackWeather('ambient cycle');
+    }
+  }, WEATHER_REFRESH_MS);
+}
 
-firstPreload.onload = function(){
-  imgA.src = firstSrc;
-  imgA.style.opacity = 1;
-  imgB.style.opacity = 0;
+function tryTimezoneFallback(){
+  fallbackWeather('timezone drift');
+  scheduleWeatherRefresh(null, null);
+}
 
-  hideLoadingMessage();
+function requestWeather(){
+  if(!navigator.geolocation){
+    tryTimezoneFallback();
+    return;
+  }
 
-  resetMotion(imgA);
-  resetMotion(imgB);
+  updateWeatherPanelText('Requesting location…');
 
-  requestAnimationFrame(animate);
-  switchTimer = setTimeout(showNextImage, nextDelayMs());
-};
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const { latitude, longitude } = pos.coords;
+    try{
+      await fetchWeatherForPosition(latitude, longitude);
+      scheduleWeatherRefresh(latitude, longitude);
+    } catch(err){
+      fallbackWeather('weather fetch weak');
+    }
+  }, err => {
+    if(err && err.code === err.TIMEOUT){
+      updateWeatherPanelText('Location timed out. Switching to emenating weather and will keep trying.');
+    }
+    tryTimezoneFallback();
+  }, {
+    enableHighAccuracy:true,
+    timeout:25000,
+    maximumAge:0
+  });
+}
 
-firstPreload.onerror = function(){
-  hideLoadingMessage();
+els.startBtn.addEventListener('click', async () => {
+  await ensureAudio();
+  if(running){
+    if(pausedByKey){
+      toggleSecretPause();
+      return;
+    }
+    if(muted){
+      setMuted(false);
+      renderSelectedStation(false);
+      log('Unmuted');
+    }
+    return;
+  }
+  if(!sessionStart) sessionStart = nowMs();
+  await tuneToChannel(currentChannel);
+});
 
-  imgA.src = firstSrc;
-  imgA.style.opacity = 1;
-  imgB.style.opacity = 0;
+els.stopBtn.addEventListener('click', async () => {
+  await ensureAudio();
+  if(!running || muted) return;
+  setMuted(true);
+  try{ els.music.pause(); }catch(e){}
+  try{ els.texture.pause(); }catch(e){}
+  log('Muted');
+});
 
-  resetMotion(imgA);
-  resetMotion(imgB);
+els.clearBtn.addEventListener('click', clearVisibleLog);
 
-  requestAnimationFrame(animate);
-  switchTimer = setTimeout(showNextImage, nextDelayMs());
-};
+els.fineTuneBtn.addEventListener('click', async () => {
+  await ensureAudio();
+  beginFineTune();
+  if(running && !pausedByKey && !muted) renderSelectedStation(false);
+});
 
-firstPreload.src = firstSrc;
+els.weatherBtn.addEventListener('click', openWeatherPanel);
+els.weatherEnableBtn.addEventListener('click', requestWeather);
+els.weatherRetryBtn.addEventListener('click', requestWeather);
+els.weatherCloseBtn.addEventListener('click', closeWeatherPanel);
+els.weatherPop.addEventListener('click', e => {
+  if(e.target === els.weatherPop) closeWeatherPanel();
+});
+
+els.recPlayBtn.addEventListener('click', async () => {
+  try{
+    await ensureMic();
+    if(!micState.recording) startMicLive();
+    else stopMicLiveAndLoop();
+  } catch(err){
+    updateTelemetry();
+  }
+});
+
+els.channelButtons.forEach((btn, idx) => {
+  btn.addEventListener('click', async () => {
+    const channel = idx + 1;
+    if(!CHANNELS[channel].enabled){
+      log(`${CHANNELS[channel].name} not wired yet`);
+      return;
+    }
+    await tuneToChannel(channel);
+  });
+});
+
+window.addEventListener('keydown', async e => {
+  if(e.repeat) return;
+
+  if(e.key === '\\' && running && Number.isFinite(els.music.duration)){
+    try{
+      els.music.currentTime = Math.min((els.music.duration || 0) - 0.5, els.music.currentTime + 15);
+      log('Skip +15 seconds');
+    }catch(err){}
+  }
+
+  if(e.key === '}' || e.key === ']'){
+    e.preventDefault();
+    const payload = fullLog.join('\n') + '\n';
+    const blob = new Blob([payload], { type:'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().replace(/[:.]/g,'-');
+    a.href = url;
+    a.download = `radio-log-${stamp}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    log('Downloaded full log');
+  }
+
+  if(e.key.toLowerCase() === 'p'){
+    e.preventDefault();
+    toggleSecretPause();
+  }
+
+  if(e.key.toLowerCase() === 'c'){
+    e.preventDefault();
+    toggleCleanMode();
+  }
+
+  if(e.key.toLowerCase() === 'r'){
+    e.preventDefault();
+    els.recPlayBtn.click();
+  }
+
+  if(e.key.toLowerCase() === 'w'){
+    e.preventDefault();
+    openWeatherPanel();
+  }
+
+  if(['1','2','3','4','5'].includes(e.key)){
+    e.preventDefault();
+    await tuneToChannel(Number(e.key));
+  }
+});
+
+els.music.addEventListener('ended', () => scheduleSelectedStationRefresh(40));
+els.music.addEventListener('error', () => {
+  log(`Main audio error on ${currentTrack ? currentTrack.title : 'unknown track'}`);
+  scheduleSelectedStationRefresh(500);
+});
+
+function seedStations(){
+  for(let i = 1; i <= 5; i++) initStation(i);
+  for(let i = 1; i <= 5; i++) advanceStationToNow(stationStates[i]);
+}
+
+updateClock();
+seedStations();
+mountEggInTelemetry();
+loadPoetry();
+fallbackWeather('ambient start');
+
+setInterval(() => {
+  updateClock();
+  for(let i = 1; i <= 5; i++) advanceStationToNow(stationStates[i]);
+
+  if(running && !pausedByKey) updateProcessing(false);
+  else if(audioCtx && outputGain) updateOutputLevel(false);
+
+  if(audioCtx){
+    updateAutoLevelAndPeakControl();
+    updateMicModulation();
+    updatePitchEgg();
+  }
+
+  if(nowMs() - lastTelemetryBeat > 1000){
+    updateTelemetry();
+    lastTelemetryBeat = nowMs();
+  }
+
+  syncFineTuneButton();
+  syncMicButton();
+  syncWeatherButton();
+
+  heartbeatCounter += 1;
+
+  if(running && heartbeatCounter % POETIC_LOG_EVERY === 0){
+    log(`tx > ${getPoeticFragment()}`);
+  }
+
+  if(heartbeatCounter % TICK_LOG_EVERY === 0){
+    const station = currentStationState();
+    log(`tick | ch ${currentChannel} ${CHANNELS[currentChannel].mode} | mode ${currentMode} | station ${station.phase} | main ${station.phase === 'track' && station.currentTrack ? station.currentTrack.title : '—'} | live ${running ? (muted ? 'muted' : (pausedByKey ? 'paused' : 'on')) : 'off'}`);
+  }
+}, HEARTBEAT_INTERVAL_MS);
+
+currentChannel = 1;
+syncLiveState();
+syncMicButton();
+syncWeatherButton();
+els.status.textContent = 'Stopped';
+updateTelemetry();
+updateWeatherPanelText();
+log('radio debug ready');
 </script>
-
 </body>
 </html>
