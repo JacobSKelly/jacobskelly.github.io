@@ -583,13 +583,6 @@ const CHANNELS = {
   }
 };
 
-const FX_PROTECTED_TRACKS = new Set([
-  'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3',
-  'https://peachradio.s3.eu-west-2.amazonaws.com/redhouse.mp3',
-  'https://peachradio.s3.eu-west-2.amazonaws.com/xenopus.mp3',
-  'https://peachradio.s3.eu-west-2.amazonaws.com/samantha.mp3'
-]);
-
 const AMBULANCE_SRC = 'https://peachradio.s3.eu-west-2.amazonaws.com/ambulance.mp3';
 const AMBULANCE_WINDOW_START = 5 * 60;
 const AMBULANCE_WINDOW_END = 19 * 60;
@@ -666,7 +659,6 @@ let fullLog = [];
 let logSeq = 0;
 
 let activeNodeStops = [];
-let overlayTimers = [];
 let selectedStationTimer = null;
 let selectedFadeTimer = null;
 let heartbeatCounter = 0;
@@ -738,14 +730,6 @@ function activeStationMeta(){
 
 function currentStationState(){
   return stationStates[currentChannel];
-}
-
-function currentTrackIsFXProtected(){
-  return !!(
-    currentTrack &&
-    FX_PROTECTED_TRACKS.has(currentTrack.src) &&
-    chance(0.8)
-  );
 }
 
 function getFineTuneAmount(){
@@ -1025,11 +1009,6 @@ function fadeGain(gainNode, target, seconds){
   gainNode.gain.linearRampToValueAtTime(target, now + seconds);
 }
 
-function clearOverlayTimers(){
-  overlayTimers.forEach(id => clearTimeout(id));
-  overlayTimers = [];
-}
-
 function clearSelectedTimers(){
   if(selectedStationTimer){
     clearTimeout(selectedStationTimer);
@@ -1049,7 +1028,6 @@ function stopOneShotNodes(){
 }
 
 function stopAllFX(){
-  clearOverlayTimers();
   stopOneShotNodes();
 
   try{ els.texture.pause(); }catch(e){}
@@ -1271,7 +1249,6 @@ function makeHumCluster(durationSec, peak = 0.02){
   };
 
   activeNodeStops.push(stop);
-  return stop;
 }
 
 function synthesizeTuningSound(durationSec = 1.8, intensity = 0.8){
@@ -1371,12 +1348,12 @@ function initStation(channel){
     phaseEndsAt: 0,
     currentTrack: null,
     preparedTrack: null,
-    preparedPreviewOffset: 15,
+    preparedPreviewOffset: 0,
     playOffsetAtPhaseStart: 0,
     lastTrackSrc: null,
     lastAmbulanceAt: 0,
-    nextTrackStartsMidway: true,
-    trackEntryMode: 'mid',
+    firstTrackStartsMidway: true,
+    trackEntryMode: 'start',
     bags: {
       centrepieces: shuffle(meta.centrepieces),
       textures: shuffle(meta.textures),
@@ -1506,9 +1483,9 @@ function enterTuning(station, at, preparedTrack = null){
   station.phaseEndsAt = at + tuningDurationFor(station);
   station.currentTrack = null;
   station.preparedTrack = preparedTrack;
-  station.preparedPreviewOffset = preparedTrack && preparedTrack.forcedWindow
-    ? preparedTrack.windowStart
-    : rand(12, 90);
+  station.preparedPreviewOffset = preparedTrack
+    ? (preparedTrack.forcedWindow ? preparedTrack.windowStart : rand(12, 90))
+    : 0;
   station.playOffsetAtPhaseStart = 0;
   station.ambience = stationAmbience(station.mode, station);
 }
@@ -1519,6 +1496,7 @@ function enterDeadAir(station, at){
   station.phaseEndsAt = at + deadAirDurationFor();
   station.currentTrack = null;
   station.preparedTrack = null;
+  station.preparedPreviewOffset = 0;
   station.playOffsetAtPhaseStart = 0;
   station.ambience = stationAmbience(station.mode, station);
 }
@@ -1526,6 +1504,7 @@ function enterDeadAir(station, at){
 function enterTrack(station, at){
   const picked = station.preparedTrack || chooseTrackForStation(station);
   station.preparedTrack = null;
+  station.preparedPreviewOffset = 0;
 
   if(!picked){
     enterTuning(station, at);
@@ -1538,14 +1517,14 @@ function enterTrack(station, at){
   let entryMode = 'start';
   if(picked.forcedWindow){
     entryMode = 'window';
-  } else if(station.nextTrackStartsMidway){
+  } else if(station.firstTrackStartsMidway){
     entryMode = 'mid';
   } else if(chance(0.06)){
     entryMode = 'short';
   }
 
   station.trackEntryMode = entryMode;
-  station.nextTrackStartsMidway = false;
+  station.firstTrackStartsMidway = false;
 
   const fallbackDuration =
     picked.forcedWindow ? (picked.windowEnd - picked.windowStart) :
@@ -1560,15 +1539,17 @@ function enterTrack(station, at){
   station.ambience = stationAmbience(station.mode, station);
 }
 
-function retuneStationNow(station){
-  const picked = station.mode === 'dead-air' ? null : chooseTrackForStation(station);
-  station.nextTrackStartsMidway = true;
-  enterTuning(station, nowMs(), picked);
-}
-
 function bootStation(station){
   const bootAt = station.createdAt;
-  enterTuning(station, bootAt);
+
+  if(station.mode === 'dead-air'){
+    enterTuning(station, bootAt);
+    return;
+  }
+
+  const picked = chooseTrackForStation(station);
+  enterTuning(station, bootAt - tuningDurationFor(station), picked);
+  enterTrack(station, bootAt);
 }
 
 function advanceStationToNow(station, t = nowMs()){
@@ -1588,7 +1569,8 @@ function advanceStationToNow(station, t = nowMs()){
       }
     } else {
       if(station.phase === 'track'){
-        enterTuning(station, edge);
+        const nextTrack = chooseTrackForStation(station);
+        enterTuning(station, edge, nextTrack);
       } else {
         enterTrack(station, edge);
       }
@@ -1832,9 +1814,7 @@ async function tuneToChannel(channel){
   });
 
   const meta = CHANNELS[channel];
-  const station = stationStates[channel];
-
-  retuneStationNow(station);
+  const station = advanceStationToNow(stationStates[channel]);
 
   setLive(true);
   if(!sessionStart) sessionStart = nowMs();
@@ -1849,7 +1829,11 @@ async function tuneToChannel(channel){
 
   playTuningBurstFor(meta);
 
-  if(station.preparedTrack){
+  if(station.phase === 'track' && station.currentTrack){
+    await stabilizeStationDurations(station);
+    const offset = stationTrackOffsetNow(station);
+    await playGhostSignal(station.currentTrack, offset, meta);
+  } else if(station.phase === 'tuning' && station.preparedTrack){
     await playGhostSignal(station.preparedTrack, station.preparedPreviewOffset, meta);
   }
 
