@@ -1,409 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shop - Jacob Samuel Kelly</title>
-
-<style>
-/* RESET */
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
-
-/* BASE */
-
-html,body{
-width:100%;
-font-family:Helvetica,Arial,sans-serif;
-background:#fff;
-color:#111;
-text-align:center;
-}
-
-body{
-display:flex;
-flex-direction:column;
-min-height:100vh;
-}
-
-/* HEADER */
-
-header{
-padding:2vh 20px 1vh 20px;
-line-height:1.2;
-}
-
-header h1{
-font-size:4vh;
-margin-bottom:1vh;
-font-weight:normal;
-}
-
-header p{
-font-size:1.8vh;
-color:#555;
-}
-
-.controls-line{
-margin-top:6px;
-}
-
-.controls-line a,
-.controls-line button,
-.controls-line span{
-font-size:0.85rem;
-color:#111;
-text-decoration:none;
-margin:0 4px;
-}
-
-.controls-line a:hover{
-text-decoration:underline;
-}
-
-/* TOP NAV */
-
-.shop-nav{
-margin-top:10px;
-margin-bottom:22px;
-line-height:1.5;
-}
-
-.shop-toggle{
-appearance:none;
-background:none;
-border:none;
-font-family:Helvetica,Arial,sans-serif;
-font-size:0.85rem;
-color:#111;
-cursor:pointer;
-padding:0;
-}
-
-.shop-toggle:hover{
-text-decoration:underline;
-}
-
-.shop-toggle.active{
-text-decoration:underline;
-}
-
-.shop-separator{
-font-size:0.85rem;
-color:#111;
-margin:0 5px;
-}
-
-/* MAIN AREA */
-
-.shop-shell{
-width:100%;
-}
-
-/* DROPDOWN PANELS */
-
-.shop-panel{
-display:none;
-max-width:90vw;
-margin:0 auto 28px auto;
-}
-
-.shop-panel.show{
-display:block;
-}
-
-/* GALLERY */
-
-.gallery{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:1.5vh;
-max-width:72vw;
-margin:0 auto;
-justify-content:center;
-}
-
-.product{
-display:flex;
-flex-direction:column;
-align-items:center;
-}
-
-.product-card{
-width:80%;
-display:flex;
-flex-direction:column;
-align-items:center;
-text-decoration:none;
-color:inherit;
-}
-
-.product-image-frame{
-width:100%;
-aspect-ratio:1/1;
-background:#f5f5f5;
-overflow:hidden;
-position:relative;
-}
-
-.product-track{
-display:flex;
-width:100%;
-height:100%;
-transition:transform 0.3s ease;
-}
-
-.product-slide{
-flex:0 0 100%;
-width:100%;
-height:100%;
-}
-
-.product-slide img{
-width:100%;
-height:100%;
-object-fit:cover;
-object-position:bottom center;
-display:block;
-cursor:pointer;
-user-select:none;
--webkit-user-drag:none;
-}
-
-.carousel-controls{
-margin-top:8px;
-display:flex;
-justify-content:center;
-align-items:center;
-gap:6px;
-min-height:18px;
-}
-
-.carousel-dot{
-width:8px;
-height:8px;
-border-radius:50%;
-border:1px solid #111;
-background:#fff;
-}
-
-.carousel-dot.active{
-background:#111;
-}
-
-.carousel-controls.hidden{
-visibility:hidden;
-}
-
-.product-info{
-width:100%;
-padding-top:10px;
-line-height:1.3;
-min-height:82px;
-}
-
-.product-title{
-font-size:0.95rem;
-font-weight:normal;
-}
-
-.product-price{
-font-size:0.85rem;
-color:#555;
-margin-top:4px;
-}
-
-.product-type{
-font-size:0.8rem;
-color:#777;
-margin-top:3px;
-}
-
-.square-wrap{
-margin:10px auto 0 auto;
-}
-
-.square-button{
-display:inline-flex;
-align-items:center;
-justify-content:center;
-text-decoration:none;
-font-family:Helvetica,Arial,sans-serif;
-transition:opacity 0.25s ease;
-background:#000;
-color:#fff;
-border:none;
-border-radius:0;
-box-shadow:none;
-min-width:auto;
-height:auto;
-padding:7px 14px 6px 14px;
-font-size:11px;
-line-height:1;
-letter-spacing:0.14em;
-text-transform:uppercase;
-}
-
-.square-button:hover{
-opacity:0.82;
-}
-
-.square-button.disabled{
-opacity:0.35;
-pointer-events:none;
-}
-
-.product-note{
-font-size:0.74rem;
-color:#777;
-margin-top:8px;
-line-height:1.3;
-opacity:0;
-transition:opacity 0.2s ease;
-min-height:1.1em;
-pointer-events:none;
-}
-
-.product-card:hover .product-note,
-.product-card:focus .product-note,
-.product:hover .product-note{
-opacity:1;
-}
-
-/* PLACEHOLDERS */
-
-.placeholder .product-image-frame{
-background:#f2f2f2;
-display:flex;
-align-items:center;
-justify-content:center;
-}
-
-.placeholder-thumb{
-width:100%;
-height:100%;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:0.78rem;
-color:#777;
-letter-spacing:0.02em;
-}
-
-.placeholder .product-info{
-min-height:62px;
-}
-
-.placeholder .product-title{
-font-size:0.9rem;
-color:#444;
-}
-
-.placeholder .product-price,
-.placeholder .product-type{
-color:#888;
-}
-
-/* FOOTER */
-
-footer{
-font-size:0.8rem;
-color:#777;
-padding:1vh 0 2vh 0;
-margin-top:auto;
-line-height:1.4;
-}
-
-footer a{
-color:#777;
-text-decoration:none;
-display:inline-block;
-margin-bottom:2px;
-}
-
-/* MOBILE */
-
-@media(max-width:768px){
-
-header h1{
-font-size:28px;
-}
-
-header p{
-font-size:14px;
-}
-
-.shop-nav{
-padding:0 14px;
-line-height:1.8;
-}
-
-.shop-panel{
-max-width:92vw;
-}
-
-.gallery{
-grid-template-columns:1fr;
-gap:2vh;
-max-width:92vw;
-}
-
-.product-card{
-width:86%;
-}
-
-}
-
-/* DESKTOP */
-
-@media(min-width:769px){
-
-.gallery .product:nth-child(4){
-grid-column:1;
-}
-
-}
-</style>
-</head>
-<body>
-
-<header>
-
-<h1>Shop</h1>
-
-<p>The Fruit That Ate Itself</p>
-
-<div class="controls-line">
-  <a href="index.html">← back</a>
-</div>
-
-<div class="shop-nav">
-  <button class="shop-toggle" data-target="printsPanel">Prints</button>
-  <span class="shop-separator">-</span>
-  <button class="shop-toggle" data-target="apparelPanel">Apparel</button>
-  <span class="shop-separator">-</span>
-  <button class="shop-toggle" data-target="booksPanel">Books</button>
-  <span class="shop-separator">-</span>
-  <button class="shop-toggle" data-target="originalPanel">Original Works</button>
-</div>
-
-</header>
-
-<main class="shop-shell">
-
   <!-- PRINTS -->
   <section class="shop-panel" id="printsPanel">
     <div class="gallery">
 
-      <div class="product placeholder">
+      <div class="product">
         <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Print 01</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
+          <div class="product-image-frame">
+            <div class="product-track" data-full-link="layer11.html">
+              <div class="product-slide">
+                <img src="images/thumbman.jpg" alt="Le Samouraï">
+              </div>
+            </div>
+          </div>
+
+          <div class="carousel-controls hidden">
+            <span class="carousel-dot active"></span>
+          </div>
+
+          <div class="product-info">
+            <p class="product-title">Le Samouraï</p>
+            <p class="product-price">£15</p>
+            <p class="product-type">Postcard-sized giclée print</p>
+            <div class="square-wrap">
+              <a target="_blank" href="https://square.link/u/a9w7yysf?src=embed" class="square-button">BUY</a>
+            </div>
+          </div>
+
+          <p class="product-note">Double click for full-size artwork.</p>
         </div>
       </div>
 
@@ -502,7 +124,7 @@ grid-column:1;
 
           <div class="product-info">
             <p class="product-title">Black T, ‘Nearly Six Eggs’</p>
-            <p class="product-price">£30</p>
+            <p class="product-price">£28</p>
             <p class="product-type">T-shirt</p>
             <div class="square-wrap">
               <a target="_blank" href="https://square.link/u/4zO8jeLV?src=embed" class="square-button">BUY</a>
@@ -516,47 +138,28 @@ grid-column:1;
       <div class="product">
         <div class="product-card">
           <div class="product-image-frame">
-            <div class="product-track" data-full-link="layer11.html">
-              <div class="product-slide">
-                <img src="images/thumbman.jpg" alt="Le Samouraï">
-              </div>
-            </div>
-          </div>
-
-          <div class="carousel-controls hidden">
-            <span class="carousel-dot active"></span>
-          </div>
-
-          <div class="product-info">
-            <p class="product-title">Le Samouraï</p>
-            <p class="product-price">£30</p>
-            <p class="product-type">T-shirt</p>
-            <div class="square-wrap">
-              <a target="_blank" href="https://square.link/u/a9w7yysf?src=embed" class="square-button">BUY</a>
-            </div>
-          </div>
-
-          <p class="product-note">Double click for full-size artwork.</p>
-        </div>
-      </div>
-
-      <div class="product">
-        <div class="product-card">
-          <div class="product-image-frame">
             <div class="product-track" data-full-link="layer5.html">
               <div class="product-slide">
-                <img src="images/mercurythumbnail.png" alt="Mercury">
+                <img src="images/mercury1.png" alt="Mercury">
+              </div>
+              <div class="product-slide">
+                <img src="images/mercury2.png" alt="Mercury">
+              </div>
+              <div class="product-slide">
+                <img src="images/mercury3.png" alt="Mercury">
               </div>
             </div>
           </div>
 
-          <div class="carousel-controls hidden">
+          <div class="carousel-controls">
             <span class="carousel-dot active"></span>
+            <span class="carousel-dot"></span>
+            <span class="carousel-dot"></span>
           </div>
 
           <div class="product-info">
             <p class="product-title">Mercury</p>
-            <p class="product-price">£30</p>
+            <p class="product-price">£28</p>
             <p class="product-type">T-shirt</p>
             <div class="square-wrap">
               <a href="#" class="square-button disabled">BUY</a>
@@ -569,201 +172,3 @@ grid-column:1;
 
     </div>
   </section>
-
-  <!-- BOOKS -->
-  <section class="shop-panel" id="booksPanel">
-    <div class="gallery">
-
-      <div class="product">
-        <div class="product-card">
-          <div class="product-image-frame">
-            <div class="product-track" data-full-link="layer12.html">
-              <div class="product-slide">
-                <img src="images/ambulancelandthumb.jpg" alt="Ambuland Land 2025">
-              </div>
-            </div>
-          </div>
-
-          <div class="carousel-controls hidden">
-            <span class="carousel-dot active"></span>
-          </div>
-
-          <div class="product-info">
-            <p class="product-title">Ambuland Land 2025</p>
-            <p class="product-price">£10</p>
-            <p class="product-type">Book</p>
-            <div class="square-wrap">
-              <a target="_blank" href="https://square.link/u/CTTCC0xE" class="square-button">BUY</a>
-            </div>
-          </div>
-
-          <p class="product-note">Double click for full-size artwork.</p>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ORIGINAL WORKS -->
-  <section class="shop-panel" id="originalPanel">
-    <div class="gallery">
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 01</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 02</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 03</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 04</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 05</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 06</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 07</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 08</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-      <div class="product placeholder">
-        <div class="product-card">
-          <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 09</p><p class="product-type">Coming Soon</p></div>
-          <p class="product-note">More works will appear here.</p>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-</main>
-
-<footer>
-  <p>
-    <a href="https://www.instagram.com/the_fruit_that_ate_itself" target="_blank" rel="noopener noreferrer">@the_fruit_that_ate_itself</a><br>
-    53.4808° N, -2.2426° W
-  </p>
-</footer>
-
-<script>
-const toggleButtons = document.querySelectorAll(".shop-toggle");
-const panels = document.querySelectorAll(".shop-panel");
-
-function closeAllPanels(){
-  panels.forEach(panel => panel.classList.remove("show"));
-  toggleButtons.forEach(button => button.classList.remove("active"));
-}
-
-toggleButtons.forEach(button => {
-  button.addEventListener("click", () => {
-    const targetId = button.getAttribute("data-target");
-    const targetPanel = document.getElementById(targetId);
-    const isOpen = targetPanel.classList.contains("show");
-
-    closeAllPanels();
-
-    if(!isOpen){
-      targetPanel.classList.add("show");
-      button.classList.add("active");
-    }
-  });
-});
-
-document.querySelectorAll('#apparelPanel .product, #booksPanel .product').forEach(product => {
-  const track = product.querySelector('.product-track');
-  if(!track){ return; }
-
-  const slides = product.querySelectorAll('.product-slide');
-  const dotsWrap = product.querySelector('.carousel-controls');
-  const dots = product.querySelectorAll('.carousel-dot');
-  const fullLink = track.getAttribute('data-full-link');
-  let current = 0;
-  let clickTimer = null;
-
-  if (slides.length > 1) {
-    dotsWrap.classList.remove('hidden');
-  }
-
-  function updateCarousel(index){
-    current = index;
-    track.style.transform = `translateX(-${index * 100}%)`;
-    dots.forEach((dot, i) => {
-      dot.classList.toggle('active', i === index);
-    });
-  }
-
-  function nextSlide(){
-    if (slides.length < 2) return;
-    const next = (current + 1) % slides.length;
-    updateCarousel(next);
-  }
-
-  track.querySelectorAll('img').forEach(img => {
-    img.addEventListener('click', () => {
-      if (clickTimer) return;
-
-      clickTimer = setTimeout(() => {
-        nextSlide();
-        clickTimer = null;
-      }, 250);
-    });
-
-    img.addEventListener('dblclick', (e) => {
-      e.preventDefault();
-      clearTimeout(clickTimer);
-      clickTimer = null;
-      window.location.href = fullLink;
-    });
-  });
-});
-</script>
-
-</body>
-</html>
