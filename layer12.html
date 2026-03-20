@@ -206,19 +206,16 @@
 
     const TOTAL_LOGICAL_PAGES = 16;
 
-    // Logical working grid for the long-term decay
     const PAGE_PIXEL_WIDTH = 1746;
     const PAGE_PIXEL_HEIGHT = 2478;
     const PIXELS_PER_PAGE = PAGE_PIXEL_WIDTH * PAGE_PIXEL_HEIGHT;
     const TOTAL_PIXELS = TOTAL_LOGICAL_PAGES * PIXELS_PER_PAGE;
 
-    // Starts at zero on this date
     const START_DATE = new Date("2026-03-20T00:00:00Z");
     const END_DATE   = new Date("2036-03-20T00:00:00Z");
 
     const SEED = 2097152;
 
-    // Secret demo mode
     const DEMO_DURATION_MS = 60000;
     let demoMode = false;
     let demoStartTime = 0;
@@ -261,11 +258,19 @@
       return Math.floor((hours / total) * TOTAL_PIXELS);
     }
 
+    function easeInQuint(t){
+      return t * t * t * t * t;
+    }
+
     function demoPixelsToBlackNow(){
       if (!demoMode) return 0;
       const elapsed = performance.now() - demoStartTime;
       const progress = clamp(elapsed / DEMO_DURATION_MS, 0, 1);
-      return Math.floor(progress * TOTAL_PIXELS);
+
+      // Secret demo starts extremely gently, then accelerates
+      const eased = easeInQuint(progress);
+
+      return Math.floor(eased * TOTAL_PIXELS);
     }
 
     function activePixelsToBlackNow(){
@@ -279,8 +284,6 @@
       return activePixelsToBlackNow() / TOTAL_PIXELS;
     }
 
-    // PDF is backwards:
-    // logical page 1 should show the final PDF page
     function logicalToPdfPage(logicalPage){
       return (TOTAL_LOGICAL_PAGES - logicalPage) + 1;
     }
@@ -340,7 +343,6 @@
 
       const viewport = page.getViewport({ scale: 1 });
 
-      // Render PDF page to a temporary canvas first
       const renderScale = Math.max(
         PAGE_PIXEL_WIDTH / viewport.width,
         PAGE_PIXEL_HEIGHT / viewport.height
@@ -359,7 +361,6 @@
         viewport: renderViewport
       }).promise;
 
-      // Now fit it into the exact working grid
       const baseCanvas = document.createElement("canvas");
       baseCanvas.width = PAGE_PIXEL_WIDTH;
       baseCanvas.height = PAGE_PIXEL_HEIGHT;
