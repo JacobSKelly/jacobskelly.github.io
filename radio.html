@@ -783,7 +783,7 @@ const WEATHER_REFRESH_MS = 15 * 60 * 1000;
 const MAX_EXTRA_NOISE_REWARD_SEC = 3 * 60 * 60;
 const HEARTBEAT_INTERVAL_MS = 400;
 const TICK_LOG_EVERY = 15;
-const POETIC_LOG_EVERY = 55;
+const POETIC_LOG_EVERY = 120;
 
 const DIGIT_MAP = {
   '0': ['a','b','c','d','e','f'],
@@ -1066,13 +1066,7 @@ function syncFineTuneButton(){
 
 function syncMicButton(){
   els.recPlayBtn.classList.toggle('recording', micState.recording);
-  if(micState.recording){
-    els.recPlayBtn.innerHTML = '<span class="recBadge"></span>recording';
-  } else if(micState.loopPlaying){
-    els.recPlayBtn.innerHTML = '<span class="recBadge"></span>playing';
-  } else {
-    els.recPlayBtn.innerHTML = '<span class="recBadge"></span>rec/play';
-  }
+  els.recPlayBtn.innerHTML = '<span class="recBadge"></span>rec/play';
 }
 
 function syncWeatherButton(){
@@ -1199,7 +1193,7 @@ Mood: clarity ${weatherState.clarityBias.toFixed(2)} / intensity ${weatherState.
 }
 
 function getPoeticFragment(){
-  if(!POETRY_LINES.length) return 'signal weak / emenating';
+  if(!POETRY_LINES.length) return '';
   const base = POETRY_LINES[Math.floor(Math.random() * POETRY_LINES.length)];
   const chaos = clamp(instability() * 0.45 + weatherState.intensity * 0.35, 0, 1);
   return base.split('').map(c => {
@@ -1207,6 +1201,14 @@ function getPoeticFragment(){
     if(Math.random() < chaos * 0.06) return '';
     return c;
   }).join('').slice(0, 105);
+}
+
+function maybeLogPoetry(){
+  if(!running || !POETRY_LINES.length) return;
+  if(chance(0.18)){
+    const fragment = getPoeticFragment();
+    if(fragment) log(`tx > ${fragment}`);
+  }
 }
 
 function updateTelemetry(){
@@ -1289,10 +1291,7 @@ async function loadPoetry(){
       .replace(/\\[a-z]+\d* ?/gi, '')
       .replace(/[{}]/g, '');
     POETRY_LINES = cleaned.split('\n').map(l => l.trim()).filter(l => l.length > 6);
-    log(`Poetry loaded (${POETRY_LINES.length} lines)`);
-  } catch(err){
-    log('Poetry failed to load');
-  }
+  } catch(err){}
 }
 
 async function ensureAudio(){
@@ -2726,7 +2725,7 @@ setInterval(() => {
   heartbeatCounter += 1;
 
   if(running && heartbeatCounter % POETIC_LOG_EVERY === 0){
-    log(`tx > ${getPoeticFragment()}`);
+    maybeLogPoetry();
   }
 
   if(heartbeatCounter % TICK_LOG_EVERY === 0){
