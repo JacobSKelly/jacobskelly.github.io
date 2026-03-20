@@ -12,6 +12,7 @@
       --line:rgba(255,255,255,.14);
       --green:#86ff8a;
       --red:#ff2a2a;
+      --gold:#f4d35e;
     }
 
     *{box-sizing:border-box}
@@ -30,7 +31,7 @@
       position:fixed;
       top:18px;
       left:18px;
-      z-index:4;
+      z-index:10;
       color:rgba(255,255,255,.68);
       text-decoration:none;
       font-size:13px;
@@ -49,7 +50,7 @@
       top:16px;
       left:50%;
       transform:translateX(-50%);
-      z-index:3;
+      z-index:9;
       color:#fff;
       font-size:clamp(24px,4vw,42px);
       letter-spacing:.08em;
@@ -57,6 +58,61 @@
       font-weight:700;
       user-select:none;
       pointer-events:none;
+      line-height:1;
+      white-space:nowrap;
+      writing-mode:horizontal-tb;
+      text-orientation:mixed;
+      width:auto;
+      max-width:calc(100vw - 140px);
+      overflow:hidden;
+      text-overflow:ellipsis;
+      text-align:center;
+    }
+
+    .weather-pop{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background:rgba(0,0,0,.62);
+      z-index:30;
+      padding:20px;
+    }
+
+    .weather-pop.open{
+      display:flex;
+    }
+
+    .weather-card{
+      width:min(430px, calc(100vw - 40px));
+      border:1px solid var(--line);
+      background:#000;
+      padding:18px;
+      display:grid;
+      gap:12px;
+      box-shadow:0 0 0 1px rgba(255,255,255,.03) inset;
+    }
+
+    .weather-card h3{
+      margin:0;
+      font-size:16px;
+      font-weight:700;
+      letter-spacing:.04em;
+      text-transform:lowercase;
+    }
+
+    .weather-copy{
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.45;
+      white-space:pre-wrap;
+    }
+
+    .weather-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
     }
 
     .wrap{
@@ -216,7 +272,7 @@
       padding:16px;
       display:grid;
       gap:14px;
-      min-height:185px;
+      min-height:190px;
       align-content:start;
       flex:0 0 auto;
     }
@@ -231,6 +287,15 @@
     .stateBlock{
       min-width:0;
       flex:1 1 auto;
+    }
+
+    .controlsRow{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
+      flex:0 0 auto;
     }
 
     .label{
@@ -248,19 +313,43 @@
       min-height:1.2em;
     }
 
-    .fineTuneBtn{
+    .radioCtl{
       flex:0 0 auto;
-      min-width:116px;
+      min-width:96px;
       text-transform:lowercase;
       letter-spacing:.03em;
     }
 
-    .fineTuneBtn.active{
+    .radioCtl.active{
       border-color:var(--green);
       color:var(--green);
       box-shadow:
         inset 0 0 0 1px rgba(134,255,138,.1),
         0 0 14px rgba(134,255,138,.06);
+    }
+
+    .recBtn.recording{
+      border-color:var(--red);
+      color:#fff;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,42,42,.12),
+        0 0 14px rgba(255,42,42,.12);
+    }
+
+    .recBadge{
+      display:inline-block;
+      width:9px;
+      height:9px;
+      border-radius:50%;
+      background:#2f0202;
+      margin-right:8px;
+      vertical-align:middle;
+      transition:background .15s ease, box-shadow .15s ease;
+    }
+
+    .recBtn.recording .recBadge{
+      background:var(--red);
+      box-shadow:0 0 10px rgba(255,42,42,.65);
     }
 
     .telemetry{
@@ -277,7 +366,41 @@
     .telemetry div{
       white-space:pre-wrap;
       word-break:break-word;
-      min-height:7.1em;
+      min-height:10em;
+    }
+
+    .gold-egg{
+      display:inline-block;
+      width:10px;
+      height:13px;
+      margin-left:6px;
+      vertical-align:middle;
+      border-radius:50% 50% 46% 46% / 56% 56% 42% 42%;
+      background:
+        radial-gradient(circle at 35% 28%, rgba(255,255,255,.9), rgba(255,255,255,0) 35%),
+        radial-gradient(circle at 50% 40%, rgba(255,228,140,.9), rgba(232,182,52,.94) 58%, rgba(140,92,10,.92) 100%);
+      box-shadow:
+        0 0 8px rgba(244,211,94,.1),
+        0 0 18px rgba(244,211,94,.06);
+      opacity:0;
+      transform:scale(.92);
+      pointer-events:none;
+      transition:opacity 1.25s ease, transform 1.25s ease, box-shadow 1.25s ease;
+    }
+
+    .gold-egg.on{
+      opacity:1;
+      transform:scale(1);
+      animation:eggBreath 2.8s ease-in-out infinite;
+      box-shadow:
+        0 0 10px rgba(244,211,94,.34),
+        0 0 20px rgba(244,211,94,.16),
+        0 0 34px rgba(244,211,94,.07);
+    }
+
+    @keyframes eggBreath{
+      0%,100%{ transform:scale(1); filter:brightness(1); }
+      50%{ transform:scale(1.08); filter:brightness(1.15); }
     }
 
     .actions{
@@ -307,7 +430,7 @@
       font-size:12px;
       color:var(--muted);
       line-height:1.38;
-      height:6.9em;
+      height:8.2em;
       overflow:hidden;
       white-space:pre-wrap;
       flex:0 0 auto;
@@ -325,6 +448,18 @@
         top:16px;
         left:14px;
         font-size:12px;
+      }
+
+      .page-title{
+        top:16px;
+        left:50%;
+        transform:translateX(-50%);
+        font-size:28px;
+        max-width:calc(100vw - 120px);
+        white-space:nowrap;
+        writing-mode:horizontal-tb;
+        text-orientation:mixed;
+        line-height:1;
       }
 
       .wrap{
@@ -390,10 +525,8 @@
         height:14px;
       }
 
-      .seg.f{ top:3px; }
-      .seg.b{ top:3px; }
-      .seg.e{ bottom:3px; }
-      .seg.c{ bottom:3px; }
+      .seg.f,.seg.b{ top:3px; }
+      .seg.e,.seg.c{ bottom:3px; }
 
       .channels{
         grid-template-columns:repeat(3,minmax(0,1fr));
@@ -427,15 +560,22 @@
       }
 
       .log{
-        height:8.2em;
+        height:10em;
       }
 
       .stateRow{
         gap:10px;
+        align-items:flex-start;
+        flex-direction:column;
       }
 
-      .fineTuneBtn{
-        min-width:96px;
+      .controlsRow{
+        width:100%;
+        justify-content:flex-start;
+      }
+
+      .radioCtl{
+        min-width:0;
         padding:10px 12px;
         font-size:13px;
       }
@@ -445,6 +585,19 @@
 <body>
 <a href="index.html" class="back-link">back</a>
 <div class="page-title">radio</div>
+
+<div id="weatherPop" class="weather-pop" aria-hidden="true">
+  <div class="weather-card">
+    <h3>weather</h3>
+    <div id="weatherCopy" class="weather-copy">Use local weather to steer the radio atmosphere.
+It will ask for location permission and refresh every 15 minutes.</div>
+    <div class="weather-actions">
+      <button id="weatherEnableBtn" type="button">Use my location</button>
+      <button id="weatherRetryBtn" type="button">Try again</button>
+      <button id="weatherCloseBtn" type="button">Close</button>
+    </div>
+  </div>
+</div>
 
 <div class="wrap">
   <div class="radio">
@@ -472,7 +625,11 @@
           <div class="value" id="status">Stopped</div>
         </div>
 
-        <button id="fineTuneBtn" class="fineTuneBtn" type="button">Fine Tune</button>
+        <div class="controlsRow">
+          <button id="recPlayBtn" class="radioCtl recBtn" type="button"><span class="recBadge"></span>rec/play</button>
+          <button id="weatherBtn" class="radioCtl" type="button">weather</button>
+          <button id="fineTuneBtn" class="radioCtl" type="button">Fine Tune</button>
+        </div>
       </div>
 
       <div class="telemetry">
@@ -481,12 +638,16 @@ CH: 1
 MODE: idle
 AUDIO: standby
 ELAPSED: 0:00
-CHAN ELAPSED: 0:00</div>
+CHAN ELAPSED: 0:00
+WEATHER: emenating</div>
         <div id="telemetryRight">MAIN: —
 TEX: —
 INST: 0.00
 AMB: 0.00
-FX: —</div>
+FX: —
+MIC: off
+PITCH: —
+EGG: <span id="eggSlot"></span></div>
       </div>
     </div>
 
@@ -510,15 +671,15 @@ const CHANNELS = {
     enabled: true,
     mode: 'main',
     centrepieces: [
-      { title:'bānhūs', src:'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3' },
-      { title:'The Red House', src:'https://peachradio.s3.eu-west-2.amazonaws.com/redhouse.mp3' },
+      { title:'bānhūs', src:'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3', soft:true },
+      { title:'The Red House', src:'https://peachradio.s3.eu-west-2.amazonaws.com/redhouse.mp3', soft:true },
       { title:'Slime Demo', src:'https://peachradio.s3.eu-west-2.amazonaws.com/slimedemo.mp3' },
-      { title:'Funeral March', src:'https://peachradio.s3.eu-west-2.amazonaws.com/funeral+march.mp3' },
+      { title:'Funeral March', src:'https://peachradio.s3.eu-west-2.amazonaws.com/funeral+march.mp3', soft:true },
       { title:'Big Black Pearl', src:'https://peachradio.s3.eu-west-2.amazonaws.com/bigblackpearl.mp3' },
-      { title:'Hypnagogia', src:'https://peachradio.s3.eu-west-2.amazonaws.com/hypna.mp3' },
+      { title:'Hypnagogia', src:'https://peachradio.s3.eu-west-2.amazonaws.com/hypna.mp3', soft:true },
       { title:'Xenopus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/xenopus.mp3' },
-      { title:'Ambulance Land', src:'https://peachradio.s3.eu-west-2.amazonaws.com/ambulance.mp3' },
-      { title:'Samantha', src:'https://peachradio.s3.eu-west-2.amazonaws.com/samantha.mp3' },
+      { title:'Ambulance Land', src:'https://peachradio.s3.eu-west-2.amazonaws.com/ambulance.mp3', soft:true },
+      { title:'Samantha', src:'https://peachradio.s3.eu-west-2.amazonaws.com/samantha.mp3', soft:true },
       { title:'The Agalma', src:'https://peachradio.s3.eu-west-2.amazonaws.com/agalma.mp3' }
     ],
     textures: [
@@ -557,15 +718,15 @@ const CHANNELS = {
     enabled: true,
     mode: 'centrepieces-only',
     centrepieces: [
-      { title:'Banhus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3' },
-      { title:'Redhouse', src:'https://peachradio.s3.eu-west-2.amazonaws.com/redhouse.mp3' },
+      { title:'Banhus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3', soft:true },
+      { title:'Redhouse', src:'https://peachradio.s3.eu-west-2.amazonaws.com/redhouse.mp3', soft:true },
       { title:'Slimedemo', src:'https://peachradio.s3.eu-west-2.amazonaws.com/slimedemo.mp3' },
-      { title:'Funeral March', src:'https://peachradio.s3.eu-west-2.amazonaws.com/funeral+march.mp3' },
+      { title:'Funeral March', src:'https://peachradio.s3.eu-west-2.amazonaws.com/funeral+march.mp3', soft:true },
       { title:'Bigblackpearl', src:'https://peachradio.s3.eu-west-2.amazonaws.com/bigblackpearl.mp3' },
-      { title:'Hypna', src:'https://peachradio.s3.eu-west-2.amazonaws.com/hypna.mp3' },
+      { title:'Hypna', src:'https://peachradio.s3.eu-west-2.amazonaws.com/hypna.mp3', soft:true },
       { title:'Xenopus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/xenopus.mp3' },
-      { title:'Ambulance Land', src:'https://peachradio.s3.eu-west-2.amazonaws.com/ambulance.mp3' },
-      { title:'Samantha', src:'https://peachradio.s3.eu-west-2.amazonaws.com/samantha.mp3' },
+      { title:'Ambulance Land', src:'https://peachradio.s3.eu-west-2.amazonaws.com/ambulance.mp3', soft:true },
+      { title:'Samantha', src:'https://peachradio.s3.eu-west-2.amazonaws.com/samantha.mp3', soft:true },
       { title:'Agalma', src:'https://peachradio.s3.eu-west-2.amazonaws.com/agalma.mp3' }
     ],
     textures: []
@@ -576,15 +737,15 @@ const CHANNELS = {
     enabled: true,
     mode: 'all-clean',
     centrepieces: [
-      { title:'Banhus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3' },
-      { title:'Redhouse', src:'https://peachradio.s3.eu-west-2.amazonaws.com/redhouse.mp3' },
+      { title:'Banhus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/banhus.mp3', soft:true },
+      { title:'Redhouse', src:'https://peachradio.s3.eu-west-2.amazonaws.com/redhouse.mp3', soft:true },
       { title:'Slimedemo', src:'https://peachradio.s3.eu-west-2.amazonaws.com/slimedemo.mp3' },
-      { title:'Funeral March', src:'https://peachradio.s3.eu-west-2.amazonaws.com/funeral+march.mp3' },
+      { title:'Funeral March', src:'https://peachradio.s3.eu-west-2.amazonaws.com/funeral+march.mp3', soft:true },
       { title:'Bigblackpearl', src:'https://peachradio.s3.eu-west-2.amazonaws.com/bigblackpearl.mp3' },
-      { title:'Hypna', src:'https://peachradio.s3.eu-west-2.amazonaws.com/hypna.mp3' },
+      { title:'Hypna', src:'https://peachradio.s3.eu-west-2.amazonaws.com/hypna.mp3', soft:true },
       { title:'Xenopus', src:'https://peachradio.s3.eu-west-2.amazonaws.com/xenopus.mp3' },
-      { title:'Ambulance Land', src:'https://peachradio.s3.eu-west-2.amazonaws.com/ambulance.mp3' },
-      { title:'Samantha', src:'https://peachradio.s3.eu-west-2.amazonaws.com/samantha.mp3' },
+      { title:'Ambulance Land', src:'https://peachradio.s3.eu-west-2.amazonaws.com/ambulance.mp3', soft:true },
+      { title:'Samantha', src:'https://peachradio.s3.eu-west-2.amazonaws.com/samantha.mp3', soft:true },
       { title:'Agalma', src:'https://peachradio.s3.eu-west-2.amazonaws.com/agalma.mp3' },
       { title:'Joiner', src:'https://peachradio.s3.eu-west-2.amazonaws.com/joiner.mp3' },
       { title:'Unicorn', src:'https://peachradio.s3.eu-west-2.amazonaws.com/unicorn.mp3' },
@@ -614,9 +775,12 @@ const AMBULANCE_WINDOW_END = 19 * 60;
 const AMBULANCE_WINDOW_FADE = 42;
 const AMBULANCE_REST_MS = 11 * 60 * 1000;
 
-const BASE_OUTPUT_LEVEL = 0.95;
-const FINE_TUNE_MAX_VOLUME_BOOST = 0.40;
-const CLEAN_MODE_VOLUME_BOOST = 0.40;
+const BASE_OUTPUT_LEVEL = 0.92;
+const PERCEIVED_CLEAN_BOOST = 0.36;
+const PERCEIVED_FINE_BOOST = 0.34;
+const FX_PEACE_WINDOW_SEC = 60;
+const WEATHER_REFRESH_MS = 15 * 60 * 1000;
+const MAX_EXTRA_NOISE_REWARD_SEC = 3 * 60 * 60;
 
 const DIGIT_MAP = {
   '0': ['a','b','c','d','e','f'],
@@ -645,7 +809,14 @@ const els = {
   stopBtn: document.getElementById('stopBtn'),
   clearBtn: document.getElementById('clearBtn'),
   fineTuneBtn: document.getElementById('fineTuneBtn'),
-  channelButtons: [1,2,3,4,5].map(i => document.getElementById(`ch${i}Btn`))
+  weatherBtn: document.getElementById('weatherBtn'),
+  recPlayBtn: document.getElementById('recPlayBtn'),
+  channelButtons: [1,2,3,4,5].map(i => document.getElementById(`ch${i}Btn`)),
+  weatherPop: document.getElementById('weatherPop'),
+  weatherCopy: document.getElementById('weatherCopy'),
+  weatherEnableBtn: document.getElementById('weatherEnableBtn'),
+  weatherRetryBtn: document.getElementById('weatherRetryBtn'),
+  weatherCloseBtn: document.getElementById('weatherCloseBtn')
 };
 
 let audioCtx = null;
@@ -654,11 +825,14 @@ let textureSource = null;
 
 let masterGain = null;
 let outputGain = null;
+let autoLevelGain = null;
 let mainGain = null;
 let textureGain = null;
 let noiseGain = null;
 let humGain = null;
 let ambientGain = null;
+let micLiveGain = null;
+let micLoopGain = null;
 
 let mainDrive = null;
 let mainFilter = null;
@@ -673,6 +847,25 @@ let ambientLP = null;
 let ambientDelay = null;
 let ambientFeedback = null;
 let ambientWet = null;
+
+let masterComp = null;
+let safetyLimiter = null;
+let outputAnalyser = null;
+let pitchAnalyser = null;
+let micAnalyser = null;
+let micPitchAnalyser = null;
+
+let micSource = null;
+let micGate = null;
+let micBand = null;
+let micRecorderDest = null;
+let micRecorder = null;
+let micChunks = [];
+let micLoopBuffer = null;
+let micLoopSource = null;
+let micLoopFilter = null;
+let micLoopDelay = null;
+let micLoopFeedback = null;
 
 let running = false;
 let muted = false;
@@ -694,11 +887,42 @@ let selectedFadeTimer = null;
 let heartbeatCounter = 0;
 let lastTelemetryBeat = 0;
 let globalAmbulanceLastAt = 0;
+let weatherRefreshTimer = null;
 
 let fineTuneStartAt = 0;
 let fineTuneUntil = 0;
 let fineTunePeak = 0;
 let fineTuneDecayMs = 0;
+
+let autoGainTarget = 1;
+let levelPeakSuppression = 0;
+let detectedPitchHz = 0;
+let eggHoldUntil = 0;
+
+let weatherState = {
+  enabled: false,
+  status: 'emenating',
+  label: 'emenating',
+  tempC: null,
+  windKmh: null,
+  cloud: null,
+  weatherCode: null,
+  isDay: null,
+  intensity: 0.24,
+  clarityBias: 0.18,
+  stormBias: 0.06,
+  lastUpdated: 0
+};
+
+let micState = {
+  permission: 'unknown',
+  active: false,
+  recording: false,
+  loopPlaying: false,
+  stream: null
+};
+
+let POETRY_LINES = [];
 
 const stationStates = {};
 
@@ -727,6 +951,10 @@ function chance(n){
 
 function clamp(v, min, max){
   return Math.max(min, Math.min(max, v));
+}
+
+function lerp(a,b,t){
+  return a + (b - a) * t;
 }
 
 function nowMs(){
@@ -762,6 +990,16 @@ function currentStationState(){
   return stationStates[currentChannel];
 }
 
+function getPeaceCurve(){
+  if(!running || !sessionStart) return 0;
+  const t = clamp(elapsedSec() / FX_PEACE_WINDOW_SEC, 0, 1);
+  return t * t * (3 - 2 * t);
+}
+
+function getLongListenReward(){
+  return clamp((elapsedSec() - 14 * 60) / MAX_EXTRA_NOISE_REWARD_SEC, 0, 1);
+}
+
 function getFineTuneMix(){
   if(!fineTuneUntil || nowMs() >= fineTuneUntil || fineTuneDecayMs <= 0) return 0;
   const elapsed = nowMs() - fineTuneStartAt;
@@ -774,34 +1012,34 @@ function getFineTuneAmount(){
   return fineTunePeak * getFineTuneMix();
 }
 
-function getFineTuneVolumeBoost(){
-  return FINE_TUNE_MAX_VOLUME_BOOST * getFineTuneMix();
+function getFineTuneBoost(){
+  return getFineTuneMix() * PERCEIVED_FINE_BOOST;
 }
 
-function getCleanModeVolumeBoost(){
-  return cleanOverride ? CLEAN_MODE_VOLUME_BOOST : 0;
+function getCleanBoost(){
+  return cleanOverride ? PERCEIVED_CLEAN_BOOST : 0;
 }
 
 function getTargetOutputLevel(){
   if(muted) return 0.0001;
-  const fineBoost = getFineTuneVolumeBoost();
-  const cleanBoost = getCleanModeVolumeBoost();
-  return BASE_OUTPUT_LEVEL * (1 + fineBoost + cleanBoost);
+  const fineBoost = getFineTuneBoost();
+  const cleanBoost = getCleanBoost();
+  const dynamicCompensation = Math.max(0, 1 - levelPeakSuppression * 0.8);
+  const weatherSoft = clamp(weatherState.clarityBias * 0.08, 0, 0.08);
+  const target = BASE_OUTPUT_LEVEL * (1 + fineBoost + cleanBoost + weatherSoft) * dynamicCompensation;
+  return clamp(target, 0.0001, 1.9);
 }
 
 function updateOutputLevel(immediate = false){
   if(!audioCtx || !outputGain) return;
-
   const now = audioCtx.currentTime;
   const target = getTargetOutputLevel();
-
   outputGain.gain.cancelScheduledValues(now);
-
   if(immediate){
     outputGain.gain.setValueAtTime(target, now);
   } else {
     outputGain.gain.setValueAtTime(outputGain.gain.value, now);
-    outputGain.gain.setTargetAtTime(target, now, muted ? 0.06 : 0.24);
+    outputGain.gain.setTargetAtTime(target, now, muted ? 0.05 : 0.22);
   }
 }
 
@@ -809,15 +1047,13 @@ function beginFineTune(){
   fineTuneStartAt = nowMs();
   fineTuneDecayMs = rand(60_000, 300_000);
   fineTuneUntil = fineTuneStartAt + fineTuneDecayMs;
-  fineTunePeak = rand(0.72, 0.94);
+  fineTunePeak = rand(0.76, 0.94);
   els.fineTuneBtn.classList.add('active');
-
   if(audioCtx){
     synthesizeTuningSound(rand(0.45, 0.9), 0.28);
     updateOutputLevel(false);
   }
-
-  log(`Fine tune engaged (${Math.round(fineTuneDecayMs / 1000)}s settle, +40% max volume assist)`);
+  log(`Fine tune engaged (${Math.round(fineTuneDecayMs / 1000)}s settle)`);
   updateProcessing(false);
   updateTelemetry();
 }
@@ -826,18 +1062,27 @@ function syncFineTuneButton(){
   els.fineTuneBtn.classList.toggle('active', getFineTuneAmount() > 0.02);
 }
 
+function syncMicButton(){
+  els.recPlayBtn.classList.toggle('recording', micState.recording);
+  if(micState.recording){
+    els.recPlayBtn.innerHTML = '<span class="recBadge"></span>recording';
+  } else if(micState.loopPlaying){
+    els.recPlayBtn.innerHTML = '<span class="recBadge"></span>playing';
+  } else {
+    els.recPlayBtn.innerHTML = '<span class="recBadge"></span>rec/play';
+  }
+}
+
+function syncWeatherButton(){
+  els.weatherBtn.classList.toggle('active', weatherState.enabled || weatherState.status === 'emenating');
+}
+
 function syncLiveState(){
   els.dot.classList.toggle('on', running && !muted && !pausedByKey);
-
-  if(!running){
-    els.liveText.textContent = 'standby';
-  } else if(pausedByKey){
-    els.liveText.textContent = 'paused';
-  } else if(muted){
-    els.liveText.textContent = 'muted';
-  } else {
-    els.liveText.textContent = 'live';
-  }
+  if(!running) els.liveText.textContent = 'standby';
+  else if(pausedByKey) els.liveText.textContent = 'paused';
+  else if(muted) els.liveText.textContent = 'muted';
+  else els.liveText.textContent = 'live';
 }
 
 function setMuted(nextMuted, immediate = false){
@@ -901,16 +1146,83 @@ function stationPhaseLabel(station){
   return 'idle';
 }
 
+function describeWeatherCode(code){
+  const map = {
+    0:'clear', 1:'mostly clear', 2:'partly cloudy', 3:'overcast',
+    45:'fog', 48:'rime fog', 51:'light drizzle', 53:'drizzle',
+    55:'dense drizzle', 56:'freezing drizzle', 57:'freezing drizzle',
+    61:'light rain', 63:'rain', 65:'heavy rain', 66:'freezing rain',
+    67:'freezing rain', 71:'light snow', 73:'snow', 75:'heavy snow',
+    77:'snow grains', 80:'showers', 81:'rain showers', 82:'violent showers',
+    85:'snow showers', 86:'heavy snow showers', 95:'thunderstorm',
+    96:'storm hail', 99:'heavy storm hail'
+  };
+  return map[code] || 'unknown';
+}
+
+function computeWeatherMood(data){
+  const tempC = data.tempC ?? 14;
+  const windKmh = data.windKmh ?? 10;
+  const cloud = data.cloud ?? 45;
+  const isDay = !!data.isDay;
+  const code = data.weatherCode ?? 1;
+  const storm = [95,96,99].includes(code) ? 1 : [61,63,65,80,81,82].includes(code) ? 0.55 : 0;
+  const rain = [51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code) ? 0.35 : 0;
+  let clarityBias = 0;
+  if(isDay) clarityBias += 0.22;
+  if(cloud <= 20) clarityBias += 0.28;
+  if(tempC >= 17 && tempC <= 28) clarityBias += 0.16;
+  if(windKmh < 18) clarityBias += 0.08;
+  let intensity = 0;
+  intensity += clamp(windKmh / 75, 0, 0.35);
+  intensity += clamp(cloud / 100, 0, 0.22);
+  intensity += storm * 0.6 + rain * 0.18;
+  if(!isDay) intensity += 0.12;
+  if(!isDay && storm > 0) intensity += 0.22;
+  return {
+    intensity: clamp(intensity, 0, 1),
+    clarityBias: clamp(clarityBias - storm * 0.2 - rain * 0.08, 0, 0.7),
+    stormBias: clamp(storm + rain + (!isDay ? 0.12 : 0), 0, 1)
+  };
+}
+
+function updateWeatherPanelText(extra = ''){
+  const base = (weatherState.enabled || weatherState.status === 'emenating')
+    ? `Weather linked.
+${weatherState.label}
+Temp ${weatherState.tempC != null ? weatherState.tempC.toFixed(1) + '°C' : '—'} | Wind ${weatherState.windKmh != null ? Math.round(weatherState.windKmh) + ' km/h' : '—'} | Cloud ${weatherState.cloud != null ? Math.round(weatherState.cloud) + '%' : '—'}
+Mood: clarity ${weatherState.clarityBias.toFixed(2)} / intensity ${weatherState.intensity.toFixed(2)}`
+    : 'Use local weather to steer the radio atmosphere.\nIt will ask for location permission and refresh every 15 minutes.';
+  els.weatherCopy.textContent = extra ? `${base}\n\n${extra}` : base;
+}
+
+function getPoeticFragment(){
+  if(!POETRY_LINES.length) return 'signal weak / emenating';
+  const base = POETRY_LINES[Math.floor(Math.random() * POETRY_LINES.length)];
+  const chaos = clamp(instability() * 0.6 + weatherState.intensity * 0.45, 0, 1);
+  return base.split('').map(c => {
+    if(Math.random() < chaos * 0.16) return ['#','~','/','\\','…'][Math.floor(Math.random() * 5)];
+    if(Math.random() < chaos * 0.1) return '';
+    return c;
+  }).join('').slice(0, 120);
+}
+
 function updateTelemetry(){
   const ctxState = audioCtx ? audioCtx.state : 'none';
   const station = currentStationState();
   const stationTrack = station && station.phase === 'track' && station.currentTrack ? station.currentTrack.title : '—';
   const fine = getFineTuneAmount();
-  const fineBoost = getFineTuneVolumeBoost();
-  const cleanBoost = getCleanModeVolumeBoost();
+  const weatherTag = weatherState.enabled ? weatherState.label : 'emenating';
+  const transmission = running ? getPoeticFragment() : '—';
+  const extra =
+`SIG: ${(1 - levelPeakSuppression).toFixed(2)}
+CLR: ${weatherState.clarityBias.toFixed(2)}
+STRM: ${weatherState.stormBias.toFixed(2)}
+PEACE: ${getPeaceCurve().toFixed(2)}
+REWARD: ${getLongListenReward().toFixed(2)}`;
 
   const fxText = audioCtx
-    ? `m ${mainGain ? mainGain.gain.value.toFixed(2) : '0.00'} / t ${textureGain ? textureGain.gain.value.toFixed(2) : '0.00'} / n ${noiseGain ? noiseGain.gain.value.toFixed(2) : '0.00'} / a ${ambientGain ? ambientGain.gain.value.toFixed(2) : '0.00'} / out ${outputGain ? outputGain.gain.value.toFixed(2) : '0.00'}${cleanOverride ? ' / clean / +40%' : fine > 0.02 ? ` / ft ${fine.toFixed(2)} / +${Math.round(fineBoost * 100)}%` : ''}${cleanOverride && fine > 0.02 ? ` / ft+clean +${Math.round((fineBoost + cleanBoost) * 100)}%` : ''}`
+    ? `m ${mainGain ? mainGain.gain.value.toFixed(2) : '0.00'} / t ${textureGain ? textureGain.gain.value.toFixed(2) : '0.00'} / n ${noiseGain ? noiseGain.gain.value.toFixed(2) : '0.00'} / a ${ambientGain ? ambientGain.gain.value.toFixed(2) : '0.00'} / out ${outputGain ? outputGain.gain.value.toFixed(2) : '0.00'} / ag ${autoLevelGain ? autoLevelGain.gain.value.toFixed(2) : '0.00'}${cleanOverride ? ' / clean' : fine > 0.02 ? ` / ft ${fine.toFixed(2)}` : ''}`
     : '—';
 
   els.telemetryLeft.textContent =
@@ -919,16 +1231,37 @@ CH: ${currentChannel}
 MODE: ${currentMode}
 AUDIO: ${running ? (pausedByKey ? 'paused' : (muted ? 'muted' : 'live')) : 'standby'}
 ELAPSED: ${formatTime(elapsedSec())}
-CHAN ELAPSED: ${formatTime(channelElapsedSec())}`;
+CHAN ELAPSED: ${formatTime(channelElapsedSec())}
+WEATHER: ${weatherTag}
+${extra}`;
 
   els.telemetryRight.textContent =
 `MAIN: ${currentTrack ? currentTrack.title : stationTrack}
 TEX: ${currentTexture ? currentTexture.title : '—'}
 INST: ${instability().toFixed(2)}
 AMB: ${station ? station.ambience.toFixed(2) : '0.00'}
-FX: ${fxText}`;
-
+FX: ${fxText}
+MIC: ${micState.recording ? 'recording' : micState.loopPlaying ? 'looping' : micState.permission === 'granted' ? 'ready' : 'off'}
+PITCH: ${detectedPitchHz ? detectedPitchHz.toFixed(1) + 'Hz' : '—'}
+TX: ${transmission}
+EGG: `;
+  mountEggInTelemetry();
   syncFineTuneButton();
+  syncMicButton();
+  syncWeatherButton();
+}
+
+function mountEggInTelemetry(){
+  const slot = document.getElementById('eggSlot');
+  if(!slot) return;
+  let egg = document.getElementById('goldEgg');
+  if(!egg){
+    egg = document.createElement('span');
+    egg.id = 'goldEgg';
+    egg.className = 'gold-egg';
+    egg.setAttribute('aria-hidden', 'true');
+  }
+  if(!slot.contains(egg)) slot.appendChild(egg);
 }
 
 function shuffle(array){
@@ -944,13 +1277,27 @@ function makeDistortionCurve(amount = 0){
   const samples = 44100;
   const curve = new Float32Array(samples);
   const k = Math.max(0, amount);
-
   for(let i = 0; i < samples; i++){
     const x = i * 2 / samples - 1;
     curve[i] = ((3 + k) * x * 20 * Math.PI / 180) / (Math.PI + k * Math.abs(x));
   }
-
   return curve;
+}
+
+async function loadPoetry(){
+  try{
+    const res = await fetch('images/poetry.rtf');
+    const text = await res.text();
+    const cleaned = text
+      .replace(/\\par[d]?/g, '\n')
+      .replace(/\\'[0-9a-f]{2}/gi, '')
+      .replace(/\\[a-z]+\d* ?/gi, '')
+      .replace(/[{}]/g, '');
+    POETRY_LINES = cleaned.split('\n').map(l => l.trim()).filter(l => l.length > 6);
+    log(`Poetry loaded (${POETRY_LINES.length} lines)`);
+  } catch(err){
+    log('Poetry failed to load');
+  }
 }
 
 async function ensureAudio(){
@@ -962,11 +1309,14 @@ async function ensureAudio(){
 
     masterGain = audioCtx.createGain();
     outputGain = audioCtx.createGain();
+    autoLevelGain = audioCtx.createGain();
     mainGain = audioCtx.createGain();
     textureGain = audioCtx.createGain();
     noiseGain = audioCtx.createGain();
     humGain = audioCtx.createGain();
     ambientGain = audioCtx.createGain();
+    micLiveGain = audioCtx.createGain();
+    micLoopGain = audioCtx.createGain();
 
     mainDrive = audioCtx.createWaveShaper();
     mainDrive.curve = makeDistortionCurve(0);
@@ -974,16 +1324,16 @@ async function ensureAudio(){
 
     mainFilter = audioCtx.createBiquadFilter();
     mainFilter.type = 'lowpass';
-    mainFilter.frequency.value = 18000;
+    mainFilter.frequency.value = 18500;
 
     textureDrive = audioCtx.createWaveShaper();
-    textureDrive.curve = makeDistortionCurve(60);
+    textureDrive.curve = makeDistortionCurve(40);
     textureDrive.oversample = '2x';
 
     textureFilter = audioCtx.createBiquadFilter();
     textureFilter.type = 'bandpass';
     textureFilter.frequency.value = 1200;
-    textureFilter.Q.value = 1.0;
+    textureFilter.Q.value = 0.92;
 
     mainSend = audioCtx.createGain();
     mainDelay = audioCtx.createDelay(4.0);
@@ -992,28 +1342,50 @@ async function ensureAudio(){
 
     ambientLP = audioCtx.createBiquadFilter();
     ambientLP.type = 'lowpass';
-    ambientLP.frequency.value = 2400;
+    ambientLP.frequency.value = 2600;
 
     ambientDelay = audioCtx.createDelay(8.0);
     ambientFeedback = audioCtx.createGain();
     ambientWet = audioCtx.createGain();
 
+    masterComp = audioCtx.createDynamicsCompressor();
+    masterComp.threshold.value = -18;
+    masterComp.knee.value = 20;
+    masterComp.ratio.value = 2.5;
+    masterComp.attack.value = 0.02;
+    masterComp.release.value = 0.28;
+
+    safetyLimiter = audioCtx.createDynamicsCompressor();
+    safetyLimiter.threshold.value = -6;
+    safetyLimiter.knee.value = 0;
+    safetyLimiter.ratio.value = 16;
+    safetyLimiter.attack.value = 0.003;
+    safetyLimiter.release.value = 0.1;
+
+    outputAnalyser = audioCtx.createAnalyser();
+    outputAnalyser.fftSize = 2048;
+    pitchAnalyser = audioCtx.createAnalyser();
+    pitchAnalyser.fftSize = 4096;
+
     masterGain.gain.value = 1;
     outputGain.gain.value = BASE_OUTPUT_LEVEL;
+    autoLevelGain.gain.value = 1;
     mainGain.gain.value = 0;
     textureGain.gain.value = 0;
     noiseGain.gain.value = 0;
     humGain.gain.value = 0;
     ambientGain.gain.value = 1;
+    micLiveGain.gain.value = 0;
+    micLoopGain.gain.value = 0;
 
-    mainSend.gain.value = 0.10;
-    mainDelay.delayTime.value = 0.22;
-    mainFeedback.gain.value = 0.24;
-    mainWet.gain.value = 0.18;
+    mainSend.gain.value = 0.08;
+    mainDelay.delayTime.value = 0.20;
+    mainFeedback.gain.value = 0.18;
+    mainWet.gain.value = 0.12;
 
-    ambientDelay.delayTime.value = 1.8;
-    ambientFeedback.gain.value = 0.55;
-    ambientWet.gain.value = 0.14;
+    ambientDelay.delayTime.value = 1.5;
+    ambientFeedback.gain.value = 0.42;
+    ambientWet.gain.value = 0.1;
 
     mainSource.connect(mainDrive);
     mainDrive.connect(mainFilter);
@@ -1042,8 +1414,16 @@ async function ensureAudio(){
 
     noiseGain.connect(masterGain);
     humGain.connect(masterGain);
-    masterGain.connect(outputGain);
-    outputGain.connect(audioCtx.destination);
+    micLiveGain.connect(masterGain);
+    micLoopGain.connect(masterGain);
+
+    masterGain.connect(masterComp);
+    masterComp.connect(autoLevelGain);
+    autoLevelGain.connect(outputGain);
+    outputGain.connect(safetyLimiter);
+    safetyLimiter.connect(outputAnalyser);
+    outputAnalyser.connect(pitchAnalyser);
+    pitchAnalyser.connect(audioCtx.destination);
 
     log(`AudioContext created (${audioCtx.state})`);
   }
@@ -1066,36 +1446,34 @@ function fadeGain(gainNode, target, seconds){
 }
 
 function clearSelectedTimers(){
-  if(selectedStationTimer){
-    clearTimeout(selectedStationTimer);
-    selectedStationTimer = null;
-  }
-  if(selectedFadeTimer){
-    clearTimeout(selectedFadeTimer);
-    selectedFadeTimer = null;
-  }
+  if(selectedStationTimer){ clearTimeout(selectedStationTimer); selectedStationTimer = null; }
+  if(selectedFadeTimer){ clearTimeout(selectedFadeTimer); selectedFadeTimer = null; }
 }
 
 function stopOneShotNodes(){
-  activeNodeStops.forEach(fn => {
-    try{ fn(); }catch(e){}
-  });
+  activeNodeStops.forEach(fn => { try{ fn(); }catch(e){} });
   activeNodeStops = [];
+}
+
+function stopMicLoopPlayback(){
+  if(micLoopSource){ try{ micLoopSource.stop(); }catch(e){} try{ micLoopSource.disconnect(); }catch(e){} micLoopSource = null; }
+  if(micLoopFilter){ try{ micLoopFilter.disconnect(); }catch(e){} micLoopFilter = null; }
+  if(micLoopDelay){ try{ micLoopDelay.disconnect(); }catch(e){} micLoopDelay = null; }
+  if(micLoopFeedback){ try{ micLoopFeedback.disconnect(); }catch(e){} micLoopFeedback = null; }
+  if(audioCtx && micLoopGain) fadeGain(micLoopGain, 0.0001, 0.4);
+  micState.loopPlaying = false;
 }
 
 function stopAllFX(){
   stopOneShotNodes();
-
   try{ els.texture.pause(); }catch(e){}
   els.texture.removeAttribute('src');
   els.texture.load();
-
   if(audioCtx){
     fadeGain(textureGain, 0, 0.15);
     fadeGain(noiseGain, 0, 0.15);
     fadeGain(humGain, 0, 0.15);
   }
-
   currentTexture = null;
   updateTelemetry();
 }
@@ -1103,13 +1481,156 @@ function stopAllFX(){
 function stationAmbience(mode, station){
   const t = clamp((nowMs() - station.createdAt) / (6 * 60 * 60 * 1000), 0, 1.3);
   const tide = (Math.sin((nowMs() - station.createdAt) / 90000) + 1) * 0.5;
-
   if(cleanOverride) return 1;
-  if(mode === 'all-clean') return clamp(0.55 + tide * 0.2, 0, 1);
-  if(mode === 'dead-air') return clamp(0.6 + tide * 0.16, 0, 1);
-  if(mode === 'textures-only') return clamp(0.35 + tide * 0.22 + t * 0.08, 0, 1);
-  if(mode === 'centrepieces-only') return clamp(0.26 + tide * 0.18 + t * 0.07, 0, 1);
-  return clamp(0.28 + tide * 0.22 + t * 0.1, 0, 1);
+  if(mode === 'all-clean') return clamp(0.62 + tide * 0.14, 0, 1);
+  if(mode === 'dead-air') return clamp(0.58 + tide * 0.14, 0, 1);
+  if(mode === 'textures-only') return clamp(0.4 + tide * 0.2 + t * 0.06, 0, 1);
+  if(mode === 'centrepieces-only') return clamp(0.34 + tide * 0.16 + t * 0.05, 0, 1);
+  return clamp(0.38 + tide * 0.2 + t * 0.08, 0, 1);
+}
+
+function getTrackSoftness(track){
+  if(!track) return 0;
+  if(track.soft) return 0.38;
+  if(track.src === AMBULANCE_SRC) return 0.42;
+  return 0;
+}
+
+function updateAutoLevelAndPeakControl(){
+  if(!audioCtx || !outputAnalyser || !autoLevelGain) return;
+  const data = new Uint8Array(outputAnalyser.fftSize);
+  outputAnalyser.getByteTimeDomainData(data);
+
+  let peak = 0;
+  let sum = 0;
+  for(let i = 0; i < data.length; i++){
+    const v = (data[i] - 128) / 128;
+    const a = Math.abs(v);
+    if(a > peak) peak = a;
+    sum += v * v;
+  }
+  const rms = Math.sqrt(sum / data.length);
+  let target = 1;
+  if(rms < 0.08) target = 1.18;
+  else if(rms < 0.12) target = 1.08;
+  else if(rms < 0.17) target = 1.0;
+  else target = lerp(1.0, 0.82, clamp((rms - 0.17) / 0.18, 0, 1));
+
+  if(peak > 0.93) levelPeakSuppression = clamp(levelPeakSuppression + 0.08, 0, 1);
+  else if(peak > 0.85) levelPeakSuppression = clamp(levelPeakSuppression + 0.03, 0, 1);
+  else levelPeakSuppression = clamp(levelPeakSuppression - 0.02, 0, 1);
+
+  target *= (1 - levelPeakSuppression * 0.28);
+  autoGainTarget = clamp(target, 0.74, 1.2);
+
+  const now = audioCtx.currentTime;
+  autoLevelGain.gain.cancelScheduledValues(now);
+  autoLevelGain.gain.setValueAtTime(autoLevelGain.gain.value, now);
+  autoLevelGain.gain.setTargetAtTime(autoGainTarget, now, 0.22);
+  updateOutputLevel(false);
+}
+
+function updateMicModulation(){
+  if(!audioCtx || !micAnalyser || !mainFilter || !micState.active) return;
+  const data = new Uint8Array(micAnalyser.fftSize);
+  micAnalyser.getByteTimeDomainData(data);
+
+  let sum = 0;
+  for(let i = 0; i < data.length; i++){
+    const v = (data[i] - 128) / 128;
+    sum += v * v;
+  }
+  const rms = Math.sqrt(sum / data.length);
+  const envelope = clamp((rms - 0.015) / 0.14, 0, 1);
+
+  const baseCut = mainFilter.frequency.value;
+  const motion = 320 + envelope * 3400;
+  mainFilter.frequency.setTargetAtTime(clamp(baseCut + motion * 0.16, 500, 19000), audioCtx.currentTime, 0.06);
+
+  if(mainDelay){
+    mainDelay.delayTime.setTargetAtTime(clamp(mainDelay.delayTime.value + envelope * 0.016, 0.07, 0.42), audioCtx.currentTime, 0.06);
+  }
+  if(mainWet){
+    mainWet.gain.setTargetAtTime(clamp(mainWet.gain.value + envelope * 0.012, 0, 0.28), audioCtx.currentTime, 0.06);
+  }
+  if(micLiveGain){
+    micLiveGain.gain.setTargetAtTime(envelope * 0.1, audioCtx.currentTime, 0.05);
+  }
+
+  const micPitch = detectPitchFromAnalyser(micPitchAnalyser, audioCtx.sampleRate);
+  if(micPitch && currentTrack && running && textureFilter){
+    const colorShift = clamp((micPitch - 120) / 600, -1, 1);
+    textureFilter.frequency.setTargetAtTime(clamp(1100 + colorShift * 700, 300, 3200), audioCtx.currentTime, 0.07);
+  }
+}
+
+function updatePitchEgg(){
+  if(!audioCtx || !pitchAnalyser) return;
+  const hz = detectPitchFromAnalyser(pitchAnalyser, audioCtx.sampleRate);
+  detectedPitchHz = hz || 0;
+  if(isFSharp(hz)) eggHoldUntil = nowMs() + 1800;
+  const egg = document.getElementById('goldEgg');
+  if(egg) egg.classList.toggle('on', nowMs() < eggHoldUntil);
+}
+
+function isFSharp(freq){
+  if(!freq || !Number.isFinite(freq)) return false;
+  const midi = Math.round(69 + 12 * Math.log2(freq / 440));
+  const pitchClass = ((midi % 12) + 12) % 12;
+  return pitchClass === 6;
+}
+
+function detectPitchFromAnalyser(analyser, sampleRate){
+  if(!analyser) return 0;
+  const buf = new Float32Array(analyser.fftSize);
+  analyser.getFloatTimeDomainData(buf);
+  return autoCorrelate(buf, sampleRate);
+}
+
+function autoCorrelate(buf, sampleRate){
+  let rms = 0;
+  for(let i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
+  rms = Math.sqrt(rms / buf.length);
+  if(rms < 0.015) return 0;
+
+  let r1 = 0;
+  let r2 = buf.length - 1;
+  const thres = 0.2;
+  for(let i = 0; i < buf.length / 2; i++){
+    if(Math.abs(buf[i]) < thres){ r1 = i; break; }
+  }
+  for(let i = 1; i < buf.length / 2; i++){
+    if(Math.abs(buf[buf.length - i]) < thres){ r2 = buf.length - i; break; }
+  }
+  const trimmed = buf.slice(r1, r2);
+  const c = new Array(trimmed.length).fill(0);
+
+  for(let i = 0; i < trimmed.length; i++){
+    for(let j = 0; j < trimmed.length - i; j++){
+      c[i] += trimmed[j] * trimmed[j + i];
+    }
+  }
+
+  let d = 0;
+  while(c[d] > c[d + 1]) d++;
+  let maxpos = -1;
+  let maxval = -1;
+  for(let i = d; i < c.length; i++){
+    if(c[i] > maxval){ maxval = c[i]; maxpos = i; }
+  }
+  if(maxpos <= 0) return 0;
+
+  let T0 = maxpos;
+  const x1 = c[T0 - 1] || c[T0];
+  const x2 = c[T0];
+  const x3 = c[T0 + 1] || c[T0];
+  const a = (x1 + x3 - 2 * x2) / 2;
+  const b = (x3 - x1) / 2;
+  if(a) T0 = T0 - b / (2 * a);
+
+  const freq = sampleRate / T0;
+  if(freq < 55 || freq > 2000) return 0;
+  return freq;
 }
 
 function updateProcessing(forceGhost = false){
@@ -1120,38 +1641,44 @@ function updateProcessing(forceGhost = false){
   const ambient = station ? station.ambience : 0.35;
   const t = instability();
   const fine = getFineTuneAmount();
+  const peace = getPeaceCurve();
+  const reward = getLongListenReward();
+  const trackSoft = getTrackSoftness(currentTrack || (station ? station.currentTrack : null));
+  const weatherHeavy = weatherState.enabled || weatherState.status === 'emenating' ? weatherState.intensity : 0;
+  const weatherClear = weatherState.enabled || weatherState.status === 'emenating' ? weatherState.clarityBias : 0;
+  const stormBias = weatherState.enabled || weatherState.status === 'emenating' ? weatherState.stormBias : 0;
 
   updateOutputLevel(false);
 
   if(cleanOverride){
     mainDrive.curve = makeDistortionCurve(0);
     textureDrive.curve = makeDistortionCurve(0);
-    mainFilter.frequency.setTargetAtTime(19000, audioCtx.currentTime, 0.25);
-    textureFilter.frequency.setTargetAtTime(1800, audioCtx.currentTime, 0.25);
-    mainSend.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.25);
-    mainDelay.delayTime.setTargetAtTime(0.12, audioCtx.currentTime, 0.25);
-    mainFeedback.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.25);
-    mainWet.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.25);
-    ambientLP.frequency.setTargetAtTime(6000, audioCtx.currentTime, 0.25);
-    ambientDelay.delayTime.setTargetAtTime(0.2, audioCtx.currentTime, 0.25);
-    ambientFeedback.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.25);
-    ambientWet.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.25);
-    noiseGain.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.15);
-    humGain.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.15);
+    mainFilter.frequency.setTargetAtTime(19500, audioCtx.currentTime, 0.22);
+    textureFilter.frequency.setTargetAtTime(1700, audioCtx.currentTime, 0.22);
+    mainSend.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.22);
+    mainDelay.delayTime.setTargetAtTime(0.11, audioCtx.currentTime, 0.22);
+    mainFeedback.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.22);
+    mainWet.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.22);
+    ambientLP.frequency.setTargetAtTime(6800, audioCtx.currentTime, 0.22);
+    ambientDelay.delayTime.setTargetAtTime(0.18, audioCtx.currentTime, 0.22);
+    ambientFeedback.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.22);
+    ambientWet.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.22);
+    noiseGain.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.12);
+    humGain.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.12);
     updateTelemetry();
     return;
   }
 
   if(forceGhost){
     const ghostClean = fine * 0.65;
-    mainDrive.curve = makeDistortionCurve((meta.mode === 'all-clean' ? 14 : 110) * (1 - ghostClean));
-    mainFilter.frequency.setTargetAtTime((meta.mode === 'all-clean' ? 2200 : 1250) + ghostClean * 5000, audioCtx.currentTime, 0.08);
-    mainSend.gain.setTargetAtTime(0.01 * (1 - ghostClean), audioCtx.currentTime, 0.08);
-    mainFeedback.gain.setTargetAtTime(0.08 * (1 - ghostClean), audioCtx.currentTime, 0.08);
-    mainWet.gain.setTargetAtTime(0.04 * (1 - ghostClean), audioCtx.currentTime, 0.08);
+    mainDrive.curve = makeDistortionCurve((meta.mode === 'all-clean' ? 10 : 70) * (1 - ghostClean));
+    mainFilter.frequency.setTargetAtTime((meta.mode === 'all-clean' ? 2600 : 1600) + ghostClean * 5600, audioCtx.currentTime, 0.08);
+    mainSend.gain.setTargetAtTime(0.008 * (1 - ghostClean), audioCtx.currentTime, 0.08);
+    mainFeedback.gain.setTargetAtTime(0.06 * (1 - ghostClean), audioCtx.currentTime, 0.08);
+    mainWet.gain.setTargetAtTime(0.025 * (1 - ghostClean), audioCtx.currentTime, 0.08);
     ambientWet.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.08);
-    noiseGain.gain.setTargetAtTime(0.035 * (1 - fine), audioCtx.currentTime, 0.08);
-    humGain.gain.setTargetAtTime(0.018 * (1 - fine), audioCtx.currentTime, 0.08);
+    noiseGain.gain.setTargetAtTime(0.02 * (1 - fine), audioCtx.currentTime, 0.08);
+    humGain.gain.setTargetAtTime(0.012 * (1 - fine), audioCtx.currentTime, 0.08);
     return;
   }
 
@@ -1160,52 +1687,66 @@ function updateProcessing(forceGhost = false){
   const texturesOnly = meta.mode === 'textures-only';
   const centreOnly = meta.mode === 'centrepieces-only';
 
-  const effectiveAmbient = clamp(ambient + fine * 0.55, 0, 1);
+  const weatherClarityLift = weatherClear * 0.5;
+  const effectiveAmbient = clamp(ambient + fine * 0.55 + weatherClarityLift - stormBias * 0.1, 0, 1);
+  const delayedEffects = peace;
+  const intensityRise = clamp(t * 0.72 + reward * 0.38 + weatherHeavy * 0.48, 0, 1.6);
+  const softness = clamp(trackSoft + weatherClear * 0.26 + (1 - delayedEffects) * 0.55, 0, 0.95);
 
-  let mainAmount = deadAir ? 0 : clamp((clean ? 6 : 44) + (1 - effectiveAmbient) * (clean ? 10 : 120) + t * (clean ? 4 : 50), 0, 260);
-  let textureAmount = clean ? 0 : clamp(24 + (1 - effectiveAmbient) * (texturesOnly ? 160 : 100) + t * 70, 0, 280);
+  let mainAmount = deadAir ? 0 : clamp((clean ? 4 : 24) + (1 - effectiveAmbient) * (clean ? 7 : 58) + intensityRise * (clean ? 4 : 34), 0, 165);
+  let textureAmount = clean ? 0 : clamp(10 + (1 - effectiveAmbient) * (texturesOnly ? 70 : 44) + intensityRise * 24, 0, 165);
 
+  mainAmount *= delayedEffects;
+  textureAmount *= delayedEffects;
+  mainAmount *= (1 - softness * 0.82);
+  textureAmount *= (1 - softness * 0.86);
   mainAmount *= (1 - fine * 0.88);
   textureAmount *= (1 - fine * 0.96);
+  mainAmount *= (1 - levelPeakSuppression * 0.35);
+  textureAmount *= (1 - levelPeakSuppression * 0.38);
 
   mainDrive.curve = makeDistortionCurve(mainAmount);
   textureDrive.curve = makeDistortionCurve(textureAmount);
 
   const mainCut = clean
-    ? 18200 - effectiveAmbient * 3600
+    ? 18400 - effectiveAmbient * 2200
     : deadAir
-      ? 7000 - effectiveAmbient * 1800
-      : 17800 - (1 - effectiveAmbient) * 8200 - t * 6000 + fine * 7000;
+      ? 7800 - effectiveAmbient * 1400
+      : 18600 - (1 - effectiveAmbient) * 4600 - intensityRise * 2400 + fine * 6800 + softness * 3400;
 
-  const textureBand = clean ? 1650 : 650 + effectiveAmbient * 700 + Math.random() * 800 + fine * 600;
+  const textureBand = clean ? 1700 : 740 + effectiveAmbient * 520 + Math.random() * 380 + fine * 540 + weatherHeavy * 120;
 
-  mainFilter.frequency.setTargetAtTime(Math.max(650, mainCut), audioCtx.currentTime, 0.7);
-  textureFilter.frequency.setTargetAtTime(textureBand, audioCtx.currentTime, 0.7);
+  mainFilter.frequency.setTargetAtTime(Math.max(850, mainCut), audioCtx.currentTime, 0.52);
+  textureFilter.frequency.setTargetAtTime(textureBand, audioCtx.currentTime, 0.52);
 
-  const sendBase = deadAir ? 0.03 : (clean ? 0.04 : 0.06 + (1 - effectiveAmbient) * 0.08);
-  const delayBase = clean ? 0.2 : 0.16 + (1 - effectiveAmbient) * 0.18;
-  const feedbackBase = clean ? 0.1 : 0.16 + (1 - effectiveAmbient) * 0.15;
-  const wetBase = clean ? 0.08 : 0.12 + (1 - effectiveAmbient) * 0.08;
+  const sendBase = delayedEffects * (deadAir ? 0.025 : (clean ? 0.03 : 0.04 + (1 - effectiveAmbient) * 0.05 + weatherHeavy * 0.02));
+  const delayBase = clean ? 0.16 : 0.12 + delayedEffects * (1 - effectiveAmbient) * 0.15 + weatherHeavy * 0.03;
+  const feedbackBase = clean ? 0.07 : 0.1 + delayedEffects * (1 - effectiveAmbient) * 0.11 + reward * 0.06;
+  const wetBase = clean ? 0.05 : 0.06 + delayedEffects * (1 - effectiveAmbient) * 0.06 + reward * 0.04;
 
-  mainSend.gain.setTargetAtTime(sendBase * (1 - fine * 0.94), audioCtx.currentTime, 0.6);
-  mainDelay.delayTime.setTargetAtTime(Math.max(0.08, delayBase * (1 - fine * 0.4)), audioCtx.currentTime, 0.6);
-  mainFeedback.gain.setTargetAtTime(feedbackBase * (1 - fine * 0.96), audioCtx.currentTime, 0.6);
-  mainWet.gain.setTargetAtTime(wetBase * (1 - fine * 0.96), audioCtx.currentTime, 0.6);
+  mainSend.gain.setTargetAtTime(sendBase * (1 - fine * 0.94) * (1 - softness * 0.65), audioCtx.currentTime, 0.48);
+  mainDelay.delayTime.setTargetAtTime(Math.max(0.08, delayBase * (1 - fine * 0.4)), audioCtx.currentTime, 0.48);
+  mainFeedback.gain.setTargetAtTime(feedbackBase * (1 - fine * 0.96) * (1 - levelPeakSuppression * 0.25), audioCtx.currentTime, 0.48);
+  mainWet.gain.setTargetAtTime(wetBase * (1 - fine * 0.96) * (1 - softness * 0.62), audioCtx.currentTime, 0.48);
 
-  ambientLP.frequency.setTargetAtTime((clean ? 4800 : 1600 + effectiveAmbient * 2800) + fine * 2200, audioCtx.currentTime, 0.8);
-  ambientDelay.delayTime.setTargetAtTime(Math.max(0.16, (deadAir ? 2.2 : 0.8 + effectiveAmbient * 3.2) * (1 - fine * 0.82)), audioCtx.currentTime, 0.8);
-  ambientFeedback.gain.setTargetAtTime((clean ? 0.4 : deadAir ? 0.56 : 0.38 + effectiveAmbient * 0.28) * (1 - fine * 0.95), audioCtx.currentTime, 0.8);
-  ambientWet.gain.setTargetAtTime((clean ? 0.08 : deadAir ? 0.14 : 0.1 + effectiveAmbient * 0.2) * (1 - fine * 0.95), audioCtx.currentTime, 0.8);
+  ambientLP.frequency.setTargetAtTime((clean ? 5200 : 2100 + effectiveAmbient * 2200) + fine * 2000 + weatherClear * 1200, audioCtx.currentTime, 0.7);
+  ambientDelay.delayTime.setTargetAtTime(Math.max(0.14, (deadAir ? 1.8 : 0.6 + effectiveAmbient * 2.1 + reward * 0.7) * (1 - fine * 0.78)), audioCtx.currentTime, 0.7);
+  ambientFeedback.gain.setTargetAtTime((clean ? 0.28 : deadAir ? 0.4 : 0.22 + effectiveAmbient * 0.18 + reward * 0.08) * (1 - fine * 0.92), audioCtx.currentTime, 0.7);
+  ambientWet.gain.setTargetAtTime((clean ? 0.05 : deadAir ? 0.1 : 0.05 + effectiveAmbient * 0.1 + reward * 0.05) * (1 - fine * 0.92) * delayedEffects, audioCtx.currentTime, 0.7);
 
-  noiseGain.gain.setTargetAtTime((deadAir ? 0.05 : 0.035) * (1 - fine * 0.92), audioCtx.currentTime, 0.25);
-  humGain.gain.setTargetAtTime((deadAir ? 0.024 : 0.015) * (1 - fine * 0.92), audioCtx.currentTime, 0.25);
+  const rareNoiseReward = reward * 0.03 + weatherHeavy * 0.01;
+  noiseGain.gain.setTargetAtTime((deadAir ? 0.034 : 0.015 + rareNoiseReward) * delayedEffects * (1 - fine * 0.92) * (1 - softness * 0.5), audioCtx.currentTime, 0.24);
+  humGain.gain.setTargetAtTime((deadAir ? 0.018 : 0.009 + reward * 0.006) * delayedEffects * (1 - fine * 0.92), audioCtx.currentTime, 0.24);
 
   if(texturesOnly){
-    mainSend.gain.setTargetAtTime(0.02 * (1 - fine * 0.9), audioCtx.currentTime, 0.5);
+    mainSend.gain.setTargetAtTime(0.018 * delayedEffects * (1 - fine * 0.9), audioCtx.currentTime, 0.45);
   }
-
   if(centreOnly){
     textureGain.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.15);
+  }
+  if(mainGain){
+    const baseMainGain = deadAir ? 0.65 : 1.0;
+    mainGain.gain.setTargetAtTime(baseMainGain, audioCtx.currentTime, 0.2);
   }
 
   updateTelemetry();
@@ -1217,31 +1758,21 @@ function makeFilteredNoise(durationSec, config = {}){
   const now = audioCtx.currentTime;
   const buffer = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * durationSec), audioCtx.sampleRate);
   const data = buffer.getChannelData(0);
-
-  for(let i = 0; i < data.length; i++){
-    data[i] = (Math.random() * 2 - 1) * (config.noiseLevel || 0.22);
-  }
+  for(let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (config.noiseLevel || 0.22);
 
   const src = audioCtx.createBufferSource();
   src.buffer = buffer;
-
   const pre = audioCtx.createBiquadFilter();
   pre.type = config.preType || 'lowpass';
   pre.frequency.value = config.preFreq || 1200;
-
   const band = audioCtx.createBiquadFilter();
   band.type = config.bandType || 'bandpass';
   band.frequency.value = config.bandFreq || 900;
   band.Q.value = config.bandQ || 0.7;
-
   const gain = audioCtx.createGain();
   gain.gain.value = 0.0001;
 
-  src.connect(pre);
-  pre.connect(band);
-  band.connect(gain);
-  gain.connect(noiseGain);
-
+  src.connect(pre); pre.connect(band); band.connect(gain); gain.connect(noiseGain);
   gain.gain.setValueAtTime(0.0001, now);
   gain.gain.exponentialRampToValueAtTime(config.peak || 0.05, now + (config.attack || 0.7));
   gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
@@ -1251,18 +1782,14 @@ function makeFilteredNoise(durationSec, config = {}){
 
   const stop = () => {
     try{ src.stop(); }catch(e){}
-    [src, pre, band, gain].forEach(node => {
-      try{ node.disconnect(); }catch(e){}
-    });
+    [src, pre, band, gain].forEach(node => { try{ node.disconnect(); }catch(e){} });
   };
-
   activeNodeStops.push(stop);
   return stop;
 }
 
 function makeHumCluster(durationSec, peak = 0.02){
   if(!audioCtx || cleanOverride) return;
-
   const now = audioCtx.currentTime;
   const base = chance(0.5) ? 50 : 60;
 
@@ -1278,69 +1805,47 @@ function makeHumCluster(durationSec, peak = 0.02){
   osc1.frequency.value = base;
   osc2.frequency.value = base * 2;
   osc3.frequency.value = base * 0.5;
-
   gain.gain.value = 0.0001;
 
-  osc1.connect(gain);
-  osc2.connect(gain);
-  osc3.connect(gain);
-  gain.connect(humGain);
-
+  osc1.connect(gain); osc2.connect(gain); osc3.connect(gain); gain.connect(humGain);
   gain.gain.setValueAtTime(0.0001, now);
   gain.gain.exponentialRampToValueAtTime(peak, now + 0.5);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
 
-  osc1.start(now);
-  osc2.start(now);
-  osc3.start(now);
+  osc1.start(now); osc2.start(now); osc3.start(now);
   osc1.stop(now + durationSec + 0.05);
   osc2.stop(now + durationSec + 0.05);
   osc3.stop(now + durationSec + 0.05);
 
-  const stop = () => {
+  activeNodeStops.push(() => {
     try{ osc1.stop(); }catch(e){}
     try{ osc2.stop(); }catch(e){}
     try{ osc3.stop(); }catch(e){}
-    [osc1, osc2, osc3, gain].forEach(node => {
-      try{ node.disconnect(); }catch(e){}
-    });
-  };
-
-  activeNodeStops.push(stop);
+    [osc1, osc2, osc3, gain].forEach(node => { try{ node.disconnect(); }catch(e){} });
+  });
 }
 
 function synthesizeTuningSound(durationSec = 1.8, intensity = 0.8){
   if(!audioCtx || cleanOverride) return;
-
   const now = audioCtx.currentTime;
   const hissBuffer = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * durationSec), audioCtx.sampleRate);
   const hissData = hissBuffer.getChannelData(0);
-
-  for(let i = 0; i < hissData.length; i++){
-    hissData[i] = (Math.random() * 2 - 1) * 0.25 * intensity;
-  }
+  for(let i = 0; i < hissData.length; i++) hissData[i] = (Math.random() * 2 - 1) * 0.25 * intensity;
 
   const hiss = audioCtx.createBufferSource();
   hiss.buffer = hissBuffer;
-
   const hp = audioCtx.createBiquadFilter();
   hp.type = 'highpass';
   hp.frequency.value = 320;
-
   const bp = audioCtx.createBiquadFilter();
   bp.type = 'bandpass';
   bp.frequency.setValueAtTime(rand(900, 2200), now);
   bp.frequency.exponentialRampToValueAtTime(rand(450, 2800), now + durationSec);
   bp.Q.value = 0.8;
-
   const hissGain = audioCtx.createGain();
   hissGain.gain.value = 0.0001;
 
-  hiss.connect(hp);
-  hp.connect(bp);
-  bp.connect(hissGain);
-  hissGain.connect(noiseGain);
-
+  hiss.connect(hp); hp.connect(bp); bp.connect(hissGain); hissGain.connect(noiseGain);
   hissGain.gain.setValueAtTime(0.0001, now);
   hissGain.gain.exponentialRampToValueAtTime(0.05 * intensity, now + 0.08);
   hissGain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
@@ -1360,41 +1865,153 @@ function synthesizeTuningSound(durationSec = 1.8, intensity = 0.8){
   toneFilter.type = 'bandpass';
   toneFilter.frequency.value = rand(950, 2100);
   toneFilter.Q.value = 2;
-
   toneGain.gain.value = 0.0001;
 
-  toneA.connect(toneFilter);
-  toneB.connect(toneFilter);
-  toneFilter.connect(toneGain);
-  toneGain.connect(noiseGain);
-
+  toneA.connect(toneFilter); toneB.connect(toneFilter); toneFilter.connect(toneGain); toneGain.connect(noiseGain);
   toneGain.gain.setValueAtTime(0.0001, now);
   toneGain.gain.exponentialRampToValueAtTime(0.02 * intensity, now + 0.04);
   toneGain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec * 0.82);
 
-  hiss.start(now);
-  hiss.stop(now + durationSec + 0.05);
-  toneA.start(now);
-  toneB.start(now);
+  hiss.start(now); hiss.stop(now + durationSec + 0.05);
+  toneA.start(now); toneB.start(now);
   toneA.stop(now + durationSec + 0.05);
   toneB.stop(now + durationSec + 0.05);
 
-  const stop = () => {
+  activeNodeStops.push(() => {
     try{ hiss.stop(); }catch(e){}
     try{ toneA.stop(); }catch(e){}
     try{ toneB.stop(); }catch(e){}
-    [hiss, hp, bp, hissGain, toneA, toneB, toneFilter, toneGain].forEach(node => {
-      try{ node.disconnect(); }catch(e){}
-    });
-  };
+    [hiss, hp, bp, hissGain, toneA, toneB, toneFilter, toneGain].forEach(node => { try{ node.disconnect(); }catch(e){} });
+  });
+}
 
-  activeNodeStops.push(stop);
+async function ensureMic(){
+  await ensureAudio();
+  if(micState.stream) return;
+
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+    micState.stream = stream;
+    micState.permission = 'granted';
+
+    micSource = audioCtx.createMediaStreamSource(stream);
+    micAnalyser = audioCtx.createAnalyser();
+    micAnalyser.fftSize = 1024;
+    micPitchAnalyser = audioCtx.createAnalyser();
+    micPitchAnalyser.fftSize = 2048;
+    micGate = audioCtx.createGain();
+    micBand = audioCtx.createBiquadFilter();
+    micRecorderDest = audioCtx.createMediaStreamDestination();
+
+    micBand.type = 'bandpass';
+    micBand.frequency.value = 1200;
+    micBand.Q.value = 1.2;
+    micGate.gain.value = 0.0001;
+
+    micSource.connect(micAnalyser);
+    micSource.connect(micPitchAnalyser);
+    micSource.connect(micBand);
+    micBand.connect(micGate);
+    micGate.connect(micLiveGain);
+    micBand.connect(micRecorderDest);
+
+    micRecorder = new MediaRecorder(micRecorderDest.stream);
+    micRecorder.addEventListener('dataavailable', e => {
+      if(e.data && e.data.size > 0) micChunks.push(e.data);
+    });
+    micRecorder.addEventListener('stop', async () => {
+      try{
+        const blob = new Blob(micChunks, { type: micRecorder.mimeType || 'audio/webm' });
+        micChunks = [];
+        const arr = await blob.arrayBuffer();
+        micLoopBuffer = await audioCtx.decodeAudioData(arr.slice(0));
+        startMicLoopPlayback();
+        log(`Mic phrase captured (${(micLoopBuffer.duration || 0).toFixed(1)}s)`);
+      } catch(err){
+        log(`Mic phrase decode failed: ${err.message || err}`);
+      } finally {
+        micState.recording = false;
+        micState.active = true;
+        syncMicButton();
+        updateTelemetry();
+      }
+    });
+
+    log('Microphone ready');
+  } catch(err){
+    micState.permission = 'denied';
+    log(`Microphone unavailable: ${err.message || err}`);
+    throw err;
+  }
+}
+
+function startMicLive(){
+  if(!audioCtx || !micGate) return;
+  micState.active = true;
+  micState.recording = true;
+  stopMicLoopPlayback();
+  const now = audioCtx.currentTime;
+  micGate.gain.cancelScheduledValues(now);
+  micGate.gain.setValueAtTime(micGate.gain.value, now);
+  micGate.gain.setTargetAtTime(0.9, now, 0.08);
+  micLiveGain.gain.setTargetAtTime(0.0, now, 0.08);
+  micChunks = [];
+  if(micRecorder && micRecorder.state !== 'recording') micRecorder.start();
+  log('Mic live capture started');
+  syncMicButton();
+  updateTelemetry();
+}
+
+function stopMicLiveAndLoop(){
+  if(!audioCtx || !micGate) return;
+  micState.recording = false;
+  const now = audioCtx.currentTime;
+  micGate.gain.cancelScheduledValues(now);
+  micGate.gain.setValueAtTime(micGate.gain.value, now);
+  micGate.gain.setTargetAtTime(0.0001, now, 0.12);
+  if(micRecorder && micRecorder.state === 'recording') micRecorder.stop();
+  log('Mic capture stopped, preparing loop');
+  syncMicButton();
+  updateTelemetry();
+}
+
+function startMicLoopPlayback(){
+  if(!audioCtx || !micLoopBuffer) return;
+  stopMicLoopPlayback();
+
+  micLoopSource = audioCtx.createBufferSource();
+  micLoopSource.buffer = micLoopBuffer;
+  micLoopSource.loop = true;
+
+  micLoopFilter = audioCtx.createBiquadFilter();
+  micLoopFilter.type = 'lowpass';
+  micLoopFilter.frequency.value = 1650;
+
+  micLoopDelay = audioCtx.createDelay(4.0);
+  micLoopDelay.delayTime.value = 0.34;
+
+  micLoopFeedback = audioCtx.createGain();
+  micLoopFeedback.gain.value = 0.38;
+
+  micLoopSource.connect(micLoopFilter);
+  micLoopFilter.connect(micLoopGain);
+  micLoopFilter.connect(micLoopDelay);
+  micLoopDelay.connect(micLoopGain);
+  micLoopDelay.connect(micLoopFeedback);
+  micLoopFeedback.connect(micLoopDelay);
+
+  micLoopGain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+  micLoopGain.gain.setTargetAtTime(0.18, audioCtx.currentTime, 0.32);
+
+  micLoopSource.start();
+  micState.loopPlaying = true;
+  syncMicButton();
+  updateTelemetry();
 }
 
 function initStation(channel){
   const meta = CHANNELS[channel];
   const allTracks = [...meta.centrepieces, ...meta.textures];
-
   stationStates[channel] = {
     channel,
     name: meta.name,
@@ -1428,19 +2045,14 @@ function refillBag(station, key){
 }
 
 function pullFromBag(station, key, excludeSrc = null){
-  if(!station.bags[key] || station.bags[key].length === 0){
-    refillBag(station, key);
-  }
-
+  if(!station.bags[key] || station.bags[key].length === 0) refillBag(station, key);
   let pool = station.bags[key];
   let idx = pool.findIndex(track => !excludeSrc || track.src !== excludeSrc);
-
   if(idx < 0){
     refillBag(station, key);
     pool = station.bags[key];
     idx = pool.findIndex(track => !excludeSrc || track.src !== excludeSrc);
   }
-
   if(idx < 0) idx = 0;
   return pool.splice(idx, 1)[0] || null;
 }
@@ -1462,7 +2074,8 @@ function makeAmbulanceWindowTrack(){
     durationHint: AMBULANCE_WINDOW_END - playStart,
     forcedWindow: true,
     windowStart: playStart,
-    windowEnd: AMBULANCE_WINDOW_END
+    windowEnd: AMBULANCE_WINDOW_END,
+    soft: true
   };
 }
 
@@ -1474,24 +2087,15 @@ function chooseTrackForStation(station){
   }
 
   let picked = null;
-
-  if(station.mode === 'textures-only'){
-    picked = pullFromBag(station, 'textures', station.lastTrackSrc);
-  } else if(station.mode === 'centrepieces-only'){
+  if(station.mode === 'textures-only') picked = pullFromBag(station, 'textures', station.lastTrackSrc);
+  else if(station.mode === 'centrepieces-only') picked = pullFromBag(station, 'centrepieces', station.lastTrackSrc);
+  else if(station.mode === 'all-clean') picked = pullFromBag(station, 'all', station.lastTrackSrc);
+  else if(station.mode === 'main'){
     picked = pullFromBag(station, 'centrepieces', station.lastTrackSrc);
-  } else if(station.mode === 'all-clean'){
-    picked = pullFromBag(station, 'all', station.lastTrackSrc);
-  } else if(station.mode === 'main'){
-    picked = pullFromBag(station, 'centrepieces', station.lastTrackSrc);
-    if(!picked && chance(0.22)){
-      picked = pullFromBag(station, 'textures', station.lastTrackSrc);
-    }
+    if(!picked && chance(0.22)) picked = pullFromBag(station, 'textures', station.lastTrackSrc);
   }
 
-  if(!picked && station.mode !== 'dead-air'){
-    picked = pullFromBag(station, 'all', station.lastTrackSrc);
-  }
-
+  if(!picked && station.mode !== 'dead-air') picked = pullFromBag(station, 'all', station.lastTrackSrc);
   if(!picked) return null;
 
   if(picked.src === AMBULANCE_SRC && chance(0.5) && (nowMs() - globalAmbulanceLastAt) > 5 * 60 * 1000){
@@ -1499,10 +2103,7 @@ function chooseTrackForStation(station){
     globalAmbulanceLastAt = nowMs();
   }
 
-  return {
-    title: picked.title,
-    src: picked.src
-  };
+  return { title: picked.title, src: picked.src, soft: !!picked.soft };
 }
 
 function tuningDurationFor(station){
@@ -1517,11 +2118,7 @@ function deadAirDurationFor(){
 
 function chooseRandomTrackStart(duration, station){
   if(!Number.isFinite(duration) || duration < 8) return 0;
-
-  if(station.currentTrack && station.currentTrack.forcedWindow){
-    return station.currentTrack.windowStart;
-  }
-
+  if(station.currentTrack && station.currentTrack.forcedWindow) return station.currentTrack.windowStart;
   const minPct = station.mode === 'all-clean' ? 0.16 : 0.1;
   const maxPct = station.mode === 'all-clean' ? 0.82 : 0.88;
   const endBuffer = station.mode === 'all-clean' ? 15 : 10;
@@ -1541,9 +2138,7 @@ function enterTuning(station, at, preparedTrack = null){
   station.phaseEndsAt = at + tuningDurationFor(station);
   station.currentTrack = null;
   station.preparedTrack = preparedTrack;
-  station.preparedPreviewOffset = preparedTrack
-    ? (preparedTrack.forcedWindow ? preparedTrack.windowStart : rand(12, 90))
-    : 0;
+  station.preparedPreviewOffset = preparedTrack ? (preparedTrack.forcedWindow ? preparedTrack.windowStart : rand(12, 90)) : 0;
   station.playOffsetAtPhaseStart = 0;
   station.ambience = stationAmbience(station.mode, station);
 }
@@ -1563,33 +2158,22 @@ function enterTrack(station, at){
   const picked = station.preparedTrack || chooseTrackForStation(station);
   station.preparedTrack = null;
   station.preparedPreviewOffset = 0;
-
   if(!picked){
     enterTuning(station, at);
     return;
   }
-
   station.currentTrack = picked;
   station.lastTrackSrc = picked.src;
 
   let entryMode = 'start';
-  if(picked.forcedWindow){
-    entryMode = 'window';
-  } else if(station.firstTrackStartsMidway){
-    entryMode = 'mid';
-  } else if(chance(0.06)){
-    entryMode = 'short';
-  }
+  if(picked.forcedWindow) entryMode = 'window';
+  else if(station.firstTrackStartsMidway) entryMode = 'mid';
+  else if(chance(0.06)) entryMode = 'short';
 
   station.trackEntryMode = entryMode;
   station.firstTrackStartsMidway = false;
 
-  const fallbackDuration =
-    picked.forcedWindow ? (picked.windowEnd - picked.windowStart) :
-    entryMode === 'start' ? 300 :
-    entryMode === 'short' ? 230 :
-    220;
-
+  const fallbackDuration = picked.forcedWindow ? (picked.windowEnd - picked.windowStart) : entryMode === 'start' ? 300 : entryMode === 'short' ? 230 : 220;
   station.phase = 'track';
   station.phaseStartedAt = at;
   station.playOffsetAtPhaseStart = entryMode === 'window' ? picked.windowStart : 0;
@@ -1599,32 +2183,23 @@ function enterTrack(station, at){
 
 function bootStation(station){
   const bootAt = station.createdAt;
-
   if(station.mode === 'dead-air'){
     enterTuning(station, bootAt);
     return;
   }
-
   const picked = chooseTrackForStation(station);
   enterTuning(station, bootAt - tuningDurationFor(station), picked);
   enterTrack(station, bootAt);
 }
 
 function advanceStationToNow(station, t = nowMs()){
-  if(station.phase === 'idle'){
-    bootStation(station);
-  }
-
+  if(station.phase === 'idle') bootStation(station);
   let safety = 0;
   while(station.phaseEndsAt <= t && safety < 120){
     const edge = station.phaseEndsAt;
-
     if(station.mode === 'dead-air'){
-      if(station.phase === 'tuning'){
-        enterDeadAir(station, edge);
-      } else {
-        enterTuning(station, edge);
-      }
+      if(station.phase === 'tuning') enterDeadAir(station, edge);
+      else enterTuning(station, edge);
     } else {
       if(station.phase === 'track'){
         const nextTrack = chooseTrackForStation(station);
@@ -1633,10 +2208,8 @@ function advanceStationToNow(station, t = nowMs()){
         enterTrack(station, edge);
       }
     }
-
     safety += 1;
   }
-
   station.ambience = stationAmbience(station.mode, station);
   return station;
 }
@@ -1647,13 +2220,11 @@ async function getTrackDurationCached(src){
     a.preload = 'metadata';
     a.crossOrigin = 'anonymous';
     a.src = src;
-
     const done = (dur) => {
       a.removeAttribute('src');
       a.load();
       resolve(Number.isFinite(dur) ? dur : null);
     };
-
     a.addEventListener('loadedmetadata', () => done(a.duration), { once:true });
     a.addEventListener('error', () => done(null), { once:true });
   });
@@ -1661,7 +2232,6 @@ async function getTrackDurationCached(src){
 
 async function stabilizeStationDurations(station){
   if(station.phase !== 'track' || !station.currentTrack) return;
-
   const track = station.currentTrack;
 
   if(track.forcedWindow){
@@ -1672,17 +2242,11 @@ async function stabilizeStationDurations(station){
 
   const dur = track.fullDuration || await getTrackDurationCached(track.src);
   if(!dur) return;
-
   track.fullDuration = dur;
 
   let startOffset = 0;
-  if(station.trackEntryMode === 'mid'){
-    startOffset = chooseRandomTrackStart(dur, station);
-  } else if(station.trackEntryMode === 'short'){
-    startOffset = chooseRareShortenStart(dur);
-  } else {
-    startOffset = 0;
-  }
+  if(station.trackEntryMode === 'mid') startOffset = chooseRandomTrackStart(dur, station);
+  else if(station.trackEntryMode === 'short') startOffset = chooseRareShortenStart(dur);
 
   station.playOffsetAtPhaseStart = startOffset;
   station.phaseEndsAt = station.phaseStartedAt + ((dur - startOffset) * 1000);
@@ -1690,8 +2254,7 @@ async function stabilizeStationDurations(station){
 
 function stationTrackOffsetNow(station, t = nowMs()){
   if(!station || station.phase !== 'track' || !station.currentTrack) return 0;
-  const offset = station.playOffsetAtPhaseStart + ((t - station.phaseStartedAt) / 1000);
-  return Math.max(0, offset);
+  return Math.max(0, station.playOffsetAtPhaseStart + ((t - station.phaseStartedAt) / 1000));
 }
 
 async function prepareTrackPlayback(track, offset){
@@ -1743,31 +2306,17 @@ async function prepareTrackPlayback(track, offset){
 
 function playTuningBurstFor(meta){
   if(meta.mode === 'all-clean'){
-    synthesizeTuningSound(rand(0.8, 1.4), 0.35);
+    synthesizeTuningSound(rand(0.7, 1.2), 0.28);
   } else if(meta.mode === 'dead-air'){
-    synthesizeTuningSound(rand(1.2, 2.2), 0.85);
-    makeFilteredNoise(rand(1.6, 2.8), {
-      preType:'highpass',
-      preFreq:340,
-      bandType:'bandpass',
-      bandFreq:900,
-      bandQ:0.6,
-      peak:0.05,
-      attack:0.18,
-      noiseLevel:0.2
+    synthesizeTuningSound(rand(1.1, 2.0), 0.7);
+    makeFilteredNoise(rand(1.4, 2.6), {
+      preType:'highpass', preFreq:340, bandType:'bandpass', bandFreq:900, bandQ:0.6, peak:0.03, attack:0.18, noiseLevel:0.18
     });
-    makeHumCluster(rand(1.8, 3.2), 0.012);
+    makeHumCluster(rand(1.6, 2.6), 0.009);
   } else {
-    synthesizeTuningSound(rand(1.0, 1.8), 0.7);
-    makeFilteredNoise(rand(1.2, 2.4), {
-      preType:'highpass',
-      preFreq:580,
-      bandType:'bandpass',
-      bandFreq:1100,
-      bandQ:0.7,
-      peak:0.04,
-      attack:0.12,
-      noiseLevel:0.18
+    synthesizeTuningSound(rand(0.9, 1.4), 0.56);
+    makeFilteredNoise(rand(1.0, 2.0), {
+      preType:'highpass', preFreq:580, bandType:'bandpass', bandFreq:1100, bandQ:0.7, peak:0.03, attack:0.12, noiseLevel:0.14
     });
   }
 }
@@ -1783,14 +2332,12 @@ function scheduleSelectedStationRefresh(delayMs){
 function scheduleAmbulanceFadeIfNeeded(station){
   if(!audioCtx || !station || station.phase !== 'track' || !station.currentTrack) return;
   if(!station.currentTrack.forcedWindow) return;
-
   clearTimeout(selectedFadeTimer);
 
   const remainingSec = (station.phaseEndsAt - nowMs()) / 1000;
   if(remainingSec <= 0) return;
 
   const msToFade = Math.max(0, (remainingSec - AMBULANCE_WINDOW_FADE) * 1000);
-
   selectedFadeTimer = setTimeout(() => {
     if(!running || currentChannel !== station.channel || !station.currentTrack || !station.currentTrack.forcedWindow) return;
     fadeGain(mainGain, 0.0001, Math.min(AMBULANCE_WINDOW_FADE, remainingSec));
@@ -1800,15 +2347,12 @@ function scheduleAmbulanceFadeIfNeeded(station){
 
 async function playGhostSignal(track, offset, meta){
   if(!track || !audioCtx) return;
-
   try{
     await prepareTrackPlayback(track, offset);
     updateProcessing(true);
-
     currentTrack = null;
     currentMode = 'tuning';
     setStatusTuning();
-
     fadeGain(mainGain, meta.mode === 'all-clean' ? 0.08 : 0.06, 0.12);
     await els.music.play().catch(() => {});
   } catch(err){
@@ -1824,12 +2368,10 @@ async function renderSelectedStation(fromRetune = false){
   if(station.phase === 'track' && station.currentTrack){
     await stabilizeStationDurations(station);
     const actualOffset = stationTrackOffsetNow(station);
-
     try{
       await prepareTrackPlayback(station.currentTrack, actualOffset);
       currentTrack = station.currentTrack;
       updateProcessing(false);
-
       fadeGain(mainGain, 1, fromRetune ? 0.7 : 0.35);
       await els.music.play().catch(() => {});
       els.status.textContent = station.currentTrack.title;
@@ -1844,14 +2386,12 @@ async function renderSelectedStation(fromRetune = false){
     }
   } else {
     currentTrack = null;
-
     if(station.phase === 'tuning' && station.preparedTrack){
       await playGhostSignal(station.preparedTrack, station.preparedPreviewOffset, meta);
     } else {
       try{ els.music.pause(); }catch(e){}
       fadeGain(mainGain, 0.0001, 0.14);
     }
-
     setStatusTuning();
     scheduleSelectedStationRefresh(station.phaseEndsAt - nowMs() + 40);
     log(`Listening to ${meta.name} / ${station.phase}`);
@@ -1911,9 +2451,7 @@ function clearVisibleLog(){
 
 function toggleSecretPause(){
   if(!running) return;
-
   pausedByKey = !pausedByKey;
-
   if(pausedByKey){
     try{ els.music.pause(); }catch(e){}
     try{ els.texture.pause(); }catch(e){}
@@ -1923,29 +2461,121 @@ function toggleSecretPause(){
     renderSelectedStation(false);
     log('Secret pause released');
   }
-
   syncLiveState();
   updateTelemetry();
 }
 
 function toggleCleanMode(){
   cleanOverride = !cleanOverride;
-
-  if(cleanOverride){
-    stopAllFX();
-    log('Clean mode on (+40% volume)');
-  } else {
-    log('Clean mode off');
-  }
-
+  log(cleanOverride ? 'Clean mode on' : 'Clean mode off');
   updateOutputLevel(false);
   updateProcessing(false);
   updateTelemetry();
 }
 
+function openWeatherPanel(){
+  els.weatherPop.classList.add('open');
+  els.weatherPop.setAttribute('aria-hidden', 'false');
+  updateWeatherPanelText();
+}
+
+function closeWeatherPanel(){
+  els.weatherPop.classList.remove('open');
+  els.weatherPop.setAttribute('aria-hidden', 'true');
+}
+
+async function fetchWeatherForPosition(lat, lon){
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&current=temperature_2m,weather_code,cloud_cover,wind_speed_10m,is_day&timezone=auto`;
+  const res = await fetch(url);
+  if(!res.ok) throw new Error(`weather request failed: ${res.status}`);
+  const json = await res.json();
+  const c = json.current || {};
+
+  const next = {
+    enabled: true,
+    status: 'ready',
+    tempC: Number.isFinite(c.temperature_2m) ? c.temperature_2m : null,
+    windKmh: Number.isFinite(c.wind_speed_10m) ? c.wind_speed_10m : null,
+    cloud: Number.isFinite(c.cloud_cover) ? c.cloud_cover : null,
+    weatherCode: Number.isFinite(c.weather_code) ? c.weather_code : 0,
+    isDay: !!c.is_day,
+    lastUpdated: nowMs()
+  };
+
+  const mood = computeWeatherMood(next);
+  Object.assign(weatherState, next, mood);
+  weatherState.label = `${describeWeatherCode(weatherState.weatherCode)}${weatherState.isDay ? ' / day' : ' / night'}`;
+  updateWeatherPanelText('Weather now steering the effects.');
+  updateTelemetry();
+  log(`Weather linked: ${weatherState.label}`);
+}
+
+function fallbackWeather(reason = 'signal weak'){
+  const hour = new Date().getHours();
+  const dayFactor = (hour >= 6 && hour <= 18) ? 1 : 0;
+  weatherState.enabled = false;
+  weatherState.status = 'emenating';
+  weatherState.tempC = 10 + Math.sin(hour / 24 * Math.PI * 2) * 8;
+  weatherState.windKmh = 5 + Math.random() * 20;
+  weatherState.cloud = Math.random() * 100;
+  weatherState.weatherCode = dayFactor ? (Math.random() < 0.6 ? 1 : 2) : (Math.random() < 0.5 ? 3 : 45);
+  weatherState.isDay = !!dayFactor;
+  Object.assign(weatherState, computeWeatherMood(weatherState));
+  weatherState.label = 'emenating';
+  updateWeatherPanelText(`Weather ${reason} → emenating`);
+  updateTelemetry();
+  log('Weather fallback engaged (emenating)');
+}
+
+function scheduleWeatherRefresh(lat = null, lon = null){
+  if(weatherRefreshTimer){
+    clearInterval(weatherRefreshTimer);
+    weatherRefreshTimer = null;
+  }
+  weatherRefreshTimer = setInterval(() => {
+    if(lat != null && lon != null){
+      fetchWeatherForPosition(lat, lon).catch(() => fallbackWeather('refresh drift'));
+    } else {
+      fallbackWeather('ambient cycle');
+    }
+  }, WEATHER_REFRESH_MS);
+}
+
+function tryTimezoneFallback(){
+  fallbackWeather('timezone drift');
+  scheduleWeatherRefresh(null, null);
+}
+
+function requestWeather(){
+  if(!navigator.geolocation){
+    tryTimezoneFallback();
+    return;
+  }
+
+  updateWeatherPanelText('Requesting location…');
+
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const { latitude, longitude } = pos.coords;
+    try{
+      await fetchWeatherForPosition(latitude, longitude);
+      scheduleWeatherRefresh(latitude, longitude);
+    } catch(err){
+      fallbackWeather('weather fetch weak');
+    }
+  }, err => {
+    if(err && err.code === err.TIMEOUT){
+      updateWeatherPanelText('Location timed out. Switching to emenating weather and will keep trying.');
+    }
+    tryTimezoneFallback();
+  }, {
+    enableHighAccuracy:true,
+    timeout:25000,
+    maximumAge:0
+  });
+}
+
 els.startBtn.addEventListener('click', async () => {
   await ensureAudio();
-
   if(running){
     if(pausedByKey){
       toggleSecretPause();
@@ -1958,32 +2588,42 @@ els.startBtn.addEventListener('click', async () => {
     }
     return;
   }
-
   if(!sessionStart) sessionStart = nowMs();
   await tuneToChannel(currentChannel);
 });
 
 els.stopBtn.addEventListener('click', async () => {
   await ensureAudio();
-  if(!running) return;
-  if(muted) return;
-
+  if(!running || muted) return;
   setMuted(true);
   try{ els.music.pause(); }catch(e){}
   try{ els.texture.pause(); }catch(e){}
   log('Muted');
 });
 
-els.clearBtn.addEventListener('click', () => {
-  clearVisibleLog();
-});
+els.clearBtn.addEventListener('click', clearVisibleLog);
 
 els.fineTuneBtn.addEventListener('click', async () => {
   await ensureAudio();
   beginFineTune();
+  if(running && !pausedByKey && !muted) renderSelectedStation(false);
+});
 
-  if(running && !pausedByKey && !muted){
-    renderSelectedStation(false);
+els.weatherBtn.addEventListener('click', openWeatherPanel);
+els.weatherEnableBtn.addEventListener('click', requestWeather);
+els.weatherRetryBtn.addEventListener('click', requestWeather);
+els.weatherCloseBtn.addEventListener('click', closeWeatherPanel);
+els.weatherPop.addEventListener('click', e => {
+  if(e.target === els.weatherPop) closeWeatherPanel();
+});
+
+els.recPlayBtn.addEventListener('click', async () => {
+  try{
+    await ensureMic();
+    if(!micState.recording) startMicLive();
+    else stopMicLiveAndLoop();
+  } catch(err){
+    updateTelemetry();
   }
 });
 
@@ -2034,44 +2674,50 @@ window.addEventListener('keydown', async e => {
     toggleCleanMode();
   }
 
+  if(e.key.toLowerCase() === 'r'){
+    e.preventDefault();
+    els.recPlayBtn.click();
+  }
+
+  if(e.key.toLowerCase() === 'w'){
+    e.preventDefault();
+    openWeatherPanel();
+  }
+
   if(['1','2','3','4','5'].includes(e.key)){
     e.preventDefault();
     await tuneToChannel(Number(e.key));
   }
 });
 
-els.music.addEventListener('ended', () => {
-  scheduleSelectedStationRefresh(40);
-});
-
+els.music.addEventListener('ended', () => scheduleSelectedStationRefresh(40));
 els.music.addEventListener('error', () => {
   log(`Main audio error on ${currentTrack ? currentTrack.title : 'unknown track'}`);
   scheduleSelectedStationRefresh(500);
 });
 
 function seedStations(){
-  for(let i = 1; i <= 5; i++){
-    initStation(i);
-  }
-  for(let i = 1; i <= 5; i++){
-    advanceStationToNow(stationStates[i]);
-  }
+  for(let i = 1; i <= 5; i++) initStation(i);
+  for(let i = 1; i <= 5; i++) advanceStationToNow(stationStates[i]);
 }
 
 updateClock();
 seedStations();
+mountEggInTelemetry();
+loadPoetry();
+fallbackWeather('ambient start');
 
 setInterval(() => {
   updateClock();
+  for(let i = 1; i <= 5; i++) advanceStationToNow(stationStates[i]);
 
-  for(let i = 1; i <= 5; i++){
-    advanceStationToNow(stationStates[i]);
-  }
+  if(running && !pausedByKey) updateProcessing(false);
+  else if(audioCtx && outputGain) updateOutputLevel(false);
 
-  if(running && !pausedByKey){
-    updateProcessing(false);
-  } else if(audioCtx && outputGain){
-    updateOutputLevel(false);
+  if(audioCtx){
+    updateAutoLevelAndPeakControl();
+    updateMicModulation();
+    updatePitchEgg();
   }
 
   if(nowMs() - lastTelemetryBeat > 1000){
@@ -2080,20 +2726,23 @@ setInterval(() => {
   }
 
   syncFineTuneButton();
+  syncMicButton();
+  syncWeatherButton();
 
   heartbeatCounter += 1;
   if(heartbeatCounter % 10 === 0){
     const station = currentStationState();
-    log(
-      `tick | ch ${currentChannel} ${CHANNELS[currentChannel].mode} | mode ${currentMode} | station ${station.phase} | main ${station.phase === 'track' && station.currentTrack ? station.currentTrack.title : '—'} | live ${running ? (muted ? 'muted' : (pausedByKey ? 'paused' : 'on')) : 'off'}`
-    );
+    log(`tick | ch ${currentChannel} ${CHANNELS[currentChannel].mode} | mode ${currentMode} | station ${station.phase} | main ${station.phase === 'track' && station.currentTrack ? station.currentTrack.title : '—'} | live ${running ? (muted ? 'muted' : (pausedByKey ? 'paused' : 'on')) : 'off'}`);
   }
 }, 250);
 
 currentChannel = 1;
 syncLiveState();
+syncMicButton();
+syncWeatherButton();
 els.status.textContent = 'Stopped';
 updateTelemetry();
+updateWeatherPanelText();
 log('radio debug ready');
 </script>
 </body>
