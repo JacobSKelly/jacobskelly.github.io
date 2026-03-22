@@ -7,471 +7,452 @@
 
 <style>
 /* RESET */
-
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
 /* BASE */
-
 html,body{
-width:100%;
-font-family:Helvetica,Arial,sans-serif;
-background:#fff;
-color:#111;
-text-align:center;
+  width:100%;
+  font-family:Helvetica,Arial,sans-serif;
+  background:#fff;
+  color:#111;
+  text-align:center;
 }
 
 body{
-display:flex;
-flex-direction:column;
-min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
 }
 
 /* HEADER */
-
 header{
-position:relative;
-padding:2vh 20px 1vh 20px;
-line-height:1.2;
+  position:relative;
+  padding:2vh 20px 1vh 20px;
+  line-height:1.2;
 }
 
 header h1{
-font-size:4vh;
-margin-bottom:1vh;
-font-weight:normal;
+  font-size:4vh;
+  margin-bottom:1vh;
+  font-weight:normal;
 }
 
 header p{
-font-size:1.8vh;
-color:#555;
+  font-size:1.8vh;
+  color:#555;
 }
 
 .controls-line{
-position:absolute;
-top:2vh;
-left:20px;
-margin-top:0;
+  position:absolute;
+  top:2vh;
+  left:20px;
+  margin-top:0;
 }
 
 .controls-line a,
 .controls-line button,
 .controls-line span{
-font-size:0.85rem;
-color:#111;
-text-decoration:none;
-margin:0 4px;
+  font-size:0.85rem;
+  color:#111;
+  text-decoration:none;
+  margin:0 4px;
 }
 
 .controls-line a:hover{
-text-decoration:underline;
+  text-decoration:underline;
 }
 
 /* TOP NAV */
-
 .shop-nav{
-margin-top:10px;
-margin-bottom:22px;
-line-height:1.5;
+  margin-top:10px;
+  margin-bottom:22px;
+  line-height:1.5;
 }
 
 .shop-toggle{
-appearance:none;
-background:none;
-border:none;
-font-family:Helvetica,Arial,sans-serif;
-font-size:0.85rem;
-color:#111;
-cursor:pointer;
-padding:0;
+  appearance:none;
+  background:none;
+  border:none;
+  font-family:Helvetica,Arial,sans-serif;
+  font-size:0.85rem;
+  color:#111;
+  cursor:pointer;
+  padding:0;
 }
 
 .shop-toggle:hover{
-text-decoration:underline;
+  text-decoration:underline;
 }
 
 .shop-toggle.active{
-text-decoration:underline;
+  text-decoration:underline;
 }
 
 .shop-separator{
-font-size:0.85rem;
-color:#111;
-margin:0 5px;
+  font-size:0.85rem;
+  color:#111;
+  margin:0 5px;
 }
 
 /* HERO */
-
 .hero{
-display:flex;
-justify-content:center;
-align-items:center;
-margin:60px 0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:60px 0;
 }
 
 .blur-box{
-width:300px;
-height:300px;
-position:relative;
-overflow:hidden;
-background:#fff;
+  width:300px;
+  height:300px;
+  position:relative;
+  overflow:hidden;
+  background:#fff;
 }
 
 .blur-box img{
-position:absolute;
-width:150%;
-height:150%;
-left:50%;
-top:50%;
-transform:translate(-50%,-50%) scale(1.2);
-object-fit:cover;
-opacity:0;
-will-change:opacity,transform,filter;
-pointer-events:none;
+  position:absolute;
+  width:150%;
+  height:150%;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%) scale(1.2);
+  object-fit:cover;
+  opacity:0;
+  will-change:opacity,transform,filter;
+  pointer-events:none;
 }
 
 .loading-message{
-position:absolute;
-left:50%;
-top:50%;
-transform:translate(-50%,-50%);
-font-size:0.78rem;
-color:#555;
-letter-spacing:0.02em;
-opacity:0;
-transition:opacity 0.25s ease;
-pointer-events:none;
-z-index:3;
-white-space:nowrap;
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  font-size:0.78rem;
+  color:#555;
+  letter-spacing:0.02em;
+  opacity:0;
+  transition:opacity 0.25s ease;
+  pointer-events:none;
+  z-index:3;
+  white-space:nowrap;
 }
 
 .loading-message.show{
-opacity:1;
+  opacity:1;
 }
 
 /* MAIN AREA */
-
 .shop-shell{
-width:100%;
+  width:100%;
 }
 
 /* DROPDOWN PANELS */
-
 .shop-panel{
-display:none;
-max-width:90vw;
-margin:0 auto 28px auto;
+  display:none;
+  max-width:90vw;
+  margin:0 auto 28px auto;
 }
 
 .shop-panel.show{
-display:block;
+  display:block;
 }
 
 /* GALLERY */
-
 .gallery{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:1.5vh;
-max-width:72vw;
-margin:0 auto;
-justify-content:center;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1.5vh;
+  max-width:72vw;
+  margin:0 auto;
+  justify-content:center;
 }
 
 .product{
-display:flex;
-flex-direction:column;
-align-items:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
 
 .product-card{
-width:80%;
-display:flex;
-flex-direction:column;
-align-items:center;
-text-decoration:none;
-color:inherit;
+  width:80%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-decoration:none;
+  color:inherit;
 }
 
 .product-image-frame{
-width:100%;
-aspect-ratio:1/1;
-background:#f5f5f5;
-overflow:hidden;
-position:relative;
+  width:100%;
+  aspect-ratio:1/1;
+  background:#f5f5f5;
+  overflow:hidden;
+  position:relative;
 }
 
 .product-track{
-display:flex;
-width:100%;
-height:100%;
-transition:transform 0.3s ease;
+  display:flex;
+  width:100%;
+  height:100%;
+  transition:transform 0.3s ease;
 }
 
 .product-slide{
-flex:0 0 100%;
-width:100%;
-height:100%;
+  flex:0 0 100%;
+  width:100%;
+  height:100%;
 }
 
 .product-slide img{
-width:100%;
-height:100%;
-object-fit:cover;
-object-position:bottom center;
-display:block;
-cursor:pointer;
-user-select:none;
--webkit-user-drag:none;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:bottom center;
+  display:block;
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-drag:none;
 }
 
 .carousel-controls{
-margin-top:8px;
-display:flex;
-justify-content:center;
-align-items:center;
-gap:6px;
-min-height:18px;
+  margin-top:8px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:6px;
+  min-height:18px;
 }
 
 .carousel-dot{
-width:8px;
-height:8px;
-border-radius:50%;
-border:1px solid #111;
-background:#fff;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  border:1px solid #111;
+  background:#fff;
 }
 
 .carousel-dot.active{
-background:#111;
+  background:#111;
 }
 
 .carousel-controls.hidden{
-visibility:hidden;
+  visibility:hidden;
 }
 
 .product-info{
-width:100%;
-padding-top:10px;
-line-height:1.3;
-min-height:82px;
+  width:100%;
+  padding-top:10px;
+  line-height:1.3;
+  min-height:82px;
 }
 
 .product-title{
-font-size:0.95rem;
-font-weight:normal;
+  font-size:0.95rem;
+  font-weight:normal;
 }
 
 .product-price{
-font-size:0.85rem;
-color:#555;
-margin-top:4px;
+  font-size:0.85rem;
+  color:#555;
+  margin-top:4px;
 }
 
 .product-type{
-font-size:0.8rem;
-color:#777;
-margin-top:3px;
+  font-size:0.8rem;
+  color:#777;
+  margin-top:3px;
 }
 
 .square-wrap{
-margin:10px auto 0 auto;
+  margin:10px auto 0 auto;
 }
 
 .square-button{
-display:inline-flex;
-align-items:center;
-justify-content:center;
-text-decoration:none;
-font-family:Helvetica,Arial,sans-serif;
-transition:opacity 0.25s ease;
-background:#000;
-color:#fff;
-border:none;
-border-radius:0;
-box-shadow:none;
-min-width:auto;
-height:auto;
-padding:7px 14px 6px 14px;
-font-size:11px;
-line-height:1;
-letter-spacing:0.14em;
-text-transform:uppercase;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+  font-family:Helvetica,Arial,sans-serif;
+  transition:opacity 0.25s ease;
+  background:#000;
+  color:#fff;
+  border:none;
+  border-radius:0;
+  box-shadow:none;
+  min-width:auto;
+  height:auto;
+  padding:7px 14px 6px 14px;
+  font-size:11px;
+  line-height:1;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
 }
 
 .square-button:hover{
-opacity:0.82;
+  opacity:0.82;
 }
 
 .square-button.disabled{
-opacity:0.35;
-pointer-events:none;
+  opacity:0.35;
+  pointer-events:none;
 }
 
 .product-note{
-font-size:0.74rem;
-color:#777;
-margin-top:8px;
-line-height:1.3;
-opacity:0;
-transition:opacity 0.2s ease;
-min-height:1.1em;
-pointer-events:none;
+  font-size:0.74rem;
+  color:#777;
+  margin-top:8px;
+  line-height:1.3;
+  opacity:0;
+  transition:opacity 0.2s ease;
+  min-height:1.1em;
+  pointer-events:none;
 }
 
 .product-card:hover .product-note,
 .product-card:focus .product-note,
 .product:hover .product-note{
-opacity:1;
+  opacity:1;
 }
 
 /* PLACEHOLDERS */
-
 .placeholder .product-image-frame{
-background:#f2f2f2;
-display:flex;
-align-items:center;
-justify-content:center;
+  background:#f2f2f2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 .placeholder-thumb{
-width:100%;
-height:100%;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:0.78rem;
-color:#777;
-letter-spacing:0.02em;
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:0.78rem;
+  color:#777;
+  letter-spacing:0.02em;
 }
 
 .placeholder .product-info{
-min-height:62px;
+  min-height:62px;
 }
 
 .placeholder .product-title{
-font-size:0.9rem;
-color:#444;
+  font-size:0.9rem;
+  color:#444;
 }
 
 .placeholder .product-price,
 .placeholder .product-type{
-color:#888;
+  color:#888;
 }
 
 /* FOOTER */
-
 footer{
-font-size:0.8rem;
-color:#777;
-padding:1vh 0 2vh 0;
-margin-top:auto;
-line-height:1.4;
+  font-size:0.8rem;
+  color:#777;
+  padding:1vh 0 2vh 0;
+  margin-top:auto;
+  line-height:1.4;
 }
 
 footer a{
-color:#777;
-text-decoration:none;
-display:inline-block;
-margin-bottom:2px;
+  color:#777;
+  text-decoration:none;
+  display:inline-block;
+  margin-bottom:2px;
 }
 
 /* MOBILE */
-
 @media(max-width:768px){
+  header{
+    padding-top:20px;
+  }
 
-header{
-padding-top:20px;
-}
+  header h1{
+    font-size:28px;
+  }
 
-header h1{
-font-size:28px;
-}
+  header p{
+    font-size:14px;
+  }
 
-header p{
-font-size:14px;
-}
+  .controls-line{
+    position:static;
+    text-align:left;
+    margin-bottom:10px;
+  }
 
-.controls-line{
-position:static;
-text-align:left;
-margin-bottom:10px;
-}
+  .shop-nav{
+    padding:0 14px;
+    line-height:1.8;
+  }
 
-.shop-nav{
-padding:0 14px;
-line-height:1.8;
-}
+  .hero{
+    margin:44px 0;
+  }
 
-.hero{
-margin:44px 0;
-}
+  .blur-box{
+    width:260px;
+    height:260px;
+  }
 
-.blur-box{
-width:260px;
-height:260px;
-}
+  .loading-message{
+    font-size:0.74rem;
+  }
 
-.loading-message{
-font-size:0.74rem;
-}
+  .shop-panel{
+    max-width:92vw;
+  }
 
-.shop-panel{
-max-width:92vw;
-}
+  .gallery{
+    grid-template-columns:1fr;
+    gap:2vh;
+    max-width:92vw;
+  }
 
-.gallery{
-grid-template-columns:1fr;
-gap:2vh;
-max-width:92vw;
-}
-
-.product-card{
-width:86%;
-}
-
+  .product-card{
+    width:86%;
+  }
 }
 
 /* DESKTOP */
-
 @media(min-width:769px){
-
-.gallery .product:nth-child(4){
-grid-column:1;
-}
-
+  .gallery .product:nth-child(4){
+    grid-column:1;
+  }
 }
 </style>
 </head>
 <body>
 
 <header>
+  <div class="controls-line">
+    <a href="index.html">Back</a>
+  </div>
 
-<div class="controls-line">
-  <a href="index.html">back</a>
-</div>
+  <h1>Shop</h1>
+  <p>The Fruit That Ate Itself</p>
 
-<h1>Shop</h1>
-
-<p>The Fruit That Ate Itself</p>
-
-<div class="shop-nav">
-  <button class="shop-toggle" data-target="printsPanel">Prints</button>
-  <span class="shop-separator">-</span>
-  <button class="shop-toggle" data-target="apparelPanel">Apparel</button>
-  <span class="shop-separator">-</span>
-  <button class="shop-toggle" data-target="booksPanel">Books</button>
-  <span class="shop-separator">-</span>
-  <button class="shop-toggle" data-target="originalPanel">Original Works</button>
-</div>
-
+  <div class="shop-nav">
+    <button class="shop-toggle" data-target="printsPanel">Prints</button>
+    <span class="shop-separator">-</span>
+    <button class="shop-toggle" data-target="apparelPanel">Apparel</button>
+    <span class="shop-separator">-</span>
+    <button class="shop-toggle" data-target="booksPanel">Books</button>
+    <span class="shop-separator">-</span>
+    <button class="shop-toggle" data-target="originalPanel">Original Works</button>
+  </div>
 </header>
 
 <section class="hero" id="hero">
   <div class="blur-box">
-    <div class="loading-message" id="loadingMessage">one moment...</div>
+    <div class="loading-message" id="loadingMessage">One moment...</div>
     <img id="imgA" alt="">
     <img id="imgB" alt="">
   </div>
@@ -502,11 +483,11 @@ grid-column:1;
             <p class="product-price">£15</p>
             <p class="product-type">Postcard-sized giclée print</p>
             <div class="square-wrap">
-              <a target="_blank" href="https://square.link/u/a9w7yysf?src=embed" class="square-button">BUY</a>
+              <a target="_blank" href="https://square.link/u/a9w7yysf?src=embed" class="square-button">Buy</a>
             </div>
           </div>
 
-          <p class="product-note">Double click for full-size artwork.</p>
+          <p class="product-note">Double-click for full-size artwork.</p>
         </div>
       </div>
 
@@ -608,11 +589,11 @@ grid-column:1;
             <p class="product-price">£28</p>
             <p class="product-type">T-shirt</p>
             <div class="square-wrap">
-              <a target="_blank" href="https://square.link/u/4zO8jeLV?src=embed" class="square-button">BUY</a>
+              <a target="_blank" href="https://square.link/u/4zO8jeLV?src=embed" class="square-button">Buy</a>
             </div>
           </div>
 
-          <p class="product-note">Double click for full-size artwork.</p>
+          <p class="product-note">Double-click for full-size artwork.</p>
         </div>
       </div>
 
@@ -621,13 +602,13 @@ grid-column:1;
           <div class="product-image-frame">
             <div class="product-track" data-full-link="layer5.html">
               <div class="product-slide">
-                <img src="images/mercury1.png" alt="Mercury">
+                <img src="images/mercury1.png" alt="Black T, Mercury">
               </div>
               <div class="product-slide">
-                <img src="images/mercury2.png" alt="Mercury">
+                <img src="images/mercury2.png" alt="Black T, Mercury">
               </div>
               <div class="product-slide">
-                <img src="images/mercury3.png" alt="Mercury">
+                <img src="images/mercury3.png" alt="Black T, Mercury">
               </div>
             </div>
           </div>
@@ -639,15 +620,50 @@ grid-column:1;
           </div>
 
           <div class="product-info">
-            <p class="product-title">Black T, 'Mercury'</p>
+            <p class="product-title">Black T, ‘Mercury’</p>
             <p class="product-price">£28</p>
             <p class="product-type">T-shirt</p>
             <div class="square-wrap">
-              <a target="_blank" href="https://square.link/u/aE57OiEg" class="square-button">BUY</a>
+              <a target="_blank" href="https://square.link/u/aE57OiEg?src=embed" class="square-button">Buy</a>
             </div>
           </div>
 
-          <p class="product-note">Double click for full-size artwork.</p>
+          <p class="product-note">Double-click for full-size artwork.</p>
+        </div>
+      </div>
+
+      <div class="product">
+        <div class="product-card">
+          <div class="product-image-frame">
+            <div class="product-track" data-full-link="layer11.html">
+              <div class="product-slide">
+                <img src="images/thumbsamx2.png" alt="Eco White T, Le Samouraï #SaveBritainsRivers">
+              </div>
+              <div class="product-slide">
+                <img src="images/thumbsamx1.png" alt="Eco White T, Le Samouraï #SaveBritainsRivers">
+              </div>
+              <div class="product-slide">
+                <img src="images/thumbsamx.png" alt="Eco White T, Le Samouraï #SaveBritainsRivers">
+              </div>
+            </div>
+          </div>
+
+          <div class="carousel-controls">
+            <span class="carousel-dot active"></span>
+            <span class="carousel-dot"></span>
+            <span class="carousel-dot"></span>
+          </div>
+
+          <div class="product-info">
+            <p class="product-title">Eco White T, ‘Le Samouraï’ #SaveBritainsRivers</p>
+            <p class="product-price">£30</p>
+            <p class="product-type">T-shirt</p>
+            <div class="square-wrap">
+              <a target="_blank" href="https://square.link/u/sDR2JhUS?src=embed" class="square-button">Buy</a>
+            </div>
+          </div>
+
+          <p class="product-note">Double-click for full-size artwork.</p>
         </div>
       </div>
 
@@ -677,11 +693,11 @@ grid-column:1;
             <p class="product-price">£10</p>
             <p class="product-type">Book</p>
             <div class="square-wrap">
-              <a target="_blank" href="https://square.link/u/CTTCC0xE" class="square-button">BUY</a>
+              <a target="_blank" href="https://square.link/u/CTTCC0xE?src=embed" class="square-button">Buy</a>
             </div>
           </div>
 
-          <p class="product-note">Double click for full-size artwork.</p>
+          <p class="product-note">Double-click for full-size artwork.</p>
         </div>
       </div>
 
@@ -804,38 +820,38 @@ toggleButtons.forEach(button => {
   });
 });
 
-document.querySelectorAll('#printsPanel .product, #apparelPanel .product, #booksPanel .product').forEach(product => {
-  const track = product.querySelector('.product-track');
+document.querySelectorAll("#printsPanel .product, #apparelPanel .product, #booksPanel .product").forEach(product => {
+  const track = product.querySelector(".product-track");
   if(!track){ return; }
 
-  const slides = product.querySelectorAll('.product-slide');
-  const dotsWrap = product.querySelector('.carousel-controls');
-  const dots = product.querySelectorAll('.carousel-dot');
-  const fullLink = track.getAttribute('data-full-link');
+  const slides = product.querySelectorAll(".product-slide");
+  const dotsWrap = product.querySelector(".carousel-controls");
+  const dots = product.querySelectorAll(".carousel-dot");
+  const fullLink = track.getAttribute("data-full-link");
   let current = 0;
   let clickTimer = null;
 
-  if (slides.length > 1) {
-    dotsWrap.classList.remove('hidden');
+  if(slides.length > 1){
+    dotsWrap.classList.remove("hidden");
   }
 
   function updateCarousel(index){
     current = index;
     track.style.transform = `translateX(-${index * 100}%)`;
     dots.forEach((dot, i) => {
-      dot.classList.toggle('active', i === index);
+      dot.classList.toggle("active", i === index);
     });
   }
 
   function nextSlide(){
-    if (slides.length < 2) return;
+    if(slides.length < 2) return;
     const next = (current + 1) % slides.length;
     updateCarousel(next);
   }
 
-  track.querySelectorAll('img').forEach(img => {
-    img.addEventListener('click', () => {
-      if (clickTimer) return;
+  track.querySelectorAll("img").forEach(img => {
+    img.addEventListener("click", () => {
+      if(clickTimer) return;
 
       clickTimer = setTimeout(() => {
         nextSlide();
@@ -843,7 +859,7 @@ document.querySelectorAll('#printsPanel .product, #apparelPanel .product, #books
       }, 250);
     });
 
-    img.addEventListener('dblclick', (e) => {
+    img.addEventListener("dblclick", (e) => {
       e.preventDefault();
       clearTimeout(clickTimer);
       clickTimer = null;
@@ -853,7 +869,6 @@ document.querySelectorAll('#printsPanel .product, #apparelPanel .product, #books
 });
 
 /* HERO SLIDESHOW */
-
 const imgA = document.getElementById("imgA");
 const imgB = document.getElementById("imgB");
 const loadingMessage = document.getElementById("loadingMessage");
@@ -875,6 +890,9 @@ const images = [
   "images/etrthumb.jpg",
   "images/cthumb.png",
   "images/thumbman.jpg",
+  "images/thumbsamx2.png",
+  "images/thumbsamx1.png",
+  "images/thumbsamx.png",
   "images/ambulancelandthumb.jpg",
   "images/t1.jpg",
   "images/t2.jpg",
@@ -966,10 +984,10 @@ function newState(){
 }
 
 function resetMotion(img){
-  stateMap.set(img,newState());
+  stateMap.set(img, newState());
 }
 
-function animateLayer(img,now){
+function animateLayer(img, now){
   const s = stateMap.get(img);
   if(!s){ return; }
 
@@ -981,7 +999,7 @@ function animateLayer(img,now){
     s.blurDuration = rand(9000,18000);
     blurT = 0;
   }
-  const blurEase = easeInOut(Math.max(0,Math.min(1,blurT)));
+  const blurEase = easeInOut(Math.max(0, Math.min(1, blurT)));
   const blurValue = s.blurFrom + (s.blurTo - s.blurFrom) * blurEase;
 
   let scaleT = (now - s.scaleStart) / s.scaleDuration;
@@ -992,7 +1010,7 @@ function animateLayer(img,now){
     s.scaleDuration = rand(14000,26000);
     scaleT = 0;
   }
-  const scaleEase = easeInOut(Math.max(0,Math.min(1,scaleT)));
+  const scaleEase = easeInOut(Math.max(0, Math.min(1, scaleT)));
   const scale = s.scaleFrom + (s.scaleTo - s.scaleFrom) * scaleEase;
 
   let moveT = (now - s.moveStart) / s.moveDuration;
@@ -1002,14 +1020,14 @@ function animateLayer(img,now){
 
     const currentRange = Math.max(0, (scale - 1) * 30);
 
-    s.xTo = rand(-currentRange,currentRange);
-    s.yTo = rand(-currentRange,currentRange);
+    s.xTo = rand(-currentRange, currentRange);
+    s.yTo = rand(-currentRange, currentRange);
 
     s.moveStart = now;
     s.moveDuration = rand(9000,18000);
     moveT = 0;
   }
-  const moveEase = easeInOut(Math.max(0,Math.min(1,moveT)));
+  const moveEase = easeInOut(Math.max(0, Math.min(1, moveT)));
   const x = s.xFrom + (s.xTo - s.xFrom) * moveEase;
   const y = s.yFrom + (s.yTo - s.yFrom) * moveEase;
 
@@ -1019,8 +1037,8 @@ function animateLayer(img,now){
 }
 
 function animate(now){
-  animateLayer(imgA,now);
-  animateLayer(imgB,now);
+  animateLayer(imgA, now);
+  animateLayer(imgB, now);
   requestAnimationFrame(animate);
 }
 
