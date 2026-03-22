@@ -170,12 +170,14 @@ header p{
   max-width:72vw;
   margin:0 auto;
   justify-content:center;
+  align-items:start;
 }
 
 .product{
   display:flex;
   flex-direction:column;
   align-items:center;
+  height:100%;
 }
 
 .product-card{
@@ -185,6 +187,7 @@ header p{
   align-items:center;
   text-decoration:none;
   color:inherit;
+  height:100%;
 }
 
 .product-image-frame{
@@ -248,12 +251,46 @@ header p{
   width:100%;
   padding-top:10px;
   line-height:1.3;
-  min-height:82px;
+  min-height:122px;
+  display:grid;
+  grid-template-rows:32px auto auto 1fr auto;
+  align-items:start;
 }
 
 .product-title{
+  width:100%;
   font-size:0.95rem;
   font-weight:normal;
+  overflow:hidden;
+  white-space:nowrap;
+  position:relative;
+}
+
+.product-title-text{
+  display:inline-block;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  vertical-align:top;
+  will-change:transform;
+}
+
+.product-title.is-overflowing .product-title-text{
+  max-width:none;
+}
+
+.product-title.is-animating .product-title-text{
+  animation:scroll-title var(--scroll-duration, 7s) linear infinite alternate;
+}
+
+@keyframes scroll-title{
+  from{
+    transform:translateX(0);
+  }
+  to{
+    transform:translateX(calc(-1 * var(--scroll-distance, 0px)));
+  }
 }
 
 .product-price{
@@ -270,6 +307,7 @@ header p{
 
 .square-wrap{
   margin:10px auto 0 auto;
+  align-self:end;
 }
 
 .square-button{
@@ -339,7 +377,8 @@ header p{
 }
 
 .placeholder .product-info{
-  min-height:62px;
+  min-height:90px;
+  grid-template-rows:32px auto 1fr;
 }
 
 .placeholder .product-title{
@@ -419,6 +458,10 @@ footer a{
   .product-card{
     width:86%;
   }
+
+  .product-info{
+    min-height:122px;
+  }
 }
 
 /* DESKTOP */
@@ -479,7 +522,7 @@ footer a{
           </div>
 
           <div class="product-info">
-            <p class="product-title">Le Samouraï</p>
+            <p class="product-title"><span class="product-title-text">Le Samouraï</span></p>
             <p class="product-price">£15</p>
             <p class="product-type">Postcard-sized giclée print</p>
             <div class="square-wrap">
@@ -494,7 +537,10 @@ footer a{
       <div class="product placeholder">
         <div class="product-card">
           <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Print 02</p><p class="product-type">Coming Soon</p></div>
+          <div class="product-info">
+            <p class="product-title"><span class="product-title-text">Print 02</span></p>
+            <p class="product-type">Coming Soon</p>
+          </div>
           <p class="product-note">More works will appear here.</p>
         </div>
       </div>
@@ -502,7 +548,10 @@ footer a{
       <div class="product placeholder">
         <div class="product-card">
           <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Print 03</p><p class="product-type">Coming Soon</p></div>
+          <div class="product-info">
+            <p class="product-title"><span class="product-title-text">Print 03</span></p>
+            <p class="product-type">Coming Soon</p>
+          </div>
           <p class="product-note">More works will appear here.</p>
         </div>
       </div>
@@ -510,7 +559,10 @@ footer a{
       <div class="product placeholder">
         <div class="product-card">
           <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Print 04</p><p class="product-type">Coming Soon</p></div>
+          <div class="product-info">
+            <p class="product-title"><span class="product-title-text">Print 04</span></p>
+            <p class="product-type">Coming Soon</p>
+          </div>
           <p class="product-note">More works will appear here.</p>
         </div>
       </div>
@@ -518,7 +570,10 @@ footer a{
       <div class="product placeholder">
         <div class="product-card">
           <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Print 05</p><p class="product-type">Coming Soon</p></div>
+          <div class="product-info">
+            <p class="product-title"><span class="product-title-text">Print 05</span></p>
+            <p class="product-type">Coming Soon</p>
+          </div>
           <p class="product-note">More works will appear here.</p>
         </div>
       </div>
@@ -526,7 +581,10 @@ footer a{
       <div class="product placeholder">
         <div class="product-card">
           <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Print 06</p><p class="product-type">Coming Soon</p></div>
+          <div class="product-info">
+            <p class="product-title"><span class="product-title-text">Print 06</span></p>
+            <p class="product-type">Coming Soon</p>
+          </div>
           <p class="product-note">More works will appear here.</p>
         </div>
       </div>
@@ -534,7 +592,10 @@ footer a{
       <div class="product placeholder">
         <div class="product-card">
           <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Print 07</p><p class="product-type">Coming Soon</p></div>
+          <div class="product-info">
+            <p class="product-title"><span class="product-title-text">Print 07</span></p>
+            <p class="product-type">Coming Soon</p>
+          </div>
           <p class="product-note">More works will appear here.</p>
         </div>
       </div>
@@ -542,7 +603,10 @@ footer a{
       <div class="product placeholder">
         <div class="product-card">
           <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Print 08</p><p class="product-type">Coming Soon</p></div>
+          <div class="product-info">
+            <p class="product-title"><span class="product-title-text">Print 08</span></p>
+            <p class="product-type">Coming Soon</p>
+          </div>
           <p class="product-note">More works will appear here.</p>
         </div>
       </div>
@@ -550,7 +614,10 @@ footer a{
       <div class="product placeholder">
         <div class="product-card">
           <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Print 09</p><p class="product-type">Coming Soon</p></div>
+          <div class="product-info">
+            <p class="product-title"><span class="product-title-text">Print 09</span></p>
+            <p class="product-type">Coming Soon</p>
+          </div>
           <p class="product-note">More works will appear here.</p>
         </div>
       </div>
@@ -585,7 +652,7 @@ footer a{
           </div>
 
           <div class="product-info">
-            <p class="product-title">Black T, ‘Nearly Six Eggs’</p>
+            <p class="product-title"><span class="product-title-text">Black T, ‘Nearly Six Eggs’</span></p>
             <p class="product-price">£28</p>
             <p class="product-type">T-shirt</p>
             <div class="square-wrap">
@@ -620,7 +687,7 @@ footer a{
           </div>
 
           <div class="product-info">
-            <p class="product-title">Black T, ‘Mercury’</p>
+            <p class="product-title"><span class="product-title-text">Black T, ‘Mercury’</span></p>
             <p class="product-price">£28</p>
             <p class="product-type">T-shirt</p>
             <div class="square-wrap">
@@ -637,13 +704,13 @@ footer a{
           <div class="product-image-frame">
             <div class="product-track" data-full-link="layer11.html">
               <div class="product-slide">
-                <img src="images/thumbsamx2.png" alt="Eco White T, Le Samouraï #SaveBritainsRivers">
+                <img src="images/thumbsamx2.png" alt="Eco White T, Le Samouraï">
               </div>
               <div class="product-slide">
-                <img src="images/thumbsamx1.png" alt="Eco White T, Le Samouraï #SaveBritainsRivers">
+                <img src="images/thumbsamx1.png" alt="Eco White T, Le Samouraï">
               </div>
               <div class="product-slide">
-                <img src="images/thumbsamx.png" alt="Eco White T, Le Samouraï #SaveBritainsRivers">
+                <img src="images/thumbsamx.png" alt="Eco White T, Le Samouraï">
               </div>
             </div>
           </div>
@@ -655,7 +722,7 @@ footer a{
           </div>
 
           <div class="product-info">
-            <p class="product-title">Eco White T, ‘Le Samouraï’ #SaveBritainsRivers</p>
+            <p class="product-title"><span class="product-title-text">Eco White T, ‘Le Samouraï’</span></p>
             <p class="product-price">£30</p>
             <p class="product-type">T-shirt</p>
             <div class="square-wrap">
@@ -689,7 +756,7 @@ footer a{
           </div>
 
           <div class="product-info">
-            <p class="product-title">Ambuland Land 2025</p>
+            <p class="product-title"><span class="product-title-text">Ambuland Land 2025</span></p>
             <p class="product-price">£10</p>
             <p class="product-type">Book</p>
             <div class="square-wrap">
@@ -711,7 +778,10 @@ footer a{
       <div class="product placeholder">
         <div class="product-card">
           <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 01</p><p class="product-type">Coming Soon</p></div>
+          <div class="product-info">
+            <p class="product-title"><span class="product-title-text">Original 01</span></p>
+            <p class="product-type">Coming Soon</p>
+          </div>
           <p class="product-note">More works will appear here.</p>
         </div>
       </div>
@@ -719,7 +789,10 @@ footer a{
       <div class="product placeholder">
         <div class="product-card">
           <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 02</p><p class="product-type">Coming Soon</p></div>
+          <div class="product-info">
+            <p class="product-title"><span class="product-title-text">Original 02</span></p>
+            <p class="product-type">Coming Soon</p>
+          </div>
           <p class="product-note">More works will appear here.</p>
         </div>
       </div>
@@ -727,7 +800,10 @@ footer a{
       <div class="product placeholder">
         <div class="product-card">
           <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 03</p><p class="product-type">Coming Soon</p></div>
+          <div class="product-info">
+            <p class="product-title"><span class="product-title-text">Original 03</span></p>
+            <p class="product-type">Coming Soon</p>
+          </div>
           <p class="product-note">More works will appear here.</p>
         </div>
       </div>
@@ -735,7 +811,10 @@ footer a{
       <div class="product placeholder">
         <div class="product-card">
           <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 04</p><p class="product-type">Coming Soon</p></div>
+          <div class="product-info">
+            <p class="product-title"><span class="product-title-text">Original 04</span></p>
+            <p class="product-type">Coming Soon</p>
+          </div>
           <p class="product-note">More works will appear here.</p>
         </div>
       </div>
@@ -743,7 +822,10 @@ footer a{
       <div class="product placeholder">
         <div class="product-card">
           <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 05</p><p class="product-type">Coming Soon</p></div>
+          <div class="product-info">
+            <p class="product-title"><span class="product-title-text">Original 05</span></p>
+            <p class="product-type">Coming Soon</p>
+          </div>
           <p class="product-note">More works will appear here.</p>
         </div>
       </div>
@@ -751,7 +833,10 @@ footer a{
       <div class="product placeholder">
         <div class="product-card">
           <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 06</p><p class="product-type">Coming Soon</p></div>
+          <div class="product-info">
+            <p class="product-title"><span class="product-title-text">Original 06</span></p>
+            <p class="product-type">Coming Soon</p>
+          </div>
           <p class="product-note">More works will appear here.</p>
         </div>
       </div>
@@ -759,7 +844,10 @@ footer a{
       <div class="product placeholder">
         <div class="product-card">
           <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 07</p><p class="product-type">Coming Soon</p></div>
+          <div class="product-info">
+            <p class="product-title"><span class="product-title-text">Original 07</span></p>
+            <p class="product-type">Coming Soon</p>
+          </div>
           <p class="product-note">More works will appear here.</p>
         </div>
       </div>
@@ -767,7 +855,10 @@ footer a{
       <div class="product placeholder">
         <div class="product-card">
           <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 08</p><p class="product-type">Coming Soon</p></div>
+          <div class="product-info">
+            <p class="product-title"><span class="product-title-text">Original 08</span></p>
+            <p class="product-type">Coming Soon</p>
+          </div>
           <p class="product-note">More works will appear here.</p>
         </div>
       </div>
@@ -775,7 +866,10 @@ footer a{
       <div class="product placeholder">
         <div class="product-card">
           <div class="product-image-frame"><div class="placeholder-thumb">Coming Soon</div></div>
-          <div class="product-info"><p class="product-title">Original 09</p><p class="product-type">Coming Soon</p></div>
+          <div class="product-info">
+            <p class="product-title"><span class="product-title-text">Original 09</span></p>
+            <p class="product-type">Coming Soon</p>
+          </div>
           <p class="product-note">More works will appear here.</p>
         </div>
       </div>
@@ -867,6 +961,36 @@ document.querySelectorAll("#printsPanel .product, #apparelPanel .product, #books
     });
   });
 });
+
+/* TITLE OVERFLOW / SCROLL */
+function setupScrollingTitles(){
+  document.querySelectorAll(".product-title").forEach(title => {
+    const text = title.querySelector(".product-title-text");
+    if(!text) return;
+
+    title.classList.remove("is-overflowing", "is-animating");
+    title.style.removeProperty("--scroll-distance");
+    title.style.removeProperty("--scroll-duration");
+    text.style.transform = "translateX(0)";
+
+    const overflow = Math.ceil(text.scrollWidth - title.clientWidth);
+
+    if(overflow > 0){
+      title.classList.add("is-overflowing");
+      title.style.setProperty("--scroll-distance", overflow + "px");
+      title.style.setProperty("--scroll-duration", Math.max(6, overflow / 18) + "s");
+
+      title.addEventListener("mouseenter", () => {
+        title.classList.add("is-animating");
+      });
+
+      title.addEventListener("mouseleave", () => {
+        title.classList.remove("is-animating");
+        text.style.transform = "translateX(0)";
+      });
+    }
+  });
+}
 
 /* HERO SLIDESHOW */
 const imgA = document.getElementById("imgA");
@@ -1131,6 +1255,9 @@ firstPreload.onerror = function(){
 };
 
 firstPreload.src = firstSrc;
+
+window.addEventListener("load", setupScrollingTitles);
+window.addEventListener("resize", setupScrollingTitles);
 </script>
 
 </body>
